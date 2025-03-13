@@ -12,8 +12,18 @@
     <!-- 添加GSAP库 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
     <style>
-        /* 移除原有的关键帧动画定义 */
+        /* 添加Canvas样式 */
+        #dishCanvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            pointer-events: none;
+        }
 
+        /* 移除不再需要的样式 */
         .dish-fly-out {
             position: absolute;
             left: 50%;
@@ -49,7 +59,7 @@
             perspective: 1000;
         }
 
-        /* 添加飞出元素池样式 */
+        /* 移除元素池样式 */
         .dish-pool {
             position: absolute;
             width: 1px;
@@ -79,6 +89,7 @@
                 <div class="w-full h-full flex flex-col items-center justify-between p-6 relative">
                     <!-- 占位区域 -->
                     <div class="flex-1 w-full flex items-center justify-center relative">
+                        <canvas id="dishCanvas"></canvas>
                         <div class="w-52 h-52">
 
                         </div>
@@ -185,80 +196,149 @@
         let selectedDish = null;
         let animationTimer = null;
         let dishImages = {}; // 用于存储预加载的图片
-        let dishElementPool = []; // 元素池
-        const POOL_SIZE = 15; // 元素池大小
+        let imagesLoaded = 0; // 跟踪已加载的图片数量
+        let canvas, ctx; // Canvas相关变量
+        let dishes = []; // 存储当前活跃的菜品动画对象
+        let animationFrameId = null; // 动画帧ID
+        let isRunningAnimation = false; // 标记动画是否正在运行
 
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', () => {
-            // 创建元素池
-            createDishElementPool();
+            // 初始化Canvas
+            initCanvas();
             // 预加载所有图片
             preloadAllImages();
         });
 
-        // 创建元素池
-        function createDishElementPool() {
-            const poolContainer = document.createElement('div');
-            poolContainer.className = 'dish-pool';
-            document.body.appendChild(poolContainer);
+        // 初始化Canvas
+        function initCanvas() {
+            canvas = document.getElementById('dishCanvas');
+            const container = canvas.closest('.flex-1.w-full.flex');
 
-            // 预先创建多个菜品元素
-            for (let i = 0; i < POOL_SIZE; i++) {
-                const dishElement = document.createElement('div');
-                dishElement.className = 'dish-fly-out';
-                dishElement.innerHTML = `
-                    <img class="w-full h-full object-cover">
-                    <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-40 backdrop-filter backdrop-blur-sm p-1 text-center">
-                        <p class="text-sm font-medium text-white"></p>
-                    </div>
-                `;
-                dishElement.style.display = 'none';
-                poolContainer.appendChild(dishElement);
-                dishElementPool.push(dishElement);
-            }
-        }
-
-        // 从元素池获取一个元素
-        function getDishElementFromPool() {
-            // 如果池中有可用元素，则取出使用
-            for (let element of dishElementPool) {
-                if (element.style.display === 'none') {
-                    element.style.display = '';
-                    return element;
-                }
+            // 设置Canvas尺寸与容器匹配
+            function resizeCanvas() {
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
             }
 
-            // 如果没有可用元素，创建一个新的
-            const dishElement = document.createElement('div');
-            dishElement.className = 'dish-fly-out';
-            dishElement.innerHTML = `
-                <img class="w-full h-full object-cover">
-                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-40 backdrop-filter backdrop-blur-sm p-1 text-center">
-                    <p class="text-sm font-medium text-white"></p>
-                </div>
-            `;
-            document.querySelector('.dish-pool').appendChild(dishElement);
-            dishElementPool.push(dishElement);
-            return dishElement;
+            // 初始调整大小
+            resizeCanvas();
+
+            // 窗口大小变化时调整Canvas大小
+            window.addEventListener('resize', resizeCanvas);
+
+            // 获取绘图上下文
+            ctx = canvas.getContext('2d', { alpha: true });
         }
 
-        // 返回元素到池中
-        function returnDishElementToPool(element) {
-            // 重置元素状态
-            element.style.animation = 'none';
-            element.classList.remove('final-dish');
-            element.style.display = 'none';
-            // 将元素移回池容器
-            document.querySelector('.dish-pool').appendChild(element);
-        }
-
-        // 预加载所有图片
+        // 优化的预加载所有图片功能
         function preloadAllImages() {
+            const totalImages = dishList.length;
+
             dishList.forEach(dish => {
+                // 创建缩略图尺寸，减少内存使用
                 const img = new Image();
+                img.crossOrigin = "Anonymous"; // 处理可能的跨域问题
+
+                // 图片加载完成事件
+                img.onload = () => {
+                    // 创建缓存的图像对象
+                    const cachedImg = createCachedDishImage(img, dish.name);
+                    dishImages[dish.name] = {
+                        original: img,
+                        cached: cachedImg
+                    };
+
+                    imagesLoaded++;
+
+                    // 所有图片加载完成后，确保按钮可用
+                    if (imagesLoaded === totalImages) {
+                        const randomButton = document.getElementById('randomButton');
+                        randomButton.disabled = false;
+                    }
+                };
+
+                // 错误处理
+                img.onerror = () => {
+                    console.warn(`无法加载图片: ${dish.name}`);
+                    imagesLoaded++;
+
+                    // 提供默认图像
+                    const defaultImg = new Image();
+                    defaultImg.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="12" cy="12" r="3"></circle></svg>';
+                    dishImages[dish.name] = {
+                        original: defaultImg,
+                        cached: null
+                    };
+
+                    // 所有图片处理完成
+                    if (imagesLoaded === totalImages) {
+                        const randomButton = document.getElementById('randomButton');
+                        randomButton.disabled = false;
+                    }
+                };
+
+                // 开始加载图片
                 img.src = dish.image;
-                dishImages[dish.name] = img;
             });
+        }
+
+        // 创建缓存的菜品图像
+        function createCachedDishImage(img, dishName) {
+            // 创建离屏Canvas用于缓存图像
+            const cacheCanvas = document.createElement('canvas');
+            const size = 120; // 缓存图像的尺寸
+            cacheCanvas.width = size;
+            cacheCanvas.height = size;
+            const cacheCtx = cacheCanvas.getContext('2d');
+
+            // 绘制圆形裁剪区域
+            cacheCtx.beginPath();
+            cacheCtx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+            cacheCtx.closePath();
+            cacheCtx.clip();
+
+            // 计算图像缩放和位置，以适应圆形区域并保持比例
+            const scale = Math.max(size / img.width, size / img.height);
+            const scaledWidth = img.width * scale;
+            const scaledHeight = img.height * scale;
+            const x = (size - scaledWidth) / 2;
+            const y = (size - scaledHeight) / 2;
+
+            // 绘制图像
+            cacheCtx.drawImage(img, x, y, scaledWidth, scaledHeight);
+
+            // 添加圆形边框
+            cacheCtx.strokeStyle = 'rgba(255,255,255,0.8)';
+            cacheCtx.lineWidth = 2;
+            cacheCtx.beginPath();
+            cacheCtx.arc(size / 2, size / 2, size / 2 - 1, 0, Math.PI * 2);
+            cacheCtx.stroke();
+
+            return cacheCanvas;
+        }
+
+        // 创建单个菜品对象 - 优化动画属性
+        function createDish(dish) {
+            return {
+                dish: dish,
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                scale: 0,
+                rotation: 0,
+                opacity: 0,
+                targetX: (Math.random() * 2 - 1) * (canvas.width * 0.4),
+                targetY: (Math.random() * 2 - 1) * (canvas.height * 0.4),
+                targetRotation: (Math.random() * 20 - 10), // 减小旋转角度范围
+                stage: 0, // 0:出现, 1:回弹, 2:飞出
+                startTime: performance.now(),
+                stageTime: performance.now(),
+                // 添加缓动函数参数
+                easing: {
+                    type: Math.floor(Math.random() * 3), // 随机选择缓动类型
+                    power: 2 + Math.random() * 1 // 缓动强度
+                }
+            };
         }
 
         // 添加辅助函数 - 使用requestAnimationFrame模拟setTimeout
@@ -285,229 +365,567 @@
             }
         }
 
-        // 随机选菜按钮点击事件
+        // 缓动函数库
+        const easingFunctions = {
+            // 线性
+            linear: t => t,
+            // 缓入
+            easeIn: (t, power = 2) => Math.pow(t, power),
+            // 缓出
+            easeOut: (t, power = 2) => 1 - Math.pow(1 - t, power),
+            // 缓入缓出
+            easeInOut: (t, power = 2) => {
+                return t < 0.5
+                    ? Math.pow(2 * t, power) / 2
+                    : 1 - Math.pow(2 * (1 - t), power) / 2;
+            }
+        };
+
+        // 应用缓动函数
+        function applyEasing(progress, easingType, power) {
+            switch (easingType) {
+                case 0: return easingFunctions.linear(progress);
+                case 1: return easingFunctions.easeOut(progress, power);
+                case 2: return easingFunctions.easeInOut(progress, power);
+                default: return easingFunctions.easeOut(progress, power);
+            }
+        }
+
+        // Canvas动画循环 - 优化性能
+        function animateCanvas(timestamp) {
+            // 如果动画已经停止，直接返回
+            if (!isRunningAnimation) return;
+
+            // 清除Canvas - 仅在有菜品需要绘制时清除
+            if (dishes.length > 0) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // 处理动画的菜品数量上限
+            const maxProcessPerFrame = 5;
+            const processCount = Math.min(dishes.length, maxProcessPerFrame);
+
+            // 遍历当前帧要处理的菜品
+            for (let i = 0; i < processCount; i++) {
+                const dish = dishes[i];
+                const elapsed = timestamp - dish.stageTime;
+
+                // 根据阶段更新属性
+                switch (dish.stage) {
+                    case 0: // 出现阶段 - 简化并使用缓动
+                        if (elapsed < 300) { // 缩短时间
+                            const progress = elapsed / 300;
+                            const easedProgress = applyEasing(progress, dish.easing.type, dish.easing.power);
+                            dish.scale = 1.2 * easedProgress;
+                            dish.rotation = -3 * easedProgress; // 减小旋转角度
+                            dish.opacity = easedProgress;
+                        } else {
+                            dish.scale = 1.2;
+                            dish.rotation = -3;
+                            dish.opacity = 1;
+                            dish.stage = 1;
+                            dish.stageTime = timestamp;
+                        }
+                        break;
+
+                    case 1: // 回弹阶段 - 简化
+                        if (elapsed < 200) { // 缩短时间
+                            const progress = elapsed / 200;
+                            const easedProgress = applyEasing(progress, dish.easing.type, dish.easing.power);
+                            dish.scale = 1.2 + (1.0 - 1.2) * easedProgress;
+                            dish.rotation = -3 + 3 * easedProgress; // 减小旋转变化
+                        } else {
+                            dish.scale = 1.0;
+                            dish.rotation = 0;
+                            dish.stage = 2;
+                            dish.stageTime = timestamp;
+                        }
+                        break;
+
+                    case 2: // 飞出阶段
+                        if (elapsed < 1500) { // 缩短时间
+                            const progress = elapsed / 1500;
+                            const easedProgress = applyEasing(progress, 1, 1.5); // 始终使用easeOut使动画更流畅
+                            dish.x = canvas.width / 2 + dish.targetX * easedProgress;
+                            dish.y = canvas.height / 2 + dish.targetY * easedProgress;
+                            dish.scale = 1.0 + (0.8 - 1.0) * progress; // 缩小变化范围
+                            dish.rotation = dish.targetRotation * progress; // 简化旋转
+                            dish.opacity = Math.max(0, 1 - progress * 1.2);
+                        } else {
+                            // 完成动画，标记为移除
+                            dish.completed = true;
+                        }
+                        break;
+
+                    case 3: // 最终菜品特效 - 简化
+                        if (elapsed < 400) { // 缩短时间
+                            const progress = elapsed / 400;
+                            const easedProgress = easingFunctions.easeOut(progress, 1.5);
+                            dish.x = dish.x + (canvas.width / 2 - dish.x) * easedProgress;
+                            dish.y = dish.y + (canvas.height / 2 - dish.y) * easedProgress;
+                            dish.scale = dish.scale + (1.3 - dish.scale) * easedProgress;
+                            dish.rotation = dish.rotation * (1 - easedProgress);
+                            dish.opacity = Math.min(1, dish.opacity + easedProgress);
+                        } else if (elapsed < 1200) {
+                            const progress = (elapsed - 400) / 800;
+                            dish.scale = 1.3 + (1.8 - 1.3) * progress;
+                            dish.opacity = 1 - progress;
+                        } else {
+                            // 标记为完成
+                            dish.completed = true;
+                            showFinalResult();
+                        }
+                        break;
+                }
+
+                // 绘制菜品 - 使用优化的方法
+                if (!dish.completed) {
+                    drawDishOptimized(dish);
+                }
+            }
+
+            // 移除已完成的菜品
+            dishes = dishes.filter(dish => !dish.completed);
+
+            // 如果还有活跃菜品，继续动画循环
+            if (dishes.length > 0) {
+                animationFrameId = requestAnimationFrame(animateCanvas);
+            } else {
+                isRunningAnimation = false;
+                animationFrameId = null;
+            }
+        }
+
+        // 更新绘制函数，优化模糊效果
+        function drawDishOptimized(dish) {
+            // 跳过不可见的菜品
+            if (dish.opacity <= 0) return;
+
+            // 保存当前上下文状态
+            ctx.save();
+
+            // 设置模糊效果 - 改进为从模糊到清晰的自然过渡
+            let blurAmount = 0;
+
+            if (dish.stage === 0) {
+                // 刚出现时模糊值从3px减少到1px
+                const elapsed = performance.now() - dish.stageTime;
+                const progress = Math.min(1.0, elapsed / 300);
+                blurAmount = 3 - (3 - 1) * progress;
+            } else if (dish.stage === 1) {
+                // 从1px线性减少到0px (完全清晰)
+                const elapsed = performance.now() - dish.stageTime;
+                const progress = Math.min(1.0, elapsed / 200);
+                blurAmount = 1 - progress;
+            } else if (dish.stage === 2) {
+                // 飞出时保持轻微模糊，从0px到1px
+                const elapsed = performance.now() - dish.stageTime;
+                const progress = Math.min(1.0, elapsed / 1500);
+                blurAmount = progress;
+            } else if (dish.stage === 3) {
+                // 最终菜品特效 - 完全移除模糊效果，保持清晰
+                blurAmount = 0;
+            }
+
+            // 应用模糊效果 - 仅当有模糊时才设置filter
+            if (blurAmount > 0) {
+                ctx.filter = `blur(${blurAmount}px)`;
+            } else {
+                ctx.filter = 'none';
+            }
+
+            // 设置透明度
+            ctx.globalAlpha = dish.opacity;
+
+            // 变换坐标系到菜品中心
+            ctx.translate(dish.x, dish.y);
+            ctx.rotate(dish.rotation * Math.PI / 180);
+            ctx.scale(dish.scale, dish.scale);
+
+            // 使用缓存的图像
+            if (dishImages[dish.dish.name] && dishImages[dish.dish.name].cached) {
+                const cachedImg = dishImages[dish.dish.name].cached;
+                // 居中绘制
+                ctx.drawImage(
+                    cachedImg,
+                    -cachedImg.width / 2,
+                    -cachedImg.height / 2
+                );
+            } else {
+                // 没有缓存图像时使用默认图像
+                const size = 60; // 默认尺寸
+                ctx.fillStyle = '#f0f0f0';
+                ctx.beginPath();
+                ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 添加文本作为备用
+                ctx.fillStyle = '#666';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.font = '14px sans-serif';
+                ctx.fillText(dish.dish.name, 0, 0);
+            }
+
+            // 恢复上下文状态
+            ctx.restore();
+        }
+
+        // 随机选菜按钮点击事件 - 优化最终菜品效果
         function randomFood() {
-            const container = document.querySelector('.flex-1.w-full.flex');
-            document.body.classList.add('gpu-accelerated'); // 添加GPU加速
+            // 如果动画已经在运行，不再重新启动
+            if (isRunningAnimation) return;
 
-            // 清除容器中现有的菜品元素
-            container.querySelectorAll('.dish-fly-out').forEach(el => {
-                returnDishElementToPool(el);
-            });
+            // 添加GPU加速
+            document.body.classList.add('gpu-accelerated');
 
-            let count = 0;
-            let maxCount = 8; // 保持菜品的总数
-            let finalDishElement = null; // 用于跟踪最后一个菜品元素
-            let animationRafId = null; // 存储requestAnimationFrame ID
+            // 清除所有活跃菜品
+            dishes = [];
+            isRunningAnimation = true;
+
+            // 停止当前可能正在进行的动画
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+
+            // 清除之前可能存在的定时器
+            if (animationTimer) {
+                clearRafTimeout(animationTimer);
+                animationTimer = null;
+            }
 
             // 禁用随机按钮，防止用户多次点击
             const randomButton = document.getElementById('randomButton');
             randomButton.disabled = true;
             randomButton.classList.add('opacity-50');
 
-            // 清除之前可能存在的动画
-            if (animationTimer) {
-                clearRafTimeout(animationTimer);
-                animationTimer = null;
-            }
+            // 重新设计：使用一个统一的时间控制器，避免多个计时器造成的不连续性
+            let animationStartTime = performance.now();
+            let animationTotalTime = 4000; // 总动画时间
+            let lastDishTime = animationStartTime;
+            let dishesToAdd = 20; // 总共会生成的菜品数量
+            let addedDishes = 0;
+            let finalDishSet = false; // 标记是否已设置最终菜品
+            let finalDishComplete = false; // 标记最终菜品动画是否完成
 
-            // 显示第一个菜品开始连锁反应
-            showNextDish();
+            // 开始主动画循环，整合菜品生成逻辑
+            function mainAnimationLoop(timestamp) {
+                // 计算动画进度 (0-1)
+                const elapsedTime = timestamp - animationStartTime;
+                const progress = Math.min(1.0, elapsedTime / animationTotalTime);
 
-            // 显示下一个菜品
-            function showNextDish() {
-                count++;
+                // 如果还有菜品需要生成且未超过总时间
+                if (addedDishes < dishesToAdd && progress < 0.95) {
+                    // 计算当前应该的生成间隔
+                    let interval;
 
-                // 随机选择一个菜品
-                const randomIndex = Math.floor(Math.random() * dishList.length);
-                const dish = dishList[randomIndex];
-                selectedDish = dish; // 保存当前展示的菜品
+                    if (progress < 0.3) {
+                        // 开始缓慢加速 (从800ms到150ms)
+                        const startProgress = progress / 0.3;
+                        interval = 800 - (800 - 150) * Math.pow(startProgress, 2.5);
+                    } else if (progress < 0.7) {
+                        // 中间高速阶段 (稳定在80-120ms)
+                        interval = 100;
+                    } else {
+                        // 结束缓慢减速 (从120ms到500ms)
+                        const endProgress = (progress - 0.7) / 0.25;
+                        interval = 100 + (500 - 100) * Math.pow(endProgress, 2);
+                    }
 
-                // 从对象池获取一个菜品元素
-                const dishElement = getDishElementFromPool();
-
-                // 更新内容
-                const imgElement = dishElement.querySelector('img');
-                const nameElement = dishElement.querySelector('p');
-
-                // 使用预加载的图片
-                imgElement.src = dish.image;
-                imgElement.alt = dish.name;
-                nameElement.textContent = dish.name;
-
-                // 随机生成飞出参数
-                const xOffset = (Math.random() * 2 - 1) * 300;
-                const yOffset = (Math.random() * 2 - 1) * 300;
-                const rotation = (Math.random() * 40 - 20);
-
-                // 添加到容器中并设置初始状态
-                container.appendChild(dishElement);
-
-                // 使用GSAP设置初始状态
-                gsap.set(dishElement, {
-                    scale: 0,
-                    rotation: 0,
-                    opacity: 0,
-                    x: 0,
-                    y: 0
-                });
-
-                // 创建飞出动画
-                const tl = gsap.timeline({
-                    onComplete: function () {
-                        if (count < maxCount) {
-                            returnDishElementToPool(dishElement);
+                    // 检查是否应该生成新菜品
+                    if (timestamp - lastDishTime >= interval) {
+                        // 随机选择一个菜品
+                        let randomIndex = Math.floor(Math.random() * dishList.length);
+                        // 避免连续显示相同菜品
+                        if (addedDishes > 0 && dishes.length > 0 && dishes[dishes.length - 1].dish.name === dishList[randomIndex].name) {
+                            randomIndex = (randomIndex + 1) % dishList.length;
                         }
+
+                        const dish = dishList[randomIndex];
+                        selectedDish = dish; // 保存当前展示的菜品
+
+                        // 创建新菜品动画对象
+                        dishes.push(createDish(dish));
+
+                        // 更新状态
+                        lastDishTime = timestamp;
+                        addedDishes++;
                     }
-                });
+                }
 
-                // 第一阶段：放大出现
-                tl.to(dishElement, {
-                    duration: 0.4,
-                    scale: 1.3,
-                    rotation: -5,
-                    opacity: 1,
-                    ease: "power2.inOut"
-                });
-
-                // 第二阶段：轻微回弹
-                tl.to(dishElement, {
-                    duration: 0.3,
-                    scale: 1.1,
-                    rotation: 3,
-                    ease: "power2.inOut"
-                });
-
-                // 第三阶段：飞出
-                tl.to(dishElement, {
-                    duration: 1.8,
-                    x: xOffset,
-                    y: yOffset,
-                    scale: 0.7,
-                    rotation: rotation,
-                    opacity: 0,
-                    ease: "power2.inOut"
-                });
-
-                // 如果不是最后一个菜品，使用1-x²函数决定下一个菜品生成的时间间隔
-                if (count < maxCount) {
-                    // 计算生成间隔时间 (使用1-x²函数)
-                    // 将count从1到maxCount映射到0到1的范围
-                    const progress = (count - 1) / (maxCount - 1);
-                    // 应用1-x²函数，值范围会从接近1变为接近0
-                    const timeMultiplier = 1 - Math.pow(progress, 2);
-                    // 将倍数应用到基础时间上，最小150ms，最大1450ms
-                    const baseTime = 150;
-                    const maxVariation = 500;
-                    const nextDishTime = baseTime + (timeMultiplier * maxVariation);
-
-                    // 使用计算出的时间安排下一个菜品生成
-                    animationRafId = rafTimeout(showNextDish, nextDishTime);
-                } else {
-                    // 如果是最后一个菜品
-                    finalDishElement = dishElement;
-
-                    // 延迟一段时间后执行最后一个菜品的特殊动画
-                    animationRafId = rafTimeout(() => {
-                        // 将非最终菜品元素返回池中（以防万一）
-                        container.querySelectorAll('.dish-fly-out').forEach(el => {
-                            if (el !== finalDishElement) {
-                                returnDishElementToPool(el);
+                // 如果动画完成且还没设置最终菜品，找出最后一个活跃菜品
+                if (progress >= 1 && !finalDishSet) {
+                    // 查找最后添加的菜品作为最终结果
+                    if (dishes.length > 0) {
+                        // 找到最后一个未完成的菜品（可能不是最后添加的）
+                        let lastActiveIndex = -1;
+                        for (let i = dishes.length - 1; i >= 0; i--) {
+                            if (!dishes[i].completed) {
+                                lastActiveIndex = i;
+                                break;
                             }
-                        });
+                        }
 
-                        // 停止当前动画
-                        gsap.killTweensOf(finalDishElement);
+                        if (lastActiveIndex >= 0) {
+                            // 将最后一个活跃菜品设置为最终态
+                            dishes[lastActiveIndex].stage = 3;
+                            dishes[lastActiveIndex].stageTime = timestamp;
+                            finalDishSet = true; // 标记已设置最终菜品
+                        } else {
+                            // 如果没有活跃菜品，创建一个新的最终菜品
+                            const finalDish = createDish(selectedDish);
+                            finalDish.stage = 3;
+                            finalDish.stageTime = timestamp;
+                            dishes.push(finalDish);
+                            finalDishSet = true;
+                        }
+                    } else if (selectedDish) {
+                        // 如果没有菜品但有选中的菜品，创建一个新的
+                        const finalDish = createDish(selectedDish);
+                        finalDish.stage = 3;
+                        finalDish.stageTime = timestamp;
+                        dishes.push(finalDish);
+                        finalDishSet = true;
+                    } else {
+                        // 如果既没有菜品也没有选中的菜品，直接结束
+                        showFinalResult();
+                        finalDishSet = true;
+                        finalDishComplete = true;
+                    }
+                }
 
-                        // 创建最终动画
-                        gsap.timeline({
-                            onComplete: function () {
-                                showFinalResult();
-                            }
-                        })
-                            .to(finalDishElement, {
-                                duration: 0.5,
-                                x: 0,
-                                y: 0,
-                                scale: 1.5,
-                                rotation: 0,
-                                opacity: 1,
-                                boxShadow: "0 0 40px rgba(0, 0, 0, 0.3)",
-                                zIndex: 50,
-                                ease: "power2.inOut"
-                            })
-                            .to(finalDishElement, {
-                                duration: 1,
-                                scale: 2,
-                                opacity: 0,
-                                ease: "power2.inOut"
-                            });
-                    }, 1500);
+                // 调用动画更新函数
+                animateFrame(timestamp);
+
+                // 如果动画仍在进行，继续循环
+                if (isRunningAnimation) {
+                    requestAnimationFrame(mainAnimationLoop);
                 }
             }
 
-            // 显示最终结果
-            function showFinalResult() {
-                // 更新结果页面的菜品信息
-                if (selectedDish) {
-                    const resultImage = document.querySelector('#resultImage');
-                    const resultName = document.querySelector('#resultName');
+            // 分离出来的帧绘制函数
+            function animateFrame(timestamp) {
+                // 如果动画已经停止，直接返回
+                if (!isRunningAnimation) return;
 
-                    resultImage.src = selectedDish.image;
-                    resultImage.alt = selectedDish.name;
-                    resultName.textContent = selectedDish.name;
+                // 清除Canvas - 仅在有菜品需要绘制时清除
+                if (dishes.length > 0) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
                 }
 
-                // 显示结果页面 - 翻转卡片
-                animationTimer = rafTimeout(() => {
-                    // 返回最后的菜品元素到池中
-                    if (finalDishElement) {
-                        returnDishElementToPool(finalDishElement);
-                        finalDishElement = null;
+                // 确保最后一个菜品总是被处理
+                const maxProcessPerFrame = 10; // 增加每帧处理数量
+                let processCount = Math.min(dishes.length, maxProcessPerFrame);
+
+                // 遍历当前帧要处理的菜品
+                for (let i = 0; i < processCount; i++) {
+                    const dish = dishes[i];
+                    const elapsed = timestamp - dish.stageTime;
+
+                    // 根据阶段更新属性
+                    switch (dish.stage) {
+                        case 0: // 出现阶段 - 简化并使用缓动
+                            if (elapsed < 300) { // 缩短时间
+                                const progress = elapsed / 300;
+                                const easedProgress = applyEasing(progress, dish.easing.type, dish.easing.power);
+                                dish.scale = 1.2 * easedProgress;
+                                dish.rotation = -3 * easedProgress; // 减小旋转角度
+                                dish.opacity = easedProgress;
+                            } else {
+                                dish.scale = 1.2;
+                                dish.rotation = -3;
+                                dish.opacity = 1;
+                                dish.stage = 1;
+                                dish.stageTime = timestamp;
+                            }
+                            break;
+
+                        case 1: // 回弹阶段 - 简化
+                            if (elapsed < 200) { // 缩短时间
+                                const progress = elapsed / 200;
+                                const easedProgress = applyEasing(progress, dish.easing.type, dish.easing.power);
+                                dish.scale = 1.2 + (1.0 - 1.2) * easedProgress;
+                                dish.rotation = -3 + 3 * easedProgress; // 减小旋转变化
+                            } else {
+                                dish.scale = 1.0;
+                                dish.rotation = 0;
+                                dish.stage = 2;
+                                dish.stageTime = timestamp;
+                            }
+                            break;
+
+                        case 2: // 飞出阶段
+                            if (elapsed < 1500) { // 缩短时间
+                                const progress = elapsed / 1500;
+                                const easedProgress = applyEasing(progress, 1, 1.5); // 始终使用easeOut使动画更流畅
+                                dish.x = canvas.width / 2 + dish.targetX * easedProgress;
+                                dish.y = canvas.height / 2 + dish.targetY * easedProgress;
+                                dish.scale = 1.0 + (0.8 - 1.0) * progress; // 缩小变化范围
+                                dish.rotation = dish.targetRotation * progress; // 简化旋转
+                                dish.opacity = Math.max(0, 1 - progress * 1.2);
+                            } else {
+                                // 完成动画，标记为移除
+                                dish.completed = true;
+                            }
+                            break;
+
+                        case 3: // 最终菜品特效 - 增强最终效果
+                            if (elapsed < 500) { // 第一阶段：回到中心
+                                const progress = elapsed / 500;
+                                const easedProgress = easingFunctions.easeOut(progress, 1.5);
+                                dish.x = dish.x + (canvas.width / 2 - dish.x) * easedProgress;
+                                dish.y = dish.y + (canvas.height / 2 - dish.y) * easedProgress;
+                                dish.scale = dish.scale + (1.3 - dish.scale) * easedProgress;
+                                dish.rotation = dish.rotation * (1 - easedProgress);
+                                dish.opacity = Math.min(1, dish.opacity + easedProgress);
+                            } else if (elapsed < 1500) { // 第二阶段：放大旋转效果
+                                const progress = (elapsed - 500) / 1000;
+                                // 使用正弦函数创建脉动效果
+                                const pulse = 1.3 + 0.2 * Math.sin(progress * Math.PI * 3);
+                                // 旋转也有轻微的摆动
+                                const rotateWave = 5 * Math.sin(progress * Math.PI * 4);
+
+                                dish.scale = pulse;
+                                dish.rotation = rotateWave;
+                                dish.opacity = 1;
+                            } else if (elapsed < 2500) { // 第三阶段：逐渐停止并淡出
+                                const progress = (elapsed - 1500) / 1000;
+                                // 逐渐减弱振幅
+                                const decayAmp = 0.2 * (1 - progress);
+                                const pulse = 1.3 + decayAmp * Math.sin(progress * Math.PI * 5);
+                                // 旋转也逐渐停止
+                                const rotateWave = 5 * (1 - progress) * Math.sin(progress * Math.PI * 6);
+
+                                dish.scale = pulse;
+                                dish.rotation = rotateWave;
+                                // 最后200ms开始淡出
+                                if (progress > 0.8) {
+                                    dish.opacity = 1 - (progress - 0.8) * 5; // 5倍速淡出
+                                }
+                            } else {
+                                // 标记为完成，但不立即显示结果
+                                dish.completed = true;
+                                finalDishComplete = true;
+
+                                // 确保在动画完成后短暂延迟再显示结果
+                                if (!animationTimer) {
+                                    animationTimer = rafTimeout(() => {
+                                        showFinalResult();
+                                    }, 300);
+                                }
+                            }
+                            break;
                     }
 
-                    document.querySelector('.card-container').classList.add('flipped');
+                    // 绘制菜品 - 使用优化的方法
+                    if (!dish.completed) {
+                        drawDishOptimized(dish);
+                    }
+                }
 
-                    // 动画完成后移除GPU加速类
-                    animationTimer = rafTimeout(() => {
-                        document.body.classList.remove('gpu-accelerated');
-                    }, 500);
+                // 移除已完成的菜品，但保留最终菜品直到动画完全结束
+                dishes = dishes.filter(dish => !dish.completed || (dish.stage === 3 && !finalDishComplete));
 
-                    // 恢复随机按钮
-                    randomButton.disabled = false;
-                    randomButton.classList.remove('opacity-50');
-                }, 300);
+                // 如果没有更多菜品需要显示并且最终动画也完成了，停止动画
+                if (dishes.length === 0 && finalDishComplete) {
+                    isRunningAnimation = false;
+                }
+            }
+
+            // 启动主动画循环
+            requestAnimationFrame(mainAnimationLoop);
+        }
+
+        // 修复结果显示函数，使用正确的卡片翻转效果
+        function showFinalResult() {
+            // 优化DOM操作顺序和减少强制布局
+            requestAnimationFrame(() => {
+                // 1. 先准备结果页数据
+                if (selectedDish) {
+                    // 更新结果页面上的图片和名称
+                    const resultImage = document.getElementById('resultImage');
+                    const resultName = document.getElementById('resultName');
+
+                    // 设置图像
+                    resultImage.src = selectedDish.image;
+                    resultName.textContent = selectedDish.name;
+
+                    // 预加载图像以确保翻转前图像已加载
+                    const img = new Image();
+                    img.onload = () => {
+                        // 图像加载完成后才触发翻转
+                        requestAnimationFrame(triggerFlip);
+                    };
+                    img.onerror = () => {
+                        console.warn("无法加载结果图像");
+                        requestAnimationFrame(triggerFlip);
+                    };
+                    img.src = selectedDish.image;
+                } else {
+                    requestAnimationFrame(triggerFlip);
+                }
+            });
+
+            // 触发卡片翻转效果
+            function triggerFlip() {
+                // 停止Canvas动画
+                isRunningAnimation = false;
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                    animationFrameId = null;
+                }
+
+                // 添加翻转类名
+                const cardContainer = document.querySelector('.card-container');
+                cardContainer.classList.add('flipped');
+
+                // 清空Canvas内容
+                clearCanvas();
+
+                // 恢复随机按钮
+                const randomButton = document.getElementById('randomButton');
+                randomButton.disabled = false;
+                randomButton.classList.remove('opacity-50');
+            }
+
+            // 辅助函数：清空Canvas内容
+            function clearCanvas() {
+                if (ctx) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
             }
         }
 
         // 添加菜品按钮点击事件
         function addFood() {
-            console.log('addFood');
+            window.location.href = 'add-food.html';
         }
 
         // 显示菜品列表按钮点击事件
         function showFoodList() {
-            console.log('showFoodList');
+            window.location.href = 'food-management.html';
         }
 
         // 再选一次按钮点击事件
         function chooseAgain() {
-            // 翻转回主页面
-            document.querySelector('.card-container').classList.remove('flipped');
+            // 翻转回主页
+            const cardContainer = document.querySelector('.card-container');
+            cardContainer.classList.remove('flipped');
 
-            // 清除上一次的选择结果
+            // 清除选中的菜品
             selectedDish = null;
 
-            // 如果存在计时器，清除它
-            if (animationTimer) {
-                clearRafTimeout(animationTimer);
-                animationTimer = null;
-            }
+            // 移除GPU加速类
+            document.body.classList.remove('gpu-accelerated');
         }
 
         // 分享结果按钮点击事件
         function shareResult() {
-            console.log('shareResult');
+            if (selectedDish) {
+                // 简单的分享功能，可以根据需要扩展
+                alert(`分享: 今天我要吃 ${selectedDish.name}！`);
+                // 这里可以添加实际的分享逻辑
+            }
         }
     </script>
 </body>
