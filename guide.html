@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今天吃什么 - 用户引导</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/ripple.css">
+    <link rel="stylesheet" href="css/wheel-animation.css">
+    <style>
+        @keyframes floatAnimation {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .float-animation {
+            animation: floatAnimation 3s ease-in-out infinite;
+        }
+
+        .float-animation-delay-1 {
+            animation-delay: 0.5s;
+        }
+
+        .float-animation-delay-2 {
+            animation-delay: 1s;
+        }
+
+        @keyframes pulseAnimation {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        .pulse-animation {
+            animation: pulseAnimation 3s ease-in-out infinite;
+        }
+
+        @keyframes rotateAnimation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .rotate-slow {
+            animation: rotateAnimation 20s linear infinite;
+        }
+
+        .guide-step {
+            display: none;
+        }
+
+        .guide-step.active {
+            display: flex;
+        }
+
+        /* 动画类 - 仅在切换时应用 */
+        .slide-in-right {
+            animation: slideInRight 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        }
+
+        .slide-out-left {
+            animation: slideOutLeft 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutLeft {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+        }
+
+        /* 新增动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes popUp {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* 添加过渡动画 - 引导页面到首页 */
+        @keyframes flyUpOut {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        .fly-up-out {
+            animation: flyUpOut 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        /* 创建一个首页预览的容器 */
+        .home-preview {
+            position: fixed;
+            top: 100vh;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: -1;
+            transition: top 0s linear 0.8s;
+            /* 动画完成后调整位置 */
+            background-color: rgba(238, 242, 255, 0.8);
+        }
+
+        .home-preview.active {
+            z-index: 50;
+        }
+
+        @keyframes flyUpIn {
+            0% {
+                transform: translateY(100vh) scale(0.8);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .fly-up-in {
+            animation: flyUpIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 0.1s;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 min-h-screen font-sans">
+    <!-- 设备模拟框架 -->
+    <div class="flex justify-center items-center p-8 h-screen main-container">
+        <!-- 用户引导页面设备 -->
+        <div
+            class="w-80 h-[600px] bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative device-container">
+            <!-- 添加一个容器来包含所有步骤，便于3D变换 -->
+            <div class="steps-container">
+                <!-- 步骤1: 介绍主功能 -->
+                <div id="step1"
+                    class="guide-step active h-full bg-gradient-to-br from-indigo-50 via-purple-100 to-pink-100 flex flex-col items-center justify-between p-6 relative overflow-hidden">
+                    <!-- 顶部跳过按钮 -->
+                    <div class="self-end">
+                        <button
+                            class="py-1.5 px-3 bg-white bg-opacity-50 backdrop-filter backdrop-blur-sm border border-white border-opacity-30 rounded-full text-sm text-gray-700 ripple-btn"
+                            onclick="skipGuide()">
+                            跳过
+                        </button>
+                    </div>
+
+                    <!-- 中间插图区域 -->
+                    <div class="flex-1 flex flex-col items-center justify-center relative w-full">
+                        <!-- 装饰图形 -->
+                        <div class="absolute inset-0 flex items-center justify-center opacity-20">
+                            <div class="w-48 h-48 rounded-full bg-purple-500 absolute blur-3xl"></div>
+                            <div class="w-40 h-40 rounded-full bg-pink-500 absolute -right-10 blur-3xl"></div>
+                        </div>
+
+                        <!-- 引导内容：图示 -->
+                        <div class="relative z-10 mb-6 h-60 flex items-center justify-center">
+                            <!-- 浮动动画的食物图片 -->
+                            <div class="w-28 h-28 absolute top-0 left-10 float-animation">
+                                <div
+                                    class="w-full h-full rounded-full bg-white bg-opacity-70 backdrop-filter backdrop-blur-md shadow-lg flex items-center justify-center">
+                                    <div class="w-20 h-20 rounded-full overflow-hidden">
+                                        <img src="https://images.unsplash.com/photo-1512058556646-c4da40fba323"
+                                            class="w-full h-full object-cover" alt="汉堡">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-24 h-24 absolute top-10 right-4 float-animation float-animation-delay-1">
+                                <div
+                                    class="w-full h-full rounded-full bg-white bg-opacity-70 backdrop-filter backdrop-blur-md shadow-lg flex items-center justify-center">
+                                    <div class="w-16 h-16 rounded-full overflow-hidden">
+                                        <img src="https://images.unsplash.com/photo-1585032226651-759b368d7246"
+                                            class="w-full h-full object-cover" alt="麻婆豆腐">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-20 h-20 absolute bottom-0 left-16 float-animation float-animation-delay-2">
+                                <div
+                                    class="w-full h-full rounded-full bg-white bg-opacity-70 backdrop-filter backdrop-blur-md shadow-lg flex items-center justify-center">
+                                    <div class="w-14 h-14 rounded-full overflow-hidden">
+                                        <img src="https://images.unsplash.com/photo-1563379926898-05f4575a45d8"
+                                            class="w-full h-full object-cover" alt="水煮鱼">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 引导内容：文字说明 -->
+                        <div class="text-center z-10">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-2">不知道吃什么？</h2>
+                            <p class="text-gray-600 mb-1 text-sm">点击随机按钮，让我来帮你决定！</p>
+                            <p class="text-gray-600 text-sm">精美动画，高效决策，不再纠结。</p>
+                        </div>
+                    </div>
+
+                    <!-- 底部控制区域 -->
+                    <div class="w-full mt-6">
+                        <!-- 分页指示器 -->
+                        <div class="flex justify-center mb-4">
+                            <div class="w-2.5 h-2.5 rounded-full bg-purple-500 mx-1"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-gray-300 mx-1"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-gray-300 mx-1"></div>
+                        </div>
+
+                        <!-- 按钮 -->
+                        <button
+                            class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg transform transition hover:scale-105 active:scale-95 ripple-btn"
+                            onclick="nextStep(2)">
+                            下一步
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 步骤2: 菜品管理功能 -->
+                <div id="step2"
+                    class="guide-step h-full bg-gradient-to-br from-indigo-50 via-purple-100 to-pink-100 flex flex-col items-center justify-between p-6 relative overflow-hidden">
+                    <!-- 顶部跳过按钮 -->
+                    <div class="self-end">
+                        <button
+                            class="py-1.5 px-3 bg-white bg-opacity-50 backdrop-filter backdrop-blur-sm border border-white border-opacity-30 rounded-full text-sm text-gray-700 ripple-btn"
+                            onclick="skipGuide()">
+                            跳过
+                        </button>
+                    </div>
+
+                    <!-- 中间插图区域 -->
+                    <div class="flex-1 flex flex-col items-center justify-center relative w-full">
+                        <!-- 装饰图形 -->
+                        <div class="absolute inset-0 flex items-center justify-center opacity-20">
+                            <div class="w-48 h-48 rounded-full bg-indigo-500 absolute blur-3xl"></div>
+                            <div class="w-40 h-40 rounded-full bg-purple-500 absolute -left-10 blur-3xl"></div>
+                        </div>
+
+                        <!-- 引导内容：图示 -->
+                        <div class="relative z-10 mb-6 flex flex-col items-center">
+                            <!-- 自定义菜品管理插图 -->
+                            <div
+                                class="w-64 h-52 bg-white bg-opacity-50 backdrop-filter backdrop-blur-md rounded-2xl shadow-lg p-4 mb-6 transform rotate-3 float-animation">
+                                <div class="w-full h-full flex flex-col">
+                                    <div class="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" class="mr-1 text-purple-500">
+                                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                                        </svg>
+                                        我的菜品列表
+                                    </div>
+
+                                    <!-- 菜品列表示例 -->
+                                    <div class="space-y-2 flex-1">
+                                        <div class="flex items-center bg-white bg-opacity-70 rounded-lg p-1.5 transform transition-all hover:scale-105"
+                                            style="animation: fadeIn 0.5s ease-out forwards; opacity: 0; animation-delay: 0.2s;">
+                                            <div class="w-8 h-8 rounded-lg overflow-hidden mr-2 pulse-animation"
+                                                style="animation-delay: 0.5s;">
+                                                <img src="https://images.unsplash.com/photo-1555126634-323283e090fa"
+                                                    class="w-full h-full object-cover" alt="菜品">
+                                            </div>
+                                            <span class="text-xs font-medium text-gray-700">红烧肉</span>
+                                        </div>
+                                        <div class="flex items-center bg-white bg-opacity-70 rounded-lg p-1.5 transform transition-all hover:scale-105"
+                                            style="animation: fadeIn 0.5s ease-out forwards; opacity: 0; animation-delay: 0.4s;">
+                                            <div class="w-8 h-8 rounded-lg overflow-hidden mr-2 pulse-animation"
+                                                style="animation-delay: 1s;">
+                                                <img src="https://images.unsplash.com/photo-1585032226651-759b368d7246"
+                                                    class="w-full h-full object-cover" alt="菜品">
+                                            </div>
+                                            <span class="text-xs font-medium text-gray-700">麻婆豆腐</span>
+                                        </div>
+                                        <div class="flex items-center bg-white bg-opacity-70 rounded-lg p-1.5 transform transition-all hover:scale-105"
+                                            style="animation: fadeIn 0.5s ease-out forwards; opacity: 0; animation-delay: 0.6s;">
+                                            <div class="w-8 h-8 rounded-lg overflow-hidden mr-2 pulse-animation"
+                                                style="animation-delay: 1.5s;">
+                                                <img src="https://images.unsplash.com/photo-1512058556646-c4da40fba323"
+                                                    class="w-full h-full object-cover" alt="菜品">
+                                            </div>
+                                            <span class="text-xs font-medium text-gray-700">汉堡</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- 添加按钮示意 -->
+                                    <div class="mt-2">
+                                        <div
+                                            class="py-1 px-2 bg-purple-100 rounded-md text-purple-600 text-xs font-medium inline-flex items-center transform transition-all hover:scale-105 pulse-animation">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round" class="mr-1">
+                                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            </svg>
+                                            添加菜品
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 添加漂浮的食物图标背景 -->
+                            <div class="absolute -right-5 top-10 w-16 h-16 opacity-50 float-animation"
+                                style="animation-delay: 0.7s;">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1" class="w-full h-full text-purple-300">
+                                    <path d="M15 11h.01M11 15h.01M16 16h.01M10 10h.01" />
+                                    <path
+                                        d="M19 9c0-1.3-2.5-1.5-3.5-1.5-1.2 0-3.6.2-4 1.5-2.6.2-4.5 1.3-4.5 3.5 0 .7.2.9.9 1.5M20 13c.2 0 .4-.8.4-1.5 0-1.3-.9-2.5-2.4-2.5" />
+                                </svg>
+                            </div>
+                            <div class="absolute -left-4 bottom-20 w-12 h-12 opacity-40 float-animation"
+                                style="animation-delay: 1.2s;">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1" class="w-full h-full text-indigo-400">
+                                    <path d="M11 12H3M4 8h15M17 16H5" />
+                                </svg>
+                            </div>
+                            <div class="absolute right-10 -bottom-5 w-14 h-14 opacity-45 float-animation"
+                                style="animation-delay: 0.2s;">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1" class="w-full h-full text-pink-300">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                                    <line x1="9" y1="9" x2="9.01" y2="9" />
+                                    <line x1="15" y1="9" x2="15.01" y2="9" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- 引导内容：文字说明 -->
+                        <div class="text-center z-10">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-2"
+                                style="animation: popUp 0.5s ease-out forwards;">自定义你的菜单</h2>
+                            <p class="text-gray-600 mb-1 text-sm"
+                                style="animation: slideUp 0.5s ease-out forwards; animation-delay: 0.2s; opacity: 0;">
+                                添加你喜欢的菜品到列表中</p>
+                            <p class="text-gray-600 text-sm"
+                                style="animation: slideUp 0.5s ease-out forwards; animation-delay: 0.4s; opacity: 0;">
+                                再也不用担心没有选择范围</p>
+                        </div>
+                    </div>
+
+                    <!-- 底部控制区域 -->
+                    <div class="w-full mt-6">
+                        <!-- 分页指示器 -->
+                        <div class="flex justify-center mb-4">
+                            <div class="w-2.5 h-2.5 rounded-full bg-gray-300 mx-1"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-purple-500 mx-1"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-gray-300 mx-1"></div>
+                        </div>
+
+                        <!-- 按钮 -->
+                        <button
+                            class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg transform transition hover:scale-105 active:scale-95 ripple-btn"
+                            onclick="nextStep(3)">
+                            下一步
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 步骤3: 准备完成 -->
+                <div id="step3"
+                    class="guide-step h-full bg-gradient-to-br from-indigo-50 via-purple-100 to-pink-100 flex flex-col items-center justify-between p-6 relative overflow-hidden">
+                    <!-- 中间插图区域 -->
+                    <div class="flex-1 flex flex-col items-center justify-center relative w-full">
+                        <!-- 装饰图形 -->
+                        <div class="absolute inset-0 pointer-events-none">
+                            <div class="w-full h-full rotate-slow opacity-20">
+                                <div class="w-48 h-48 rounded-full bg-purple-600 absolute top-10 -left-20 blur-2xl">
+                                </div>
+                                <div class="w-48 h-48 rounded-full bg-pink-500 absolute bottom-10 -right-20 blur-2xl">
+                                </div>
+                                <div class="w-32 h-32 rounded-full bg-indigo-500 absolute top-40 right-10 blur-2xl">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 引导内容：成功准备好的图示 -->
+                        <div class="relative z-10 mb-6 flex flex-col items-center">
+                            <!-- 主要视觉元素：一个大的成功图标或应用logo -->
+                            <div
+                                class="w-36 h-36 rounded-full bg-white bg-opacity-60 backdrop-filter backdrop-blur-md flex items-center justify-center shadow-xl mb-8 pulse-animation">
+                                <div
+                                    class="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                                    <img src="https://unpkg.com/lucide-static@latest/icons/utensils.svg"
+                                        class="w-12 h-12 text-white">
+                                </div>
+                            </div>
+
+                            <!-- 动画元素：三个小圆点围绕主元素旋转 -->
+                            <div
+                                class="absolute w-48 h-48 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rotate-slow">
+                                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                    <div
+                                        class="w-6 h-6 rounded-full bg-gradient-to-r from-pink-400 to-purple-500 shadow-md float-animation">
+                                    </div>
+                                </div>
+                                <div class="absolute bottom-0 left-0 transform -translate-x-1/2 translate-y-1/2">
+                                    <div class="w-6 h-6 rounded-full bg-gradient-to-r from-indigo-400 to-blue-500 shadow-md float-animation"
+                                        style="animation-delay: 0.5s"></div>
+                                </div>
+                                <div class="absolute bottom-0 right-0 transform translate-x-1/2 translate-y-1/2">
+                                    <div class="w-6 h-6 rounded-full bg-gradient-to-r from-green-400 to-teal-500 shadow-md float-animation"
+                                        style="animation-delay: 1s"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 引导内容：文字说明 -->
+                        <div class="text-center z-10 max-w-xs">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-3">一切准备就绪！</h2>
+                            <p class="text-gray-600 mb-3 text-sm">您的美食决策助手已经准备好了</p>
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center justify-start">
+                                    <div
+                                        class="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mr-2">
+                                        <img src="https://unpkg.com/lucide-static@latest/icons/check.svg"
+                                            class="w-3 h-3 text-white">
+                                    </div>
+                                    <p class="text-sm text-gray-600">随机选择喜爱的美食</p>
+                                </div>
+                                <div class="flex items-center justify-start">
+                                    <div
+                                        class="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mr-2">
+                                        <img src="https://unpkg.com/lucide-static@latest/icons/check.svg"
+                                            class="w-3 h-3 text-white">
+                                    </div>
+                                    <p class="text-sm text-gray-600">自定义个人菜品库</p>
+                                </div>
+                                <div class="flex items-center justify-start">
+                                    <div
+                                        class="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mr-2">
+                                        <img src="https://unpkg.com/lucide-static@latest/icons/check.svg"
+                                            class="w-3 h-3 text-white">
+                                    </div>
+                                    <p class="text-sm text-gray-600">精美动画与统计数据</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 底部控制区域 -->
+                    <div class="w-full mt-4">
+                        <!-- 分页指示器 -->
+                        <div class="flex justify-center mb-4">
+                            <div class="w-2.5 h-2.5 rounded-full bg-gray-300 mx-1"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-gray-300 mx-1"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-purple-500 mx-1"></div>
+                        </div>
+
+                        <!-- 按钮 -->
+                        <button
+                            class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg transform transition hover:scale-105 active:scale-95 flex items-center justify-center ripple-btn"
+                            onclick="startApp()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="mr-2 text-white">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                                <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                                <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                            </svg>
+                            开始使用
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 首页预览容器 -->
+    <div class="home-preview">
+        <div class="w-80 h-[600px] bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative">
+            <div
+                class="h-full bg-gradient-to-br from-indigo-50 via-purple-100 to-pink-50 flex flex-col items-center justify-center p-6">
+                <div
+                    class="w-24 h-24 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-8 pulse-animation">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+                        stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="feather feather-home">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">欢迎来到首页!</h2>
+                <p class="text-gray-600 text-center">您的美食决策助手已准备好为您服务</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/ripple.js"></script>
+    <script src="js/wheel-animation.js"></script>
+    <script>
+        // 存储当前步骤
+        let currentStep = 1;
+
+        // 修改后的步骤切换功能 - 使用全局拨轮动画
+        function nextStep(step) {
+            if (currentStep === step) return;
+
+            // 获取设备容器
+            const deviceContainer = document.querySelector('.device-container');
+            // 获取当前步骤元素和目标步骤元素
+            const currentEl = document.getElementById('step' + currentStep);
+            const nextEl = document.getElementById('step' + step);
+
+            // 使用拨轮动画
+            wheelAnimation(deviceContainer, currentEl, nextEl, () => {
+                // 更新当前步骤
+                currentStep = step;
+            });
+        }
+
+        // 跳过引导
+        function skipGuide() {
+            startApp();
+        }
+
+        // 开始使用 - 添加转场动画
+        function startApp() {
+            // 获取主容器和首页预览
+            const mainContainer = document.querySelector('.main-container');
+            const deviceContainer = document.querySelector('.device-container');
+            const homePreview = document.querySelector('.home-preview');
+
+            // 激活首页预览
+            homePreview.classList.add('active');
+
+            // 添加飞出动画
+            deviceContainer.classList.add('fly-up-out');
+
+            // 为首页预览添加飞入动画
+            setTimeout(() => {
+                const homePreviewDevice = homePreview.querySelector('div');
+                homePreviewDevice.classList.add('fly-up-in');
+
+                // 动画完成后跳转
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 600);
+            }, 100);
+        }
+
+    </script>
+</body>
+
+</html>

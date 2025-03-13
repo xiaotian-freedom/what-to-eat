@@ -1,0 +1,30 @@
+/* 翻转卡片相关样式 */
+.device-container {
+    perspective: 1500px;
+}
+
+.card-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 1s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-face {
+    position: absolute;
+    width: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+#resultPage {
+    transform: rotateY(180deg);
+}
+
+.card-container.flipped {
+    transform: rotateY(180deg);
+}

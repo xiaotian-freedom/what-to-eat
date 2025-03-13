@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今天吃什么 - 菜品管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 min-h-screen font-sans">
+    <!-- 设备模拟框架 -->
+    <div class="flex justify-center items-center p-8 h-screen">
+        <!-- 菜品管理页面模拟设备 -->
+        <div class="w-80 h-[600px] bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative mx-4">
+            <!-- 顶部状态栏 -->
+            <div class="bg-white bg-opacity-70 backdrop-filter backdrop-blur-lg p-4 flex justify-between items-center border-b border-gray-100">
+                <div class="flex items-center">
+                    <a href="#" class="text-gray-600 mr-2">
+                        <img src="https://unpkg.com/lucide-static@latest/icons/chevron-left.svg" class="w-5 h-5">
+                    </a>
+                    <div class="text-lg font-bold text-gray-800">菜品管理</div>
+                </div>
+                <a href="#" class="text-gray-600">
+                    <img src="https://unpkg.com/lucide-static@latest/icons/plus.svg" class="w-5 h-5">
+                </a>
+            </div>
+            
+            <!-- 内容区域 - 菜品列表 -->
+            <div class="h-full bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4 overflow-y-auto">
+                <!-- 分类标签 -->
+                <div class="flex overflow-x-auto py-2 mb-4 scrollbar-hide">
+                    <div class="px-4 py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-sm font-medium mr-2 shadow-sm whitespace-nowrap">
+                        全部菜品 (12)
+                    </div>
+                    <div class="px-4 py-1.5 bg-white bg-opacity-50 backdrop-filter backdrop-blur-sm border border-white border-opacity-30 rounded-full text-sm font-medium mr-2 text-gray-700 whitespace-nowrap">
+                        家常菜 (5)
+                    </div>
+                    <div class="px-4 py-1.5 bg-white bg-opacity-50 backdrop-filter backdrop-blur-sm border border-white border-opacity-30 rounded-full text-sm font-medium mr-2 text-gray-700 whitespace-nowrap">
+                        快餐 (3)
+                    </div>
+                    <div class="px-4 py-1.5 bg-white bg-opacity-50 backdrop-filter backdrop-blur-sm border border-white border-opacity-30 rounded-full text-sm font-medium mr-2 text-gray-700 whitespace-nowrap">
+                        小吃 (4)
+                    </div>
+                </div>
+                
+                <!-- 菜品列表 -->
+                <div class="space-y-3">
+                    <!-- 菜品项 1 -->
+                    <div class="bg-white bg-opacity-60 backdrop-filter backdrop-blur-lg rounded-xl p-3 flex items-center shadow-sm">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-3 shadow">
+                            <img src="https://images.unsplash.com/photo-1555126634-323283e090fa" class="w-full h-full object-cover" alt="红烧肉">
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-800">红烧肉</h3>
+                            <p class="text-xs text-gray-500">家常菜</p>
+                        </div>
+                        <button class="p-1.5 rounded-full bg-white bg-opacity-70 backdrop-filter backdrop-blur-sm border border-gray-100">
+                            <img src="https://unpkg.com/lucide-static@latest/icons/trash-2.svg" class="w-4 h-4 text-red-500">
+                        </button>
+                    </div>
+                    
+                    <!-- 菜品项 2 -->
+                    <div class="bg-white bg-opacity-60 backdrop-filter backdrop-blur-lg rounded-xl p-3 flex items-center shadow-sm">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-3 shadow">
+                            <img src="https://images.unsplash.com/photo-1585032226651-759b368d7246" class="w-full h-full object-cover" alt="麻婆豆腐">
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-800">麻婆豆腐</h3>
+                            <p class="text-xs text-gray-500">家常菜</p>
+                        </div>
+                        <button class="p-1.5 rounded-full bg-white bg-opacity-70 backdrop-filter backdrop-blur-sm border border-gray-100">
+                            <img src="https://unpkg.com/lucide-static@latest/icons/trash-2.svg" class="w-4 h-4 text-red-500">
+                        </button>
+                    </div>
+                    
+                    <!-- 菜品项 3 -->
+                    <div class="bg-white bg-opacity-60 backdrop-filter backdrop-blur-lg rounded-xl p-3 flex items-center shadow-sm">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-3 shadow">
+                            <img src="https://images.unsplash.com/photo-1563379926898-05f4575a45d8" class="w-full h-full object-cover" alt="水煮鱼">
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-800">水煮鱼</h3>
+                            <p class="text-xs text-gray-500">家常菜</p>
+                        </div>
+                        <button class="p-1.5 rounded-full bg-white bg-opacity-70 backdrop-filter backdrop-blur-sm border border-gray-100">
+                            <img src="https://unpkg.com/lucide-static@latest/icons/trash-2.svg" class="w-4 h-4 text-red-500">
+                        </button>
+                    </div>
+                    
+                    <!-- 菜品项 4 -->
+                    <div class="bg-white bg-opacity-60 backdrop-filter backdrop-blur-lg rounded-xl p-3 flex items-center shadow-sm">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-3 shadow">
+                            <img src="https://images.unsplash.com/photo-1512058556646-c4da40fba323" class="w-full h-full object-cover" alt="汉堡">
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-800">汉堡</h3>
+                            <p class="text-xs text-gray-500">快餐</p>
+                        </div>
+                        <button class="p-1.5 rounded-full bg-white bg-opacity-70 backdrop-filter backdrop-blur-sm border border-gray-100">
+                            <img src="https://unpkg.com/lucide-static@latest/icons/trash-2.svg" class="w-4 h-4 text-red-500">
+                        </button>
+                    </div>
+                    
+                    <!-- 菜品项 5 -->
+                    <div class="bg-white bg-opacity-60 backdrop-filter backdrop-blur-lg rounded-xl p-3 flex items-center shadow-sm">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-3 shadow">
+                            <img src="https://images.unsplash.com/photo-1573821663912-569905455b1c" class="w-full h-full object-cover" alt="披萨">
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-800">披萨</h3>
+                            <p class="text-xs text-gray-500">快餐</p>
+                        </div>
+                        <button class="p-1.5 rounded-full bg-white bg-opacity-70 backdrop-filter backdrop-blur-sm border border-gray-100">
+                            <img src="https://unpkg.com/lucide-static@latest/icons/trash-2.svg" class="w-4 h-4 text-red-500">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 添加菜品页面模拟设备 -->
+        <div class="w-80 h-[600px] bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative mx-4">
+            <!-- 顶部状态栏 -->
+            <div class="bg-white bg-opacity-70 backdrop-filter backdrop-blur-lg p-4 flex justify-between items-center border-b border-gray-100">
+                <div class="flex items-center">
+                    <a href="#" class="text-gray-600 mr-2">
+                        <img src="https://unpkg.com/lucide-static@latest/icons/chevron-left.svg" class="w-5 h-5">
+                    </a>
+                    <div class="text-lg font-bold text-gray-800">添加菜品</div>
+                </div>
+            </div>
+            
+            <!-- 内容区域 - 添加菜品表单 -->
+            <div class="h-full bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4">
+                <!-- 上传图片区域 -->
+                <div class="mb-6 flex justify-center">
+                    <div class="w-40 h-40 rounded-full bg-white bg-opacity-50 backdrop-filter backdrop-blur-sm border border-white border-opacity-30 flex flex-col items-center justify-center shadow-lg relative">
+                        <div class="absolute inset-0 rounded-full overflow-hidden flex items-center justify-center">
+                            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c" class="w-full h-full object-cover opacity-70" alt="菜品示例">
+                        </div>
+                        <div class="absolute inset-0 rounded-full flex items-center justify-center bg-black bg-opacity-20 backdrop-filter backdrop-blur-sm">
+                            <div class="p-2 rounded-full bg-white bg-opacity-70">
+                                <img src="https://unpkg.com/lucide-static@latest/icons/camera.svg" class="w-6 h-6 text-gray-700">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 表单输入区域 -->
+                <div class="space-y-4">
+                    <!-- 菜品名称 -->
+                    <div class="space-y-1">
+                        <label class="text-sm font-medium text-gray-700 block">菜品名称</label>
+                        <input type="text" placeholder="输入菜品名称" class="w-full px-4 py-3 rounded-xl bg-white bg-opacity-70 backdrop-filter backdrop-blur-sm border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-sm">
+                    </div>
+                    
+                    <!-- 菜品分类 -->
+                    <div class="space-y-1">
+                        <label class="text-sm font-medium text-gray-700 block">菜品分类</label>
+                        <div class="relative">
+                            <select class="w-full px-4 py-3 rounded-xl bg-white bg-opacity-70 backdrop-filter backdrop-blur-sm border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-sm appearance-none pr-10">
+                                <option>家常菜</option>
+                                <option>快餐</option>
+                                <option>小吃</option>
+                                <option>甜点</option>
+                                <option>饮品</option>
+                            </select>
+                            <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                <img src="https://unpkg.com/lucide-static@latest/icons/chevron-down.svg" class="w-5 h-5 text-gray-500">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 菜品描述 -->
+                    <div class="space-y-1">
+                        <label class="text-sm font-medium text-gray-700 block">菜品描述 (可选)</label>
+                        <textarea placeholder="简单描述一下这道菜..." rows="3" class="w-full px-4 py-3 rounded-xl bg-white bg-opacity-70 backdrop-filter backdrop-blur-sm border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-sm"></textarea>
+                    </div>
+                </div>
+                
+                <!-- 底部按钮区域 -->
+                <div class="absolute bottom-8 left-4 right-4">
+                    <button class="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg transform transition hover:scale-105 active:scale-95 flex items-center justify-center">
+                        <img src="https://unpkg.com/lucide-static@latest/icons/check.svg" class="w-5 h-5 mr-2">
+                        确认添加
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

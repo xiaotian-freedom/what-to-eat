@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今天吃什么 - 主页</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/ripple.css">
+    <link rel="stylesheet" href="css/wheel-animation.css">
+    <link rel="stylesheet" href="css/card-flip.css">
+    <!-- 添加GSAP库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <style>
+        /* 移除原有的关键帧动画定义 */
+
+        .dish-fly-out {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            border-radius: 50%;
+            overflow: hidden;
+            width: 120px;
+            height: 120px;
+            margin-left: -60px;
+            margin-top: -60px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+            contain: layout style paint;
+        }
+
+        /* 添加GPU加速的类 */
+        .gpu-accelerated {
+            -webkit-transform: translateZ(0);
+            -moz-transform: translateZ(0);
+            -ms-transform: translateZ(0);
+            -o-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            -moz-backface-visibility: hidden;
+            -ms-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-perspective: 1000;
+            -moz-perspective: 1000;
+            -ms-perspective: 1000;
+            perspective: 1000;
+        }
+
+        /* 添加飞出元素池样式 */
+        .dish-pool {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 min-h-screen font-sans">
+    <!-- 设备模拟框架 -->
+    <div class="flex justify-center items-center p-4 w-screen h-screen device-container">
+        <!-- 卡片容器 -->
+        <div class="card-container">
+            <!-- 主页面模拟设备 -->
+            <div id="homePage"
+                class="card-face w-full h-[600px] mx-3 bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative">
+                <!-- 顶部状态栏 -->
+                <div
+                    class="bg-white bg-opacity-70 backdrop-filter backdrop-blur-lg p-4 flex justify-center items-center border-b border-gray-100">
+                    <div class="text-lg font-bold text-gray-800">今天吃什么</div>
+                </div>
+
+                <!-- 内容区域 -->
+                <div class="w-full h-full flex flex-col items-center justify-between p-6 relative">
+                    <!-- 占位区域 -->
+                    <div class="flex-1 w-full flex items-center justify-center relative">
+                        <div class="w-52 h-52">
+
+                        </div>
+                    </div>
+
+                    <!-- 底部按钮区域 -->
+                    <div class="mt-6 w-full">
+                        <button id="randomButton"
+                            class="w-full py-4 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg transform transition flex items-center justify-center ripple-btn"
+                            onclick="randomFood()">
+                            <img src="https://unpkg.com/lucide-static@latest/icons/shuffle.svg"
+                                class="w-5 h-5 mr-2 text-white filter invert">
+                            随机选菜
+                        </button>
+
+                        <div class="flex justify-between mt-4">
+                            <button onclick="addFood()"
+                                class="w-12 h-12 rounded-full bg-purple-500 backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn">
+                                <img src="https://unpkg.com/lucide-static@latest/icons/plus.svg"
+                                    class="w-5 h-5 filter invert">
+                            </button>
+                            <button onclick="showFoodList()"
+                                class="w-12 h-12 rounded-full bg-pink-500 backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn">
+                                <img src="https://unpkg.com/lucide-static@latest/icons/list.svg"
+                                    class="w-5 h-5 filter invert">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 选择结果展示页面模拟设备 -->
+            <div id="resultPage"
+                class="card-face w-full h-[600px] bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative mx-4">
+                <!-- 顶部状态栏 -->
+                <div
+                    class="bg-white bg-opacity-70 backdrop-filter backdrop-blur-lg p-4 flex justify-center items-center border-b border-gray-100">
+                    <div class="text-lg font-bold text-gray-800">选择结果</div>
+                </div>
+
+                <!-- 内容区域 -->
+                <div
+                    class="h-full flex flex-col items-center p-6 relative bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+                    <!-- 选中结果展示 -->
+                    <div
+                        class="w-64 h-64 rounded-full bg-white backdrop-filter backdrop-blur-lg shadow-xl flex flex-col items-center justify-center mt-3">
+                        <div class="w-full h-full rounded-full overflow-hidden shadow-lg relative">
+                            <img id="resultImage" class="w-full h-full object-cover">
+                            <div
+                                class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-40 backdrop-filter backdrop-blur-sm p-2 text-center">
+                                <p id="resultName" class="text-lg font-medium text-white"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 底部按钮区域 -->
+                    <div class="flex justify-between mt-4 w-full">
+                        <button onclick="chooseAgain()"
+                            class="w-12 h-12 rounded-full bg-purple-500 backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn">
+                            <img src="https://unpkg.com/lucide-static@latest/icons/shuffle.svg"
+                                class="w-5 h-5 text-white filter invert">
+                        </button>
+                        <button onclick="shareResult()"
+                            class="w-12 h-12 rounded-full bg-pink-500 backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn">
+                            <img src="https://unpkg.com/lucide-static@latest/icons/share-2.svg"
+                                class="w-5 h-5 text-white filter invert">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/ripple.js"></script>
+    <script src="js/wheel-animation.js"></script>
+    <script>
+        // 菜品数据
+        const dishList = [
+            { name: "红烧肉", image: "https://plus.unsplash.com/premium_photo-1664391872041-1e05862c9706?q=80&w=3787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", desc: "经典美味，肥而不腻" },
+            { name: "麻婆豆腐", image: "https://images.unsplash.com/photo-1585032226651-759b368d7246", desc: "辣味十足，下饭神器" },
+            { name: "水煮鱼", image: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8", desc: "麻辣鲜香，回味无穷" },
+            { name: "宫保鸡丁", image: "https://images.unsplash.com/photo-1525755662778-989d0524087e", desc: "经典川菜，酸甜可口" },
+            { name: "葱爆羊肉", image: "https://images.unsplash.com/photo-1544025162-d76694265947", desc: "鲜香嫩滑，营养价值高" },
+            { name: "糖醋排骨", image: "https://images.unsplash.com/photo-1544025162-d76694265947", desc: "酸甜可口，色泽诱人" },
+            { name: "蚝油生菜", image: "https://images.unsplash.com/photo-1543362906-acfc16c67564", desc: "清爽解腻，健康低脂" },
+            { name: "东坡肉", image: "https://images.unsplash.com/photo-1555126634-323283e090fa", desc: "肥而不腻，入口即化" },
+            { name: "炸酱面", image: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601", desc: "经典家常面，浓香可口" },
+            { name: "回锅肉", image: "https://images.unsplash.com/photo-1514326640560-7d063ef2aed5", desc: "川菜代表，香辣下饭" },
+            { name: "北京烤鸭", image: "https://images.unsplash.com/photo-1518492104633-130d0cc84637", desc: "皮酥肉嫩，名扬四海" },
+            { name: "酸菜鱼", image: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8", desc: "酸辣开胃，鱼肉鲜嫩" },
+            { name: "辣子鸡", image: "https://images.unsplash.com/photo-1525755662778-989d0524087e", desc: "麻辣香酥，香气四溢" },
+            { name: "干锅牛蛙", image: "https://images.unsplash.com/photo-1548943487-a2e4e43b4853", desc: "鲜嫩多汁，香辣过瘾" },
+            { name: "土豆炖牛肉", image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df", desc: "浓郁软糯，温暖人心" },
+            { name: "麻辣香锅", image: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8", desc: "百搭食材，麻辣诱人" },
+            { name: "手撕包菜", image: "https://images.unsplash.com/photo-1543362906-acfc16c67564", desc: "爽脆可口，简单美味" },
+            { name: "黄焖鸡米饭", image: "https://images.unsplash.com/photo-1525755662778-989d0524087e", desc: "香浓入味，饱腹满足" },
+            { name: "蛋炒饭", image: "https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f", desc: "家常经典，简单美味" },
+            { name: "凉皮", image: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601", desc: "劲道爽滑，酸辣可口" },
+            { name: "油泼面", image: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601", desc: "香辣劲道，热气腾腾" },
+            { name: "豆腐脑", image: "https://images.unsplash.com/photo-1585032226651-759b368d7246", desc: "软嫩清香，早餐佳品" },
+            { name: "锅包肉", image: "https://images.unsplash.com/photo-1544025162-d76694265947", desc: "酥脆爽口，东北名菜" }
+        ];
+
+        let selectedDish = null;
+        let animationTimer = null;
+        let dishImages = {}; // 用于存储预加载的图片
+        let dishElementPool = []; // 元素池
+        const POOL_SIZE = 15; // 元素池大小
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 创建元素池
+            createDishElementPool();
+            // 预加载所有图片
+            preloadAllImages();
+        });
+
+        // 创建元素池
+        function createDishElementPool() {
+            const poolContainer = document.createElement('div');
+            poolContainer.className = 'dish-pool';
+            document.body.appendChild(poolContainer);
+
+            // 预先创建多个菜品元素
+            for (let i = 0; i < POOL_SIZE; i++) {
+                const dishElement = document.createElement('div');
+                dishElement.className = 'dish-fly-out';
+                dishElement.innerHTML = `
+                    <img class="w-full h-full object-cover">
+                    <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-40 backdrop-filter backdrop-blur-sm p-1 text-center">
+                        <p class="text-sm font-medium text-white"></p>
+                    </div>
+                `;
+                dishElement.style.display = 'none';
+                poolContainer.appendChild(dishElement);
+                dishElementPool.push(dishElement);
+            }
+        }
+
+        // 从元素池获取一个元素
+        function getDishElementFromPool() {
+            // 如果池中有可用元素，则取出使用
+            for (let element of dishElementPool) {
+                if (element.style.display === 'none') {
+                    element.style.display = '';
+                    return element;
+                }
+            }
+
+            // 如果没有可用元素，创建一个新的
+            const dishElement = document.createElement('div');
+            dishElement.className = 'dish-fly-out';
+            dishElement.innerHTML = `
+                <img class="w-full h-full object-cover">
+                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-40 backdrop-filter backdrop-blur-sm p-1 text-center">
+                    <p class="text-sm font-medium text-white"></p>
+                </div>
+            `;
+            document.querySelector('.dish-pool').appendChild(dishElement);
+            dishElementPool.push(dishElement);
+            return dishElement;
+        }
+
+        // 返回元素到池中
+        function returnDishElementToPool(element) {
+            // 重置元素状态
+            element.style.animation = 'none';
+            element.classList.remove('final-dish');
+            element.style.display = 'none';
+            // 将元素移回池容器
+            document.querySelector('.dish-pool').appendChild(element);
+        }
+
+        // 预加载所有图片
+        function preloadAllImages() {
+            dishList.forEach(dish => {
+                const img = new Image();
+                img.src = dish.image;
+                dishImages[dish.name] = img;
+            });
+        }
+
+        // 添加辅助函数 - 使用requestAnimationFrame模拟setTimeout
+        function rafTimeout(callback, delay) {
+            const startTime = performance.now();
+
+            function checkTime(timestamp) {
+                const elapsedTime = timestamp - startTime;
+                if (elapsedTime >= delay) {
+                    callback();
+                } else {
+                    rafId = requestAnimationFrame(checkTime);
+                }
+            }
+
+            let rafId = requestAnimationFrame(checkTime);
+            return rafId;
+        }
+
+        // 添加辅助函数 - 清除基于requestAnimationFrame的timeout
+        function clearRafTimeout(rafId) {
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+            }
+        }
+
+        // 随机选菜按钮点击事件
+        function randomFood() {
+            const container = document.querySelector('.flex-1.w-full.flex');
+            document.body.classList.add('gpu-accelerated'); // 添加GPU加速
+
+            // 清除容器中现有的菜品元素
+            container.querySelectorAll('.dish-fly-out').forEach(el => {
+                returnDishElementToPool(el);
+            });
+
+            let count = 0;
+            let maxCount = 8; // 保持菜品的总数
+            let finalDishElement = null; // 用于跟踪最后一个菜品元素
+            let animationRafId = null; // 存储requestAnimationFrame ID
+
+            // 禁用随机按钮，防止用户多次点击
+            const randomButton = document.getElementById('randomButton');
+            randomButton.disabled = true;
+            randomButton.classList.add('opacity-50');
+
+            // 清除之前可能存在的动画
+            if (animationTimer) {
+                clearRafTimeout(animationTimer);
+                animationTimer = null;
+            }
+
+            // 显示第一个菜品开始连锁反应
+            showNextDish();
+
+            // 显示下一个菜品
+            function showNextDish() {
+                count++;
+
+                // 随机选择一个菜品
+                const randomIndex = Math.floor(Math.random() * dishList.length);
+                const dish = dishList[randomIndex];
+                selectedDish = dish; // 保存当前展示的菜品
+
+                // 从对象池获取一个菜品元素
+                const dishElement = getDishElementFromPool();
+
+                // 更新内容
+                const imgElement = dishElement.querySelector('img');
+                const nameElement = dishElement.querySelector('p');
+
+                // 使用预加载的图片
+                imgElement.src = dish.image;
+                imgElement.alt = dish.name;
+                nameElement.textContent = dish.name;
+
+                // 随机生成飞出参数
+                const xOffset = (Math.random() * 2 - 1) * 300;
+                const yOffset = (Math.random() * 2 - 1) * 300;
+                const rotation = (Math.random() * 40 - 20);
+
+                // 添加到容器中并设置初始状态
+                container.appendChild(dishElement);
+
+                // 使用GSAP设置初始状态
+                gsap.set(dishElement, {
+                    scale: 0,
+                    rotation: 0,
+                    opacity: 0,
+                    x: 0,
+                    y: 0
+                });
+
+                // 创建飞出动画
+                const tl = gsap.timeline({
+                    onComplete: function () {
+                        if (count < maxCount) {
+                            returnDishElementToPool(dishElement);
+                        }
+                    }
+                });
+
+                // 第一阶段：放大出现
+                tl.to(dishElement, {
+                    duration: 0.4,
+                    scale: 1.3,
+                    rotation: -5,
+                    opacity: 1,
+                    ease: "power2.inOut"
+                });
+
+                // 第二阶段：轻微回弹
+                tl.to(dishElement, {
+                    duration: 0.3,
+                    scale: 1.1,
+                    rotation: 3,
+                    ease: "power2.inOut"
+                });
+
+                // 第三阶段：飞出
+                tl.to(dishElement, {
+                    duration: 1.8,
+                    x: xOffset,
+                    y: yOffset,
+                    scale: 0.7,
+                    rotation: rotation,
+                    opacity: 0,
+                    ease: "power2.inOut"
+                });
+
+                // 如果不是最后一个菜品，使用1-x²函数决定下一个菜品生成的时间间隔
+                if (count < maxCount) {
+                    // 计算生成间隔时间 (使用1-x²函数)
+                    // 将count从1到maxCount映射到0到1的范围
+                    const progress = (count - 1) / (maxCount - 1);
+                    // 应用1-x²函数，值范围会从接近1变为接近0
+                    const timeMultiplier = 1 - Math.pow(progress, 2);
+                    // 将倍数应用到基础时间上，最小150ms，最大1450ms
+                    const baseTime = 150;
+                    const maxVariation = 500;
+                    const nextDishTime = baseTime + (timeMultiplier * maxVariation);
+
+                    // 使用计算出的时间安排下一个菜品生成
+                    animationRafId = rafTimeout(showNextDish, nextDishTime);
+                } else {
+                    // 如果是最后一个菜品
+                    finalDishElement = dishElement;
+
+                    // 延迟一段时间后执行最后一个菜品的特殊动画
+                    animationRafId = rafTimeout(() => {
+                        // 将非最终菜品元素返回池中（以防万一）
+                        container.querySelectorAll('.dish-fly-out').forEach(el => {
+                            if (el !== finalDishElement) {
+                                returnDishElementToPool(el);
+                            }
+                        });
+
+                        // 停止当前动画
+                        gsap.killTweensOf(finalDishElement);
+
+                        // 创建最终动画
+                        gsap.timeline({
+                            onComplete: function () {
+                                showFinalResult();
+                            }
+                        })
+                            .to(finalDishElement, {
+                                duration: 0.5,
+                                x: 0,
+                                y: 0,
+                                scale: 1.5,
+                                rotation: 0,
+                                opacity: 1,
+                                boxShadow: "0 0 40px rgba(0, 0, 0, 0.3)",
+                                zIndex: 50,
+                                ease: "power2.inOut"
+                            })
+                            .to(finalDishElement, {
+                                duration: 1,
+                                scale: 2,
+                                opacity: 0,
+                                ease: "power2.inOut"
+                            });
+                    }, 1500);
+                }
+            }
+
+            // 显示最终结果
+            function showFinalResult() {
+                // 更新结果页面的菜品信息
+                if (selectedDish) {
+                    const resultImage = document.querySelector('#resultImage');
+                    const resultName = document.querySelector('#resultName');
+
+                    resultImage.src = selectedDish.image;
+                    resultImage.alt = selectedDish.name;
+                    resultName.textContent = selectedDish.name;
+                }
+
+                // 显示结果页面 - 翻转卡片
+                animationTimer = rafTimeout(() => {
+                    // 返回最后的菜品元素到池中
+                    if (finalDishElement) {
+                        returnDishElementToPool(finalDishElement);
+                        finalDishElement = null;
+                    }
+
+                    document.querySelector('.card-container').classList.add('flipped');
+
+                    // 动画完成后移除GPU加速类
+                    animationTimer = rafTimeout(() => {
+                        document.body.classList.remove('gpu-accelerated');
+                    }, 500);
+
+                    // 恢复随机按钮
+                    randomButton.disabled = false;
+                    randomButton.classList.remove('opacity-50');
+                }, 300);
+            }
+        }
+
+        // 添加菜品按钮点击事件
+        function addFood() {
+            console.log('addFood');
+        }
+
+        // 显示菜品列表按钮点击事件
+        function showFoodList() {
+            console.log('showFoodList');
+        }
+
+        // 再选一次按钮点击事件
+        function chooseAgain() {
+            // 翻转回主页面
+            document.querySelector('.card-container').classList.remove('flipped');
+
+            // 清除上一次的选择结果
+            selectedDish = null;
+
+            // 如果存在计时器，清除它
+            if (animationTimer) {
+                clearRafTimeout(animationTimer);
+                animationTimer = null;
+            }
+        }
+
+        // 分享结果按钮点击事件
+        function shareResult() {
+            console.log('shareResult');
+        }
+    </script>
+</body>
+
+</html>
