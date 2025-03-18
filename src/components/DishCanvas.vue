@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+  import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
   import type { Dish, DishAnimation, CachedDishImage } from '@/types';
 
   const props = defineProps<{
@@ -42,8 +42,12 @@
       }
     };
 
-    // 初始调整大小
-    resizeCanvas();
+    // 在下一个渲染帧中调整Canvas大小，确保DOM已完全渲染
+    requestAnimationFrame(() => {
+      resizeCanvas();
+      // 再次确认尺寸，防止某些情况下的不准确
+      setTimeout(resizeCanvas, 100);
+    });
 
     // 窗口大小变化时调整Canvas大小
     window.addEventListener('resize', resizeCanvas);
@@ -113,15 +117,15 @@
 
     if (img) {
       // 有图片时，绘制图片
-      // 计算图像缩放和位置
-      const scale = Math.max(size / img.width, size / img.height);
-      const scaledWidth = img.width * scale;
-      const scaledHeight = img.height * scale;
-      const x = (size - scaledWidth) / 2;
-      const y = (size - scaledHeight) / 2;
-
-      // 绘制图像
-      cacheCtx.drawImage(img, x, y, scaledWidth, scaledHeight);
+      // 确保图像已完全加载
+      if (img.complete) {
+        drawImageToCache(img, cacheCtx, size);
+      } else {
+        // 图像未加载完成，添加加载事件
+        img.onload = () => {
+          drawImageToCache(img, cacheCtx, size);
+        };
+      }
     } else {
       // 无图片时，绘制背景颜色和文字
       cacheCtx.fillStyle = dish.backgroundColor || '#4A5568';
@@ -143,6 +147,23 @@
     cacheCtx.stroke();
 
     return cacheCanvas;
+  };
+
+  // 抽取一个函数来处理图像绘制
+  const drawImageToCache = (
+    img: HTMLImageElement,
+    cacheCtx: CanvasRenderingContext2D,
+    size: number
+  ) => {
+    // 计算图像缩放和位置，确保图像以正方形比例绘制
+    const scale = Math.max(size / img.width, size / img.height);
+    const scaledWidth = img.width * scale;
+    const scaledHeight = img.height * scale;
+    const x = (size - scaledWidth) / 2;
+    const y = (size - scaledHeight) / 2;
+
+    // 绘制图像
+    cacheCtx.drawImage(img, x, y, scaledWidth, scaledHeight);
   };
 
   // 创建单个菜品对象
@@ -581,8 +602,11 @@
 
   // 组件挂载时初始化
   onMounted(() => {
-    initCanvas();
-    preloadAllImages();
+    // 延迟初始化，确保DOM已完全渲染
+    nextTick(() => {
+      initCanvas();
+      preloadAllImages();
+    });
   });
 
   // 组件卸载前清理

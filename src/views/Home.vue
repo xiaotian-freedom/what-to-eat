@@ -1,26 +1,25 @@
 <template>
-  <div class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 min-h-screen font-sans">
-    <!-- 设备模拟框架 -->
-    <div class="flex justify-center items-center p-4 w-screen h-screen device-container">
-      <!-- 卡片容器 -->
-      <div class="card-container" :class="{ flipped: showResult }">
-        <!-- 主页面 -->
-        <HomeCard
-          ref="homeCardRef"
-          :dishList="dishList"
-          @random-food="randomFood"
-          @add-food="addFood"
-          @show-food-list="showFoodList"
-          @selected-dish="selectedDish = $event"
-        />
+  <div
+    class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 font-sans flex justify-center items-center px-5 w-full h-screen"
+  >
+    <!-- 卡片容器 -->
+    <div class="card-container" :class="{ flipped: showResult }">
+      <!-- 主页面 -->
+      <HomeCard
+        ref="homeCardRef"
+        :dishList="dishList"
+        @random-food="randomFood"
+        @add-food="addFood"
+        @show-food-list="showFoodList"
+        @selected-dish="selectedDish = $event"
+      />
 
-        <!-- 结果页面 -->
-        <ResultCard
-          :selectedDish="selectedDish"
-          @choose-again="chooseAgain"
-          @share-result="shareResult"
-        />
-      </div>
+      <!-- 结果页面 -->
+      <ResultCard
+        :selectedDish="selectedDish"
+        @choose-again="chooseAgain"
+        @share-result="shareResult"
+      />
     </div>
   </div>
 </template>
@@ -72,8 +71,6 @@
   const shareResult = () => {
     if (selectedDish.value) {
       // 简单的分享功能，可以根据需要扩展
-      alert(`分享: 今天我要吃 ${selectedDish.value.name}！`);
-      // 这里可以添加实际的分享逻辑
     }
   };
 
@@ -107,8 +104,7 @@
     transform-style: preserve-3d;
     position: relative;
     width: 100%;
-    max-width: 400px;
-    height: 600px;
+    height: 70vh;
   }
 
   .card-container.flipped {

@@ -4,6 +4,7 @@
   import HeaderBar from '@/components/HeaderBar.vue';
   import { useFoodStore } from '@/stores';
   import { showConfirmDialog } from 'vant';
+  import IconEmpty from '@/assets/icons/empty.svg';
 
   const router = useRouter();
   const foodStore = useFoodStore();
@@ -21,7 +22,6 @@
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       confirmButtonColor: '#ee0a24',
-      // theme: 'round-button',
     })
       .then(() => {
         // 用户点击确认按钮
@@ -32,6 +32,11 @@
       });
   };
 
+  // 编辑菜品
+  const editFood = (id: string): void => {
+    router.push(`/edit-food/${id}`);
+  };
+
   // 添加新菜品
   const addNewDish = (): void => {
     router.push('/add-food');
@@ -40,85 +45,90 @@
 
 <template>
   <div
-    class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 w-screen h-screen font-sans"
+    class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 w-screen h-screen font-sans flex justify-center items-center px-5"
   >
-    <!-- 设备模拟框架 -->
-    <div class="flex justify-center items-center p-4 h-full">
-      <!-- 菜品管理页面模拟设备 -->
+    <!-- 菜品管理页面模拟设备 -->
+    <div
+      class="w-full h-full bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative mx-auto flex flex-col device-container"
+    >
+      <!-- 顶部状态栏 -->
+      <HeaderBar
+        title="菜品管理"
+        rightIcon="https://unpkg.com/lucide-static@latest/icons/plus.svg"
+        :onRightIconClick="addNewDish"
+      />
+
+      <!-- 内容区域 - 菜品列表 -->
       <div
-        class="w-full bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative mx-auto flex flex-col device-container"
+        class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex flex-col overflow-hidden h-[500px]"
       >
-        <!-- 顶部状态栏 -->
-        <HeaderBar
-          title="菜品管理"
-          rightIcon="https://unpkg.com/lucide-static@latest/icons/plus.svg"
-          :onRightIconClick="addNewDish"
-        />
-
-        <!-- 内容区域 - 菜品列表 -->
-        <div
-          class="flex-1 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex flex-col overflow-hidden"
-        >
-          <!-- 可滚动的菜品列表 -->
-          <div class="flex-1 overflow-y-auto custom-scrollbar p-3">
-            <div class="space-y-3">
-              <!-- 菜品项 -->
-              <div
-                v-for="(item, index) in foodStore.foodItems"
-                :key="item.id"
-                class="bg-white/60 backdrop-filter backdrop-blur-lg rounded-xl p-3 flex items-center shadow-sm food-card wave-in"
-                :style="`animation-delay: ${0.05 * (index + 1)}s`"
-              >
-                <!-- 替换图片区域，添加条件渲染 -->
-                <template v-if="item.image">
-                  <img
-                    :src="item.image"
-                    class="w-16 h-16 rounded-full object-cover mr-3 shadow-lg"
-                    :alt="item.name"
-                  />
-                </template>
+        <!-- 可滚动的菜品列表 -->
+        <div class="overflow-y-auto p-3">
+          <div class="space-y-3">
+            <!-- 菜品项 -->
+            <van-swipe-cell
+              v-for="(item, index) in foodStore.foodItems"
+              :key="item.id"
+              class="wave-in"
+              :style="`animation-delay: ${0.05 * (index + 1)}s`"
+            >
+              <template #default>
                 <div
-                  v-else
-                  class="w-16 h-16 rounded-full mr-3 shadow-lg flex items-center justify-center text-white font-bold text-xl"
-                  :style="`background-color: ${item.backgroundColor || item.categoryColor}`"
+                  class="bg-white/60 backdrop-filter backdrop-blur-lg rounded-xl p-3 flex items-center shadow-sm"
                 >
-                  {{ item.name.charAt(0) }}
-                </div>
+                  <!-- 替换图片区域，添加条件渲染 -->
+                  <template v-if="item.image">
+                    <img
+                      :src="item.image"
+                      class="w-16 h-16 rounded-full object-cover mr-3 shadow-lg"
+                      :alt="item.name"
+                    />
+                  </template>
+                  <div
+                    v-else
+                    class="w-16 h-16 rounded-full mr-3 shadow-lg flex items-center justify-center text-white font-bold text-xl"
+                    :style="`background-color: ${item.backgroundColor || item.categoryColor}`"
+                  >
+                    {{ item.name.charAt(0) }}
+                  </div>
 
-                <div class="flex-1">
-                  <h3 class="font-medium text-gray-800">{{ item.name }}</h3>
-                  <p class="text-xs text-gray-500 flex items-center">
-                    <span
-                      class="inline-block w-2 h-2 rounded-full mr-1"
-                      :style="{ backgroundColor: item.categoryColor }"
-                    ></span>
-                    {{ item.category }}
-                  </p>
+                  <div class="flex-1">
+                    <h3 class="font-medium text-gray-800">{{ item.name }}</h3>
+                    <p class="text-xs text-gray-500 flex items-center">
+                      <span
+                        class="inline-block w-2 h-2 rounded-full mr-1"
+                        :style="{ backgroundColor: item.categoryColor }"
+                      ></span>
+                      {{ item.category }}
+                    </p>
+                  </div>
                 </div>
-                <button
-                  @click="deleteFood(item.id, item.name)"
-                  class="p-2 rounded-full bg-white bg-opacity-70 backdrop-filter backdrop-blur-sm border border-gray-100 delete-btn ripple-btn"
-                >
-                  <img
-                    src="https://unpkg.com/lucide-static@latest/icons/trash-2.svg"
-                    class="w-4 h-4 text-red-500"
-                  />
-                </button>
-              </div>
+              </template>
+              <template #right>
+                <div class="flex h-full">
+                  <button
+                    @click="editFood(item.id)"
+                    class="h-full flex items-center justify-center px-4 bg-blue-500 text-white"
+                  >
+                    编辑
+                  </button>
+                  <button
+                    @click="deleteFood(item.id, item.name)"
+                    class="h-full flex items-center justify-center px-4 bg-red-500 text-white"
+                  >
+                    删除
+                  </button>
+                </div>
+              </template>
+            </van-swipe-cell>
 
-              <!-- 空状态提示 -->
-              <van-empty
-                v-if="foodStore.foodItems.length === 0"
-                class="custom-empty"
-                description-class="custom-empty-description"
-              >
-                <template #description>
-                  <p class="text-center">
-                    还没有添加任何菜品<br />
-                    点击右上角＋添加
-                  </p>
-                </template>
-              </van-empty>
+            <!-- 空状态提示 -->
+            <div
+              v-if="foodStore.foodItems.length === 0"
+              class="flex flex-col items-center justify-center"
+            >
+              <img :src="IconEmpty" alt="空状态" class="w-32 h-32 mx-auto mt-16" />
+              <p class="text-center text-gray-500 mt-6">还没有添加任何菜品</p>
             </div>
           </div>
         </div>
@@ -128,18 +138,6 @@
 </template>
 
 <style scoped>
-  /* 卡片悬停效果 */
-  .food-card {
-    transition: all 0.3s ease;
-    will-change: transform, opacity;
-    /* 性能优化 */
-  }
-
-  .food-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-  }
-
   /* 删除按钮效果 */
   .delete-btn {
     transition: all 0.2s ease;
@@ -233,5 +231,15 @@
     font-size: 14px;
     color: #969799;
     line-height: 1.6;
+  }
+
+  /* 左滑操作按钮样式 */
+  :deep(.van-swipe-cell__right) {
+    height: 100%;
+  }
+
+  .van-swipe-cell {
+    border-radius: 0.75rem;
+    overflow: hidden;
   }
 </style>

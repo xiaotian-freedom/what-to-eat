@@ -27,10 +27,54 @@ a:hover {
 /* 防止 iOS 缩放 */
 html,
 body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: fixed;
   touch-action: manipulation;
   -webkit-touch-callout: none;
   -webkit-text-size-adjust: none;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* iOS Safari 视口高度修复 */
+@supports (-webkit-touch-callout: none) {
+
+  html,
+  body {
+    height: -webkit-fill-available;
+  }
+
+  .h-screen,
+  .min-h-screen {
+    height: -webkit-fill-available;
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* iOS 安全区域适配类 */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+.ph-safe {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* 垂直居中容器适配 */
+.ios-center-fix {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% - env(safe-area-inset-bottom) / 2));
+  width: 100%;
 }
 
 h1 {
@@ -51,7 +95,7 @@ h1 {
 button {
   cursor: pointer;
   border: none;
-  padding: 0.5rem 1rem;
+  /* padding: 0.5rem 1rem; */
   font-weight: 500;
   transition: transform 0.1s ease;
 }

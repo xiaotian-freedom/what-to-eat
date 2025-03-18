@@ -1,87 +1,79 @@
 <template>
   <div
-    class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 font-sans w-screen h-screen flex justify-center items-center device-container p-4"
+    class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 font-sans w-full h-screen device-container px-5 flex justify-center items-center"
   >
-    <div class="card-container w-full">
-      <div
-        id="addFoodPage"
-        class="card-face bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative"
-      >
-        <!-- 使用封装的顶部状态栏组件 -->
-        <HeaderBar title="添加菜品" :showBackButton="true" :onBack="goBack" />
+    <div
+      id="addFoodPage"
+      class="card-face bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative w-full"
+    >
+      <!-- 使用封装的顶部状态栏组件 -->
+      <HeaderBar title="添加菜品" :showBackButton="true" :onBack="goBack" />
 
-        <!-- 内容区域 - 添加菜品表单 -->
-        <div
-          class="h-full bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4 flex flex-col justify-center"
-        >
-          <!-- 上传图片区域 -->
-          <div class="mb-8 flex justify-center pt-8">
+      <!-- 内容区域 - 添加菜品表单 -->
+      <div
+        class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4 flex flex-col justify-center"
+      >
+        <!-- 上传图片区域 -->
+        <div class="mb-8 flex justify-center pt-8">
+          <div
+            class="w-44 h-44 rounded-full bg-white/50 backdrop-filter backdrop-blur-sm border-2 border-white border-opacity-60 flex flex-col items-center justify-center shadow-lg relative image-upload-area cursor-pointer focus:outline-none focus:ring-0"
+            @click="triggerFileInput"
+          >
             <div
-              class="w-44 h-44 rounded-full bg-white/50 backdrop-filter backdrop-blur-sm border-2 border-white border-opacity-60 flex flex-col items-center justify-center shadow-lg relative image-upload-area cursor-pointer focus:outline-none focus:ring-0"
-              @click="triggerFileInput"
+              class="absolute inset-0 rounded-full overflow-hidden flex items-center justify-center"
+            >
+              <img
+                :src="previewSrc"
+                class="w-full h-full object-cover"
+                :style="{ opacity: imageSelected ? '1' : '0.7' }"
+                alt="菜品示例"
+              />
+            </div>
+            <div
+              class="absolute inset-0 rounded-full flex items-center justify-center bg-black/30 backdrop-filter backdrop-blur-sm hover:bg-opacity-20 transition-all duration-300 focus:outline-none image-overlay"
+              :style="{
+                opacity: imageSelected ? '0' : '1',
+                pointerEvents: imageSelected ? 'none' : 'auto',
+              }"
             >
               <div
-                class="absolute inset-0 rounded-full overflow-hidden flex items-center justify-center"
+                class="p-3 rounded-full bg-white bg-opacity-80 shadow-lg upload-icon-pulse focus:outline-none"
               >
-                <img
-                  :src="previewSrc"
-                  class="w-full h-full object-cover"
-                  :style="{ opacity: imageSelected ? '1' : '0.7' }"
-                  alt="菜品示例"
-                />
+                <img :src="IconCamera" class="w-6 h-6" />
               </div>
-              <div
-                class="absolute inset-0 rounded-full flex items-center justify-center bg-black/30 backdrop-filter backdrop-blur-sm hover:bg-opacity-20 transition-all duration-300 focus:outline-none image-overlay"
-                :style="{
-                  opacity: imageSelected ? '0' : '1',
-                  pointerEvents: imageSelected ? 'none' : 'auto',
-                }"
-              >
-                <div
-                  class="p-3 rounded-full bg-white bg-opacity-80 shadow-lg upload-icon-pulse focus:outline-none"
-                >
-                  <img
-                    src="https://unpkg.com/lucide-static@latest/icons/camera.svg"
-                    class="w-6 h-6 text-purple-500"
-                  />
-                </div>
-              </div>
-              <input
-                type="file"
-                ref="fileInput"
-                class="hidden"
-                accept="image/*"
-                @change="onFileChange"
-              />
             </div>
-          </div>
-
-          <!-- 简化的表单输入区域 -->
-          <div class="space-y-4 mt-4">
-            <div class="space-y-1">
-              <van-field
-                v-model="foodName"
-                placeholder="输入菜品名称"
-                class="rounded-xl !py-3 !px-4 shadow-sm !text-base"
-                :border="false"
-                input-align="center"
-                clearable
-              />
-            </div>
-          </div>
-
-          <!-- 底部按钮区域 -->
-          <button
-            @click="submitForm"
-            class="w-full py-3 mt-4 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg transform transition flex items-center justify-center ripple-btn focus:outline-none focus:ring-0"
-          >
-            <img
-              src="https://unpkg.com/lucide-static@latest/icons/check.svg"
-              class="w-5 h-5 mr-2 filter invert"
+            <input
+              type="file"
+              ref="fileInput"
+              class="hidden"
+              accept="image/*"
+              @change="onFileChange"
             />
-            确认添加
-          </button>
+          </div>
         </div>
+
+        <!-- 简化的表单输入区域 -->
+        <div class="space-y-4 mt-8">
+          <div class="space-y-1">
+            <van-field
+              v-model="foodName"
+              placeholder="输入菜品名称"
+              class="rounded-xl !py-3 !px-4 !text-base !border-1 !border-purple-500"
+              :border="false"
+              input-align="center"
+              clearable
+            />
+          </div>
+        </div>
+
+        <!-- 底部按钮区域 -->
+        <button
+          @click="submitForm"
+          class="w-full py-4 my-5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg transform transition flex items-center justify-center focus:outline-none focus:ring-0"
+        >
+          <img :src="IconConfirm" class="w-5 h-5 mr-2 filter invert" />
+          确认添加
+        </button>
       </div>
     </div>
   </div>
@@ -94,12 +86,15 @@
   import type { Food } from '@/types/food';
   import { showSuccessToast, showToast } from 'vant';
   import { ColorManager } from '@/utils/ColorManager';
+  import IconConfirm from '@/assets/icons/confirm.svg';
+  import IconCamera from '@/assets/icons/camera.svg';
+  import previewImg from '@/assets/images/preview.jpeg';
 
   const router = useRouter();
   const foodStore = useFoodStore();
   const fileInput = ref<HTMLInputElement | null>(null);
   const foodName = ref('');
-  const previewSrc = ref('https://images.unsplash.com/photo-1546069901-ba9599a7e63c');
+  const previewSrc = ref(previewImg);
   const imageSelected = ref(false);
 
   // 触发文件选择
@@ -148,8 +143,13 @@
     // 使用 store 添加菜品
     foodStore.addFood(newFood);
 
+    // 清除表单
+    foodName.value = '';
+    previewSrc.value = '';
+    imageSelected.value = false;
+
     showSuccessToast('添加成功');
-    router.back();
+    // router.back();
   };
 </script>
 

@@ -1,15 +1,15 @@
 <template>
   <div
     id="homePage"
-    class="card-face w-full bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative"
+    class="card-face bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative flex flex-col w-full h-full"
   >
     <!-- 顶部状态栏 -->
     <HeaderBar title="今天吃什么" :showBackButton="false" :centerTitle="true" />
 
     <!-- 内容区域 -->
-    <div class="w-full flex flex-col items-center justify-between p-6 relative">
+    <div class="flex-1 flex flex-col items-center p-6 overflow-hidden">
       <!-- 占位区域 -->
-      <div ref="canvasContainer" class="flex-1 w-full flex items-center justify-center relative">
+      <div ref="canvasContainer" class="flex-grow w-full flex items-center justify-center relative">
         <DishCanvas
           ref="dishCanvasRef"
           :dishList="combinedDishList"
@@ -18,8 +18,8 @@
         <div class="w-52 h-52"></div>
       </div>
 
-      <!-- 底部按钮区域 -->
-      <div class="mt-6 w-full">
+      <!-- 底部按钮区域 - 固定在底部 -->
+      <div class="mt-auto pt-6 w-full">
         <ActionButtons
           :disabled="isAnimating"
           :showMainButtons="true"

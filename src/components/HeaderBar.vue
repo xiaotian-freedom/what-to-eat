@@ -9,7 +9,7 @@
         @click.prevent="handleBack"
         class="text-gray-600 mr-2 hover:bg-gray-100 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
       >
-        <img src="https://unpkg.com/lucide-static@latest/icons/chevron-left.svg" class="w-5 h-5" />
+        <img src="@/assets/icons/left.svg" class="w-5 h-5" />
       </a>
       <div
         :class="[

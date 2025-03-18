@@ -1,14 +1,10 @@
 <template>
   <div
     id="resultPage"
-    class="card-face w-full bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative"
+    class="card-face bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative flex flex-col w-full h-full"
   >
     <!-- 顶部状态栏 -->
-    <div
-      class="bg-white bg-opacity-70 backdrop-filter backdrop-blur-lg p-4 flex justify-center items-center border-b border-gray-100"
-    >
-      <div class="text-lg font-bold text-gray-800">选择结果</div>
-    </div>
+    <HeaderBar title="选择结果" :showBackButton="false" :centerTitle="true" />
 
     <!-- 内容区域 -->
     <div
@@ -43,7 +39,7 @@
       </div>
 
       <!-- 底部按钮区域 -->
-      <div class="mt-4 w-full">
+      <div class="mt-auto pt-6 w-full">
         <ActionButtons
           :disabled="false"
           :showMainButtons="false"
@@ -58,6 +54,8 @@
 <script setup lang="ts">
   import type { Dish } from '@/types';
   import ActionButtons from './ActionButtons.vue';
+  import HeaderBar from '@/components/HeaderBar.vue';
+
   defineProps<{
     selectedDish: Dish | null;
   }>();

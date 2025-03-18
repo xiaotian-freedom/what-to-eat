@@ -7,7 +7,7 @@ import './assets/css/ripple.css';
 import App from './App.vue';
 import router from './router';
 import 'vant/lib/index.css';
-import { Button, Toast, Empty, Field, Dialog } from 'vant';
+import { Button, Toast, Empty, Field, Dialog, SwipeCell } from 'vant';
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -18,6 +18,7 @@ app.use(Toast);
 app.use(Empty);
 app.use(Field);
 app.use(Dialog);
+app.use(SwipeCell);
 
 // 创建扩展的触摸事件接口
 interface TouchEventWithScale extends TouchEvent {
