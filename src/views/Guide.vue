@@ -93,12 +93,12 @@
         ease: 'power4.in', // 更强的加速效果
         onComplete: () => {
           // 动画完成后跳转
-          router.push('/home');
+          router.replace('/home');
         },
       });
     } else {
       // 如果没有找到元素，直接跳转
-      router.push('/home');
+      router.replace('/home');
     }
   };
 </script>

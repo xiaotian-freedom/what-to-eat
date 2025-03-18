@@ -31,7 +31,9 @@
   import ResultCard from '@/components/ResultCard.vue';
   import type { Dish } from '@/types';
   import { dishList } from '@/data/dishList';
+  import { useRouter } from 'vue-router';
 
+  const router = useRouter();
   const selectedDish = ref<Dish | null>(null);
   const showResult = ref(false);
   const homeCardRef = useTemplateRef('homeCardRef');
@@ -49,12 +51,12 @@
 
   // 添加菜品
   const addFood = () => {
-    window.location.href = 'add-food.html';
+    router.push('/add-food');
   };
 
   // 显示菜品列表
   const showFoodList = () => {
-    window.location.href = 'food-management.html';
+    router.push('/food-management');
   };
 
   // 再选一次

@@ -47,13 +47,14 @@ h1 {
   margin: 0 auto;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
+button {
+  cursor: pointer;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: transform 0.1s ease;
+}
 
-  a:hover {
-    color: #747bff;
-  }
+button:active {
+  transform: scale(0.95);
 }

@@ -1,14 +1,14 @@
-import type { Dish, CachedImage } from '../types';
+import type { Dish, CachedDishImage } from '@/types';
 
 // 创建缓存的菜品图像
-export function createCachedDishImage(img: HTMLImageElement, dishName: string): HTMLCanvasElement {
+export function createCachedDishImage(img: HTMLImageElement): HTMLCanvasElement {
   // 创建离屏Canvas用于缓存图像
   const cacheCanvas = document.createElement('canvas');
   const size = 120; // 缓存图像的尺寸
   cacheCanvas.width = size;
   cacheCanvas.height = size;
   const cacheCtx = cacheCanvas.getContext('2d');
-  
+
   if (!cacheCtx) return cacheCanvas;
 
   // 绘制圆形裁剪区域
@@ -38,24 +38,24 @@ export function createCachedDishImage(img: HTMLImageElement, dishName: string): 
 }
 
 // 预加载函数，返回Promise以便在完成后进行后续操作
-export function preloadAllImages(dishList: Dish[]): Promise<Record<string, CachedImage>> {
-  return new Promise((resolve) => {
-    const dishImages: Record<string, CachedImage> = {};
+export function preloadAllImages(dishList: Dish[]): Promise<Record<string, CachedDishImage>> {
+  return new Promise(resolve => {
+    const dishImages: Record<string, CachedDishImage> = {};
     const totalImages = dishList.length;
     let imagesLoaded = 0;
 
     dishList.forEach(dish => {
       // 创建缩略图尺寸，减少内存使用
       const img = new Image();
-      img.crossOrigin = "Anonymous"; // 处理可能的跨域问题
+      img.crossOrigin = 'Anonymous'; // 处理可能的跨域问题
 
       // 图片加载完成事件
       img.onload = () => {
         // 创建缓存的图像对象
-        const cachedImg = createCachedDishImage(img, dish.name);
+        const cachedImg = createCachedDishImage(img);
         dishImages[dish.name] = {
           original: img,
-          cached: cachedImg
+          cached: cachedImg,
         };
 
         imagesLoaded++;
@@ -73,10 +73,11 @@ export function preloadAllImages(dishList: Dish[]): Promise<Record<string, Cache
 
         // 提供默认图像
         const defaultImg = new Image();
-        defaultImg.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="12" cy="12" r="3"></circle></svg>';
+        defaultImg.src =
+          'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="12" cy="12" r="3"></circle></svg>';
         dishImages[dish.name] = {
           original: defaultImg,
-          cached: null
+          cached: null,
         };
 
         // 所有图片处理完成
@@ -89,4 +90,4 @@ export function preloadAllImages(dishList: Dish[]): Promise<Record<string, Cache
       img.src = dish.image;
     });
   });
-} 
+}

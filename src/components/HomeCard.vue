@@ -4,11 +4,7 @@
     class="card-face w-full bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative"
   >
     <!-- 顶部状态栏 -->
-    <div
-      class="bg-white bg-opacity-70 backdrop-filter backdrop-blur-lg p-4 flex justify-center items-center border-b border-gray-100"
-    >
-      <div class="text-lg font-bold text-gray-800">今天吃什么</div>
-    </div>
+    <HeaderBar title="今天吃什么" :showBackButton="false" :centerTitle="true" />
 
     <!-- 内容区域 -->
     <div class="w-full flex flex-col items-center justify-between p-6 relative">
@@ -41,7 +37,7 @@
   import DishCanvas from './DishCanvas.vue';
   import ActionButtons from './ActionButtons.vue';
   import type { Dish } from '@/types';
-
+  import HeaderBar from '@/components/HeaderBar.vue';
   defineProps<{
     dishList: Dish[];
   }>();
