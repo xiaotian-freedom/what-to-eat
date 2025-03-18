@@ -31,6 +31,7 @@
   import type { Dish } from '@/types';
   import { dishList } from '@/data/dishList';
   import { useRouter } from 'vue-router';
+  import { showSuccessToast } from 'vant';
 
   const router = useRouter();
   const selectedDish = ref<Dish | null>(null);
@@ -69,9 +70,9 @@
 
   // 分享结果
   const shareResult = () => {
-    if (selectedDish.value) {
-      // 简单的分享功能，可以根据需要扩展
-    }
+    // 暂时复制当前页面到剪贴板
+    navigator.clipboard.writeText(window.location.href);
+    showSuccessToast('已复制到剪贴板');
   };
 
   onMounted(() => {

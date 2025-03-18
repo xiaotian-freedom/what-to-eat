@@ -1,7 +1,7 @@
 <template>
   <div
     id="step1"
-    class="w-80 bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative"
+    class="w-[80%] bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative"
     :class="[isActive ? 'flex' : 'hidden', isFlying ? 'fly-up-out' : '']"
   >
     <div
@@ -10,7 +10,7 @@
       <!-- 顶部跳过按钮 -->
       <div class="self-end">
         <button
-          class="py-1.5 px-3 bg-white bg-opacity-50 backdrop-filter backdrop-blur-sm border border-white border-opacity-30 rounded-full text-sm text-gray-700 ripple-btn"
+          class="py-1.5 px-3 bg-white/50 backdrop-filter backdrop-blur-sm border border-white rounded-full text-sm !text-[#a855f7]"
           @click="$emit('skip')"
         >
           跳过

@@ -1,7 +1,7 @@
 <template>
   <div
     id="step3"
-    class="w-80 bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative"
+    class="w-[80%] bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative"
     :class="[isActive ? 'flex' : 'hidden', isFlying ? 'fly-up-out' : '']"
   >
     <div
@@ -27,10 +27,7 @@
             <div
               class="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center"
             >
-              <img
-                src="https://unpkg.com/lucide-static@latest/icons/utensils.svg"
-                class="w-12 h-12 filter invert"
-              />
+              <img :src="UtensilsIcon" class="w-12 h-12" />
             </div>
           </div>
 
@@ -67,10 +64,7 @@
               <div
                 class="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mr-2"
               >
-                <img
-                  src="https://unpkg.com/lucide-static@latest/icons/check.svg"
-                  class="w-3 h-3 text-white filter invert"
-                />
+                <img :src="CheckIcon" class="w-3 h-3 text-white" />
               </div>
               <p class="text-sm text-gray-600">随机选择喜爱的美食</p>
             </div>
@@ -78,10 +72,7 @@
               <div
                 class="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mr-2"
               >
-                <img
-                  src="https://unpkg.com/lucide-static@latest/icons/check.svg"
-                  class="w-3 h-3 text-white filter invert"
-                />
+                <img :src="CheckIcon" class="w-3 h-3 text-white" />
               </div>
               <p class="text-sm text-gray-600">自定义个人菜品库</p>
             </div>
@@ -89,10 +80,7 @@
               <div
                 class="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mr-2"
               >
-                <img
-                  src="https://unpkg.com/lucide-static@latest/icons/check.svg"
-                  class="w-3 h-3 text-white filter invert"
-                />
+                <img :src="CheckIcon" class="w-3 h-3 text-white" />
               </div>
               <p class="text-sm text-gray-600">精美动画与统计数据</p>
             </div>
@@ -114,23 +102,7 @@
           class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg transform transition hover:scale-105 active:scale-95 flex items-center justify-center"
           @click="$emit('start')"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="mr-2 text-white"
-          >
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-            <line x1="9" y1="9" x2="9.01" y2="9"></line>
-            <line x1="15" y1="9" x2="15.01" y2="9"></line>
-          </svg>
+          <img :src="SmileIcon" class="w-5 h-5 mr-2" />
           开始使用
         </button>
       </div>
@@ -139,6 +111,9 @@
 </template>
 
 <script setup>
+  import UtensilsIcon from '@/assets/icons/utensils.svg';
+  import CheckIcon from '@/assets/icons/check.svg';
+  import SmileIcon from '@/assets/icons/smile.svg';
   defineProps({
     isActive: {
       type: Boolean,

@@ -34,7 +34,7 @@
 
   // 编辑菜品
   const editFood = (id: string): void => {
-    router.push(`/edit-food/${id}`);
+    router.push(`/add-food?id=${id}`);
   };
 
   // 添加新菜品
@@ -49,7 +49,7 @@
   >
     <!-- 菜品管理页面模拟设备 -->
     <div
-      class="w-full h-full bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative mx-auto flex flex-col device-container"
+      class="w-full bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative mx-auto flex flex-col device-container"
     >
       <!-- 顶部状态栏 -->
       <HeaderBar
@@ -214,11 +214,6 @@
   .add-btn:hover {
     transform: rotate(90deg);
     background: linear-gradient(to right, #a855f7, #ec4899);
-  }
-
-  /* 设备容器固定高度 */
-  .device-container {
-    height: 80%;
   }
 
   /* 空状态样式 */

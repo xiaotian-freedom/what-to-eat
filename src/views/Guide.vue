@@ -1,26 +1,25 @@
 <template>
-  <div class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 min-h-screen font-sans">
-    <!-- 设备模拟框架 -->
-    <div class="flex justify-center items-center p-8 h-screen">
-      <!-- 步骤1: 介绍主功能 -->
-      <GuideStepOne
-        :is-active="currentStep === 1"
-        :is-flying="isFlying"
-        @skip="skipGuide"
-        @next="nextStep"
-      />
+  <div
+    class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 font-sans h-screen flex justify-center items-center"
+  >
+    <!-- 步骤1: 介绍主功能 -->
+    <GuideStepOne
+      :is-active="currentStep === 1"
+      :is-flying="isFlying"
+      @skip="skipGuide"
+      @next="nextStep"
+    />
 
-      <!-- 步骤2: 菜品管理功能 -->
-      <GuideStepTwo
-        :is-active="currentStep === 2"
-        :is-flying="isFlying"
-        @skip="skipGuide"
-        @next="nextStep"
-      />
+    <!-- 步骤2: 菜品管理功能 -->
+    <GuideStepTwo
+      :is-active="currentStep === 2"
+      :is-flying="isFlying"
+      @skip="skipGuide"
+      @next="nextStep"
+    />
 
-      <!-- 步骤3: 准备完成 -->
-      <GuideStepThree :is-active="currentStep === 3" :is-flying="isFlying" @start="startApp" />
-    </div>
+    <!-- 步骤3: 准备完成 -->
+    <GuideStepThree :is-active="currentStep === 3" :is-flying="isFlying" @start="startApp" />
   </div>
 </template>
 

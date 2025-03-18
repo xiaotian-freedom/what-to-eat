@@ -7,7 +7,11 @@
       class="card-face bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative w-full"
     >
       <!-- 使用封装的顶部状态栏组件 -->
-      <HeaderBar title="添加菜品" :showBackButton="true" :onBack="goBack" />
+      <HeaderBar
+        :title="isEdit ? '修改菜品' : '添加菜品'"
+        :showBackButton="true"
+        :onBack="goBack"
+      />
 
       <!-- 内容区域 - 添加菜品表单 -->
       <div
@@ -71,16 +75,16 @@
           @click="submitForm"
           class="w-full py-4 my-5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg transform transition flex items-center justify-center focus:outline-none focus:ring-0"
         >
-          <img :src="IconConfirm" class="w-5 h-5 mr-2 filter invert" />
-          确认添加
+          <img :src="IconConfirm" class="w-5 h-5 mr-2" />
+          {{ isEdit ? '确认修改' : '确认添加' }}
         </button>
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-  import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { ref, onMounted } from 'vue';
+  import { useRouter, useRoute } from 'vue-router';
   import HeaderBar from '@/components/HeaderBar.vue';
   import { useFoodStore } from '@/stores';
   import type { Food } from '@/types/food';
@@ -91,11 +95,36 @@
   import previewImg from '@/assets/images/preview.jpeg';
 
   const router = useRouter();
+  const route = useRoute();
   const foodStore = useFoodStore();
   const fileInput = ref<HTMLInputElement | null>(null);
   const foodName = ref('');
   const previewSrc = ref(previewImg);
   const imageSelected = ref(false);
+  const isEdit = ref(false);
+  const editFoodId = ref<string | null>(null);
+
+  // 在组件挂载时检查是否为编辑模式
+  onMounted(() => {
+    if (route.query.id) {
+      isEdit.value = true;
+      editFoodId.value = route.query.id as string;
+
+      // 获取要编辑的菜品数据
+      const foodToEdit = foodStore.getFoodById(editFoodId.value);
+      if (foodToEdit) {
+        foodName.value = foodToEdit.name;
+        if (foodToEdit.image) {
+          previewSrc.value = foodToEdit.image;
+          imageSelected.value = true;
+        } else if (foodToEdit.backgroundColor) {
+          // 如果没有图片，可以显示背景色
+          previewSrc.value = previewImg;
+          imageSelected.value = false;
+        }
+      }
+    }
+  });
 
   // 触发文件选择
   const triggerFileInput = () => {
@@ -129,27 +158,38 @@
       return;
     }
 
-    // 创建新菜品对象
-    const newFood: Omit<Food, 'id'> = {
-      name: foodName.value.trim(),
-      // 如果用户没有上传图片，则使用随机颜色代替图片
-      image: imageSelected.value ? previewSrc.value : '',
-      category: '默认',
-      categoryColor: ColorManager.getRandomColor(),
-      // 添加背景颜色属性，在没有图片时使用
-      backgroundColor: !imageSelected.value ? ColorManager.getRandomColor() : '',
-    };
+    if (isEdit.value && editFoodId.value) {
+      // 修改现有菜品
+      const updatedFood: Food = {
+        id: editFoodId.value,
+        name: foodName.value.trim(),
+        image: imageSelected.value ? previewSrc.value : '',
+        // 如果没有选择图片，则使用背景色
+        backgroundColor: !imageSelected.value ? ColorManager.getRandomColor() : '',
+      };
 
-    // 使用 store 添加菜品
-    foodStore.addFood(newFood);
+      // 使用 store 更新菜品
+      foodStore.updateFood(updatedFood);
+      showSuccessToast('修改成功');
+    } else {
+      // 创建新菜品对象
+      const newFood: Omit<Food, 'id'> = {
+        name: foodName.value.trim(),
+        // 如果用户没有上传图片，则使用随机颜色代替图片
+        image: imageSelected.value ? previewSrc.value : '',
+        category: '默认',
+        categoryColor: ColorManager.getRandomColor(),
+        // 添加背景颜色属性，在没有图片时使用
+        backgroundColor: !imageSelected.value ? ColorManager.getRandomColor() : '',
+      };
 
-    // 清除表单
-    foodName.value = '';
-    previewSrc.value = '';
-    imageSelected.value = false;
+      // 使用 store 添加菜品
+      foodStore.addFood(newFood);
+      showSuccessToast('添加成功');
+    }
 
-    showSuccessToast('添加成功');
-    // router.back();
+    // 操作完成后返回
+    router.back();
   };
 </script>
 
