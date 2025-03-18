@@ -1,11 +1,21 @@
 import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 import './assets/css/style.css';
 // import './assets/css/card-flip.css';
 import './assets/css/ripple.css';
 // import './assets/css/wheel-animation.css';
 import App from './App.vue';
 import router from './router';
+import 'vant/lib/index.css';
+import { Button, Toast, Empty, Field, Dialog } from 'vant';
 
 const app = createApp(App);
+const pinia = createPinia();
 app.use(router);
+app.use(pinia);
+app.use(Button);
+app.use(Toast);
+app.use(Empty);
+app.use(Field);
+app.use(Dialog);
 app.mount('#app');

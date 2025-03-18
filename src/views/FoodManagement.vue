@@ -1,69 +1,40 @@
-<script setup>
-  import { ref } from 'vue';
+<script setup lang="ts">
+  import { onMounted } from 'vue';
   import { useRouter } from 'vue-router';
   import HeaderBar from '@/components/HeaderBar.vue';
+  import { useFoodStore } from '@/stores';
+  import { showConfirmDialog } from 'vant';
 
   const router = useRouter();
+  const foodStore = useFoodStore();
 
-  // 菜品数据
-  const foodItems = ref([
-    {
-      id: 1,
-      name: '红烧肉',
-      category: '家常菜',
-      categoryColor: 'bg-purple-400',
-      image: 'https://images.unsplash.com/photo-1555126634-323283e090fa',
-    },
-    {
-      id: 2,
-      name: '麻婆豆腐',
-      category: '家常菜',
-      categoryColor: 'bg-purple-400',
-      image: 'https://images.unsplash.com/photo-1585032226651-759b368d7246',
-    },
-    {
-      id: 3,
-      name: '水煮鱼',
-      category: '家常菜',
-      categoryColor: 'bg-purple-400',
-      image: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8',
-    },
-    {
-      id: 4,
-      name: '宫保鸡丁',
-      category: '家常菜',
-      categoryColor: 'bg-purple-400',
-      image: 'https://images.unsplash.com/photo-1525755662778-989d0524087e',
-    },
-    {
-      id: 5,
-      name: '葱爆羊肉',
-      category: '快餐',
-      categoryColor: 'bg-blue-400',
-      image: 'https://images.unsplash.com/photo-1544025162-d76694265947',
-    },
-    {
-      id: 6,
-      name: '蚝油生菜',
-      category: '小吃',
-      categoryColor: 'bg-pink-400',
-      image: 'https://images.unsplash.com/photo-1543362906-acfc16c67564',
-    },
-  ]);
-
-  // 处理返回操作
-  const handleBack = () => {
-    router.back();
-  };
+  // 页面加载时获取数据
+  onMounted(() => {
+    foodStore.loadFoodItems();
+  });
 
   // 删除菜品
-  const deleteFood = (id, name) => {
-    if (confirm(`确定要删除"${name}"吗？`)) {
-      const index = foodItems.value.findIndex(item => item.id === id);
-      if (index !== -1) {
-        foodItems.value.splice(index, 1);
-      }
-    }
+  const deleteFood = (id: string, name: string): void => {
+    showConfirmDialog({
+      title: '确认删除',
+      message: `确定要删除"${name}"吗？`,
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      confirmButtonColor: '#ee0a24',
+      // theme: 'round-button',
+    })
+      .then(() => {
+        // 用户点击确认按钮
+        foodStore.deleteFood(id);
+      })
+      .catch(() => {
+        // 用户点击取消按钮或关闭弹窗
+      });
+  };
+
+  // 添加新菜品
+  const addNewDish = (): void => {
+    router.push('/add-food');
   };
 </script>
 
@@ -89,23 +60,37 @@
           class="flex-1 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex flex-col overflow-hidden"
         >
           <!-- 可滚动的菜品列表 -->
-          <div class="flex-1 overflow-y-auto custom-scrollbar px-4 py-3">
+          <div class="flex-1 overflow-y-auto custom-scrollbar p-3">
             <div class="space-y-3">
               <!-- 菜品项 -->
               <div
-                v-for="(item, index) in foodItems"
+                v-for="(item, index) in foodStore.foodItems"
                 :key="item.id"
-                class="bg-white bg-opacity-60 backdrop-filter backdrop-blur-lg rounded-xl p-3 flex items-center shadow-sm food-card wave-in"
+                class="bg-white/60 backdrop-filter backdrop-blur-lg rounded-xl p-3 flex items-center shadow-sm food-card wave-in"
                 :style="`animation-delay: ${0.05 * (index + 1)}s`"
               >
-                <div class="w-16 h-16 rounded-lg overflow-hidden mr-3 shadow">
-                  <img :src="item.image" class="w-full h-full object-cover" :alt="item.name" />
+                <!-- 替换图片区域，添加条件渲染 -->
+                <template v-if="item.image">
+                  <img
+                    :src="item.image"
+                    class="w-16 h-16 rounded-full object-cover mr-3 shadow-lg"
+                    :alt="item.name"
+                  />
+                </template>
+                <div
+                  v-else
+                  class="w-16 h-16 rounded-full mr-3 shadow-lg flex items-center justify-center text-white font-bold text-xl"
+                  :style="`background-color: ${item.backgroundColor || item.categoryColor}`"
+                >
+                  {{ item.name.charAt(0) }}
                 </div>
+
                 <div class="flex-1">
                   <h3 class="font-medium text-gray-800">{{ item.name }}</h3>
                   <p class="text-xs text-gray-500 flex items-center">
                     <span
-                      :class="['inline-block w-2 h-2 rounded-full mr-1', item.categoryColor]"
+                      class="inline-block w-2 h-2 rounded-full mr-1"
+                      :style="{ backgroundColor: item.categoryColor }"
                     ></span>
                     {{ item.category }}
                   </p>
@@ -120,6 +105,20 @@
                   />
                 </button>
               </div>
+
+              <!-- 空状态提示 -->
+              <van-empty
+                v-if="foodStore.foodItems.length === 0"
+                class="custom-empty"
+                description-class="custom-empty-description"
+              >
+                <template #description>
+                  <p class="text-center">
+                    还没有添加任何菜品<br />
+                    点击右上角＋添加
+                  </p>
+                </template>
+              </van-empty>
             </div>
           </div>
         </div>
@@ -129,13 +128,6 @@
 </template>
 
 <style scoped>
-  /* 移除点击蓝色背景 */
-  a,
-  button {
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
-  }
-
   /* 卡片悬停效果 */
   .food-card {
     transition: all 0.3s ease;
@@ -229,5 +221,17 @@
   /* 设备容器固定高度 */
   .device-container {
     height: 80%;
+  }
+
+  /* 空状态样式 */
+  .custom-empty {
+    padding: 32px 0;
+  }
+
+  .custom-empty-description {
+    text-align: center;
+    font-size: 14px;
+    color: #969799;
+    line-height: 1.6;
   }
 </style>

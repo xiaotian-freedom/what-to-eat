@@ -19,7 +19,21 @@
         class="w-64 h-64 rounded-full bg-white backdrop-filter backdrop-blur-lg shadow-xl flex flex-col items-center justify-center mt-3"
       >
         <div class="w-full h-full rounded-full overflow-hidden shadow-lg relative">
-          <img v-if="selectedDish" :src="selectedDish.image" class="w-full h-full object-cover" />
+          <!-- 有图片时显示图片 -->
+          <template v-if="selectedDish && selectedDish.image">
+            <img :src="selectedDish.image" class="w-full h-full object-cover" />
+          </template>
+
+          <!-- 无图片时显示背景颜色和首字母 -->
+          <div
+            v-else-if="selectedDish"
+            class="w-full h-full flex items-center justify-center"
+            :style="{ backgroundColor: selectedDish.backgroundColor || '#4A5568' }"
+          >
+            <span class="text-white text-6xl font-bold">{{ selectedDish.name.charAt(0) }}</span>
+          </div>
+
+          <!-- 底部名称显示 -->
           <div
             class="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-filter backdrop-blur-sm p-2 text-center"
           >

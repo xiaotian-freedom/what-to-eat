@@ -59,11 +59,13 @@
           <!-- 简化的表单输入区域 -->
           <div class="space-y-4 mt-4">
             <div class="space-y-1">
-              <input
-                type="text"
+              <van-field
                 v-model="foodName"
                 placeholder="输入菜品名称"
-                class="w-full px-4 py-3 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 input-focus-ring"
+                class="rounded-xl !py-3 !px-4 shadow-sm !text-base"
+                :border="false"
+                input-align="center"
+                clearable
               />
             </div>
           </div>
@@ -84,13 +86,17 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
   import { ref } from 'vue';
   import { useRouter } from 'vue-router';
   import HeaderBar from '@/components/HeaderBar.vue';
+  import { useFoodStore } from '@/stores';
+  import type { Food } from '@/types/food';
+  import { showSuccessToast, showToast } from 'vant';
+  import { ColorManager } from '@/utils/ColorManager';
 
   const router = useRouter();
+  const foodStore = useFoodStore();
   const fileInput = ref<HTMLInputElement | null>(null);
   const foodName = ref('');
   const previewSrc = ref('https://images.unsplash.com/photo-1546069901-ba9599a7e63c');
@@ -124,13 +130,25 @@
   // 提交表单
   const submitForm = () => {
     if (!foodName.value.trim()) {
-      alert('请输入菜品名称');
+      showToast('请输入菜品名称');
       return;
     }
 
-    // 这里可以添加实际的提交逻辑
-    alert(`菜品"${foodName.value}"添加成功！`);
+    // 创建新菜品对象
+    const newFood: Omit<Food, 'id'> = {
+      name: foodName.value.trim(),
+      // 如果用户没有上传图片，则使用随机颜色代替图片
+      image: imageSelected.value ? previewSrc.value : '',
+      category: '默认',
+      categoryColor: ColorManager.getRandomColor(),
+      // 添加背景颜色属性，在没有图片时使用
+      backgroundColor: !imageSelected.value ? ColorManager.getRandomColor() : '',
+    };
 
+    // 使用 store 添加菜品
+    foodStore.addFood(newFood);
+
+    showSuccessToast('添加成功');
     router.back();
   };
 </script>
@@ -151,14 +169,6 @@
   .image-upload-area:hover {
     transform: scale(1.05);
     box-shadow: 0 0 25px rgba(167, 139, 250, 0.5);
-  }
-
-  .input-focus-ring {
-    transition: all 0.3s ease;
-  }
-
-  .input-focus-ring:focus {
-    box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.3);
   }
 
   .upload-icon-pulse {

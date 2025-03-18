@@ -1,8 +1,9 @@
 // 菜品数据接口
 export interface Dish {
   name: string;
-  image: string;
+  image?: string;
   desc: string;
+  backgroundColor?: string;
 }
 
 // 菜品动画对象接口
@@ -28,6 +29,6 @@ export interface DishAnimation {
 
 // 缓存的菜品图像接口
 export interface CachedDishImage {
-  original: HTMLImageElement;
+  original: HTMLImageElement | null;
   cached: HTMLCanvasElement | null;
 }

@@ -12,7 +12,7 @@
       <div ref="canvasContainer" class="flex-1 w-full flex items-center justify-center relative">
         <DishCanvas
           ref="dishCanvasRef"
-          :dishList="dishList"
+          :dishList="combinedDishList"
           @animation-complete="onAnimationComplete"
         />
         <div class="w-52 h-52"></div>
@@ -33,14 +33,34 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue';
+  import { ref, computed, onMounted } from 'vue';
   import DishCanvas from './DishCanvas.vue';
   import ActionButtons from './ActionButtons.vue';
   import type { Dish } from '@/types';
   import HeaderBar from '@/components/HeaderBar.vue';
-  defineProps<{
+  import { useFoodStore } from '@/stores';
+
+  const props = defineProps<{
     dishList: Dish[];
   }>();
+
+  const foodStore = useFoodStore();
+
+  // 优先使用 store 中的数据，如果为空才使用 dishList
+  const combinedDishList = computed(() => {
+    if (foodStore.foodItems.length > 0) {
+      // 将 Food 类型转换为 Dish 类型
+      return foodStore.foodItems.map(food => ({
+        name: food.name,
+        image: food.image || '',
+        desc: food.category || '美味佳肴',
+        backgroundColor: food.backgroundColor || food.categoryColor || '#4A5568',
+      }));
+    } else {
+      // 如果 store 中没有数据，使用默认 dishList
+      return props.dishList;
+    }
+  });
 
   const emit = defineEmits<{
     (e: 'random-food'): void;
@@ -52,6 +72,11 @@
   const isAnimating = ref(false);
   const dishCanvasRef = ref<InstanceType<typeof DishCanvas> | null>(null);
   const canvasContainer = ref<HTMLDivElement | null>(null);
+
+  // 页面加载时确保数据已经加载
+  onMounted(() => {
+    foodStore.loadFoodItems();
+  });
 
   // 启动随机动画
   const startRandomAnimation = async (): Promise<void> => {

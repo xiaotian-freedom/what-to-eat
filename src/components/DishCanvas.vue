@@ -55,11 +55,22 @@
   // 预加载所有图片
   const preloadAllImages = () => {
     props.dishList.forEach(dish => {
+      if (!dish.image) {
+        // 无图片情况直接创建颜色块缓存
+        const cachedImg = createCachedDishImage(dish);
+        dishImages.value[dish.name] = {
+          original: null,
+          cached: cachedImg,
+        };
+        imagesLoaded.value++;
+        return;
+      }
+
       const img = new Image();
       img.crossOrigin = 'Anonymous';
 
       img.onload = () => {
-        const cachedImg = createCachedDishImage(img);
+        const cachedImg = createCachedDishImage(dish, img);
         dishImages.value[dish.name] = {
           original: img,
           cached: cachedImg,
@@ -72,12 +83,11 @@
         console.warn(`无法加载图片: ${dish.name}`);
         imagesLoaded.value++;
 
-        const defaultImg = new Image();
-        defaultImg.src =
-          'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="12" cy="12" r="3"></circle></svg>';
+        // 图片加载失败时使用颜色块代替
+        const cachedImg = createCachedDishImage(dish);
         dishImages.value[dish.name] = {
-          original: defaultImg,
-          cached: null,
+          original: null,
+          cached: cachedImg,
         };
       };
 
@@ -86,7 +96,7 @@
   };
 
   // 创建缓存的菜品图像
-  const createCachedDishImage = (img: HTMLImageElement): HTMLCanvasElement => {
+  const createCachedDishImage = (dish: Dish, img?: HTMLImageElement): HTMLCanvasElement => {
     const cacheCanvas = document.createElement('canvas');
     const size = 120;
     cacheCanvas.width = size;
@@ -101,15 +111,29 @@
     cacheCtx.closePath();
     cacheCtx.clip();
 
-    // 计算图像缩放和位置
-    const scale = Math.max(size / img.width, size / img.height);
-    const scaledWidth = img.width * scale;
-    const scaledHeight = img.height * scale;
-    const x = (size - scaledWidth) / 2;
-    const y = (size - scaledHeight) / 2;
+    if (img) {
+      // 有图片时，绘制图片
+      // 计算图像缩放和位置
+      const scale = Math.max(size / img.width, size / img.height);
+      const scaledWidth = img.width * scale;
+      const scaledHeight = img.height * scale;
+      const x = (size - scaledWidth) / 2;
+      const y = (size - scaledHeight) / 2;
 
-    // 绘制图像
-    cacheCtx.drawImage(img, x, y, scaledWidth, scaledHeight);
+      // 绘制图像
+      cacheCtx.drawImage(img, x, y, scaledWidth, scaledHeight);
+    } else {
+      // 无图片时，绘制背景颜色和文字
+      cacheCtx.fillStyle = dish.backgroundColor || '#4A5568';
+      cacheCtx.fillRect(0, 0, size, size);
+
+      // 添加文字（菜品名称首字母）
+      cacheCtx.fillStyle = '#FFFFFF';
+      cacheCtx.font = 'bold 60px sans-serif';
+      cacheCtx.textAlign = 'center';
+      cacheCtx.textBaseline = 'middle';
+      cacheCtx.fillText(dish.name.charAt(0), size / 2, size / 2);
+    }
 
     // 添加圆形边框
     cacheCtx.strokeStyle = 'rgba(255,255,255,0.8)';
@@ -240,19 +264,20 @@
         ctx.drawImage(cachedImg, -cachedImg.width / 2, -cachedImg.height / 2);
       }
     } else {
-      // 没有缓存图像时使用默认图像
+      // 没有缓存图像时绘制备用图像
       const size = 60;
-      ctx.fillStyle = '#f0f0f0';
+      // 使用菜品背景颜色或默认颜色
+      ctx.fillStyle = dish.dish.backgroundColor || '#f0f0f0';
       ctx.beginPath();
       ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
       ctx.fill();
 
-      // 添加文本作为备用
-      ctx.fillStyle = '#666';
+      // 添加首字母文本
+      ctx.fillStyle = '#FFFFFF';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.font = '14px sans-serif';
-      ctx.fillText(dish.dish.name, 0, 0);
+      ctx.font = 'bold 30px sans-serif';
+      ctx.fillText(dish.dish.name.charAt(0), 0, 0);
     }
 
     // 恢复上下文状态

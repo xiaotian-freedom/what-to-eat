@@ -1,8 +1,4 @@
-export interface Dish {
-  name: string;
-  image: string;
-  desc: string;
-}
+import type { Dish } from '@/types';
 
 export const dishList: Dish[] = [
   {
