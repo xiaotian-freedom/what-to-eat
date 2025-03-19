@@ -92,14 +92,14 @@
   import { ColorManager } from '@/utils/ColorManager';
   import IconConfirm from '@/assets/icons/confirm.svg';
   import IconCamera from '@/assets/icons/camera.svg';
-  import previewImg from '@/assets/images/preview.jpeg';
+  import ImgTofu from '@/assets/images/tofu.jpg';
 
   const router = useRouter();
   const route = useRoute();
   const foodStore = useFoodStore();
   const fileInput = ref<HTMLInputElement | null>(null);
   const foodName = ref('');
-  const previewSrc = ref(previewImg);
+  const previewSrc = ref(ImgTofu);
   const imageSelected = ref(false);
   const isEdit = ref(false);
   const editFoodId = ref<string | null>(null);
@@ -119,7 +119,7 @@
           imageSelected.value = true;
         } else if (foodToEdit.backgroundColor) {
           // 如果没有图片，可以显示背景色
-          previewSrc.value = previewImg;
+          previewSrc.value = ImgTofu;
           imageSelected.value = false;
         }
       }

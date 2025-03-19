@@ -33,11 +33,7 @@
               class="w-full h-full rounded-full bg-white bg-opacity-70 backdrop-filter backdrop-blur-md shadow-lg flex items-center justify-center"
             >
               <div class="w-20 h-20 rounded-full overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1512058556646-c4da40fba323"
-                  class="w-full h-full object-cover"
-                  alt="汉堡"
-                />
+                <img :src="ImgHamburger" class="w-full h-full object-cover" alt="汉堡" />
               </div>
             </div>
           </div>
@@ -46,11 +42,7 @@
               class="w-full h-full rounded-full bg-white bg-opacity-70 backdrop-filter backdrop-blur-md shadow-lg flex items-center justify-center"
             >
               <div class="w-16 h-16 rounded-full overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1585032226651-759b368d7246"
-                  class="w-full h-full object-cover"
-                  alt="麻婆豆腐"
-                />
+                <img :src="ImgTofu" class="w-full h-full object-cover" alt="麻婆豆腐" />
               </div>
             </div>
           </div>
@@ -59,11 +51,7 @@
               class="w-full h-full rounded-full bg-white bg-opacity-70 backdrop-filter backdrop-blur-md shadow-lg flex items-center justify-center"
             >
               <div class="w-14 h-14 rounded-full overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1563379926898-05f4575a45d8"
-                  class="w-full h-full object-cover"
-                  alt="水煮鱼"
-                />
+                <img :src="ImgNoodles" class="w-full h-full object-cover" alt="意大利面" />
               </div>
             </div>
           </div>
@@ -99,6 +87,10 @@
 </template>
 
 <script setup>
+  import ImgTofu from '@/assets/images/tofu.jpg';
+  import ImgHamburger from '@/assets/images/hamburger.jpg';
+  import ImgNoodles from '@/assets/images/noodles.jpg';
+
   defineProps({
     isActive: {
       type: Boolean,
