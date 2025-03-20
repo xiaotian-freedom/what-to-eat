@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import GuidePage from '@/views/Guide.vue';
-import HomePage from '@/views/Home.vue';
-import AddFoodPage from '@/views/AddFood.vue';
-import FoodManagementPage from '@/views/FoodManagement.vue';
+import GuidePage from '@/views/GuidePage.vue';
+import HomePage from '@/views/HomePage.vue';
+import AddFoodPage from '@/views/AddFoodPage.vue';
+import FoodManagementPage from '@/views/FoodManagementPage.vue';
 const routes = [
   {
     path: '/',

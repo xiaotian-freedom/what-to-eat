@@ -88,20 +88,32 @@
   import HeaderBar from '@/components/HeaderBar.vue';
   import { useFoodStore } from '@/stores';
   import type { Food } from '@/types/food';
-  import { showSuccessToast, showToast } from 'vant';
+  import { closeToast, showFailToast, showLoadingToast, showSuccessToast, showToast } from 'vant';
   import { ColorManager } from '@/utils/ColorManager';
   import IconConfirm from '@/assets/icons/confirm.svg';
   import IconCamera from '@/assets/icons/camera.svg';
   import ImgTofu from '@/assets/images/tofu.jpg';
+  import { getUploadToken, initQiniu } from '@/utils/upload';
+  import { upload } from '@/utils/qiniu';
+  // import { useUserStore } from '@/stores/user';
 
-  const router = useRouter();
   const route = useRoute();
+  const router = useRouter();
+  // 菜品store
   const foodStore = useFoodStore();
+  // 用户store
+  // const userStore = useUserStore();
+  // 文件输入框
   const fileInput = ref<HTMLInputElement | null>(null);
+  // 菜品名称
   const foodName = ref('');
+  // 预览图片
   const previewSrc = ref(ImgTofu);
+  // 是否选择图片
   const imageSelected = ref(false);
+  // 是否为编辑模式
   const isEdit = ref(false);
+  // 编辑菜品id
   const editFoodId = ref<string | null>(null);
 
   // 在组件挂载时检查是否为编辑模式
@@ -132,17 +144,74 @@
   };
 
   // 文件选择后预览
-  const onFileChange = (event: Event) => {
+  const onFileChange = async (event: Event) => {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = e => {
-        if (e.target?.result) {
-          previewSrc.value = e.target.result as string;
-          imageSelected.value = true;
-        }
+    const file = input.files?.[0];
+
+    if (!file) return;
+
+    // 验证文件类型和大小
+    if (!file.type.startsWith('image/')) {
+      showToast('请上传图片格式文件');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      showToast('图片大小不能超过 10M');
+      return;
+    }
+    uploadToQiniu(file);
+  };
+
+  // 上传到七牛云
+  const uploadToQiniu = async (file: File) => {
+    try {
+      showLoadingToast('上传中...');
+      const uploadToken = await getUploadToken();
+      if (uploadToken && uploadToken.data.status === 0 && uploadToken.data.code === 200) {
+        initQiniu(uploadToken.data.data.uptoken, file.name, uploadToken.data.data.domain);
+        upload(
+          file,
+          (res: any) => {
+            showToast('上传成功');
+            const imgUrl = uploadToken.data.data.domain + '/' + res.key;
+            console.log(imgUrl, 'imgUrl');
+            updateFoodImage(imgUrl);
+          },
+          (error: any) => {
+            console.log(error);
+            showFailToast('上传失败');
+          },
+          () => {
+            closeToast();
+          }
+        );
+      } else {
+        showFailToast('获取上传token失败');
+      }
+    } catch (error) {
+      console.log(error);
+      showFailToast('上传失败，请重试');
+    } finally {
+      // 重置 input
+      if (fileInput.value) {
+        fileInput.value.value = '';
+        fileInput.value.capture = '';
+      }
+    }
+  };
+
+  // 更新菜品图片
+  const updateFoodImage = (imgUrl: string) => {
+    previewSrc.value = imgUrl;
+    console.log(previewSrc.value, 'previewSrc');
+    imageSelected.value = true;
+    if (isEdit.value && editFoodId.value) {
+      const updatedFood: Food = {
+        id: editFoodId.value,
+        name: foodName.value.trim(),
+        image: imgUrl,
       };
-      reader.readAsDataURL(input.files[0]);
+      foodStore.updateFood(updatedFood);
     }
   };
 
