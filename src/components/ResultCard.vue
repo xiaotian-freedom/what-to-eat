@@ -16,8 +16,12 @@
       >
         <div class="w-full h-full rounded-full overflow-hidden shadow-lg relative">
           <!-- 有图片时显示图片 -->
-          <template v-if="selectedDish && selectedDish.image">
-            <img :src="selectedDish.image" class="w-full h-full object-cover" />
+          <template v-if="shouldShowImage()">
+            <img
+              :src="selectedDish!.image"
+              class="w-full h-full object-cover"
+              @error="handleImageError"
+            />
           </template>
 
           <!-- 无图片时显示背景颜色和首字母 -->
@@ -52,13 +56,27 @@
 </template>
 
 <script setup lang="ts">
+  import { ref } from 'vue';
   import type { Dish } from '@/types';
   import ActionButtons from './ActionButtons.vue';
   import HeaderBar from '@/components/HeaderBar.vue';
 
-  defineProps<{
+  const props = defineProps<{
     selectedDish: Dish | null;
   }>();
+
+  // 存储图片加载失败的状态
+  const imageLoadFailed = ref(false);
+
+  // 处理图片加载失败
+  const handleImageError = (): void => {
+    imageLoadFailed.value = true;
+  };
+
+  // 检查是否应该显示图片
+  const shouldShowImage = (): boolean => {
+    return !!(props.selectedDish?.image && !imageLoadFailed.value);
+  };
 
   defineEmits<{
     (e: 'choose-again'): void;

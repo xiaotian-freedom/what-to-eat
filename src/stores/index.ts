@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { Food } from '@/types/food';
+import { ColorManager } from '@/utils/ColorManager';
 
 export const useFoodStore = defineStore('food', () => {
   // 菜品列表状态
@@ -12,6 +13,12 @@ export const useFoodStore = defineStore('food', () => {
       const storedItems = localStorage.getItem('foodItems');
       if (storedItems) {
         foodItems.value = JSON.parse(storedItems);
+        // 确保每个菜品都有背景颜色
+        foodItems.value.forEach(item => {
+          if (!item.backgroundColor) {
+            item.backgroundColor = ColorManager.getRandomColor();
+          }
+        });
       }
     } catch (error) {
       console.error('加载菜品数据出错:', error);
@@ -32,6 +39,7 @@ export const useFoodStore = defineStore('food', () => {
     const newFood: Food = {
       ...food,
       id: Date.now().toString(),
+      backgroundColor: food.backgroundColor || ColorManager.getRandomColor(),
     };
     foodItems.value.unshift(newFood);
     saveFoodItems();

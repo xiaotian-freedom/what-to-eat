@@ -31,6 +31,7 @@
                 class="w-full h-full object-cover"
                 :style="{ opacity: imageSelected ? '1' : '0.7' }"
                 alt="菜品示例"
+                @error="handleImageError"
               />
             </div>
             <div
@@ -115,9 +116,14 @@
   const isEdit = ref(false);
   // 编辑菜品id
   const editFoodId = ref<string | null>(null);
+  // 图片加载失败状态
+  const imageLoadFailed = ref(false);
 
   // 在组件挂载时检查是否为编辑模式
   onMounted(() => {
+    // 重置图片加载失败状态
+    imageLoadFailed.value = false;
+
     if (route.query.id) {
       isEdit.value = true;
       editFoodId.value = route.query.id as string;
@@ -200,11 +206,20 @@
     }
   };
 
+  // 处理图片加载失败
+  const handleImageError = (): void => {
+    imageLoadFailed.value = true;
+    // 重置为默认图片
+    previewSrc.value = ImgTofu;
+    imageSelected.value = false;
+  };
+
   // 更新菜品图片
   const updateFoodImage = (imgUrl: string) => {
     previewSrc.value = imgUrl;
     console.log(previewSrc.value, 'previewSrc');
     imageSelected.value = true;
+    imageLoadFailed.value = false; // 重置失败状态
     if (isEdit.value && editFoodId.value) {
       const updatedFood: Food = {
         id: editFoodId.value,

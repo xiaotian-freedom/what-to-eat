@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted } from 'vue';
+  import { onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import HeaderBar from '@/components/HeaderBar.vue';
   import { useFoodStore } from '@/stores';
@@ -9,10 +9,23 @@
   const router = useRouter();
   const foodStore = useFoodStore();
 
+  // 存储图片加载失败的菜品ID
+  const failedImages = ref<Set<string>>(new Set());
+
   // 页面加载时获取数据
   onMounted(() => {
     foodStore.loadFoodItems();
   });
+
+  // 处理图片加载失败
+  const handleImageError = (itemId: string): void => {
+    failedImages.value.add(itemId);
+  };
+
+  // 检查图片是否加载失败
+  const isImageFailed = (itemId: string): boolean => {
+    return failedImages.value.has(itemId);
+  };
 
   // 删除菜品
   const deleteFood = (id: string, name: string): void => {
@@ -76,12 +89,13 @@
                 <div
                   class="bg-white/60 backdrop-filter backdrop-blur-lg rounded-xl p-3 flex items-center shadow-sm"
                 >
-                  <!-- 替换图片区域，添加条件渲染 -->
-                  <template v-if="item.image">
+                  <!-- 图片区域 - 支持加载失败时的替代显示 -->
+                  <template v-if="item.image && !isImageFailed(item.id)">
                     <img
                       :src="item.image"
                       class="w-16 h-16 rounded-full object-cover mr-3 shadow-lg"
                       :alt="item.name"
+                      @error="handleImageError(item.id)"
                     />
                   </template>
                   <div
