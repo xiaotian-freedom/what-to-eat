@@ -32,8 +32,11 @@
   import { dishList } from '@/data/dishList';
   import { useRouter } from 'vue-router';
   import { showFailToast, showSuccessToast } from 'vant';
+  import { useChallengeStore } from '@/stores/challenge';
 
   const router = useRouter();
+  const challengeStore = useChallengeStore();
+
   const selectedDish = ref<Dish | null>(null);
   const showResult = ref(false);
   const homeCardRef = useTemplateRef('homeCardRef');
@@ -82,6 +85,8 @@
   onMounted(() => {
     // 添加GPU加速类
     document.body.classList.add('gpu-accelerated');
+    // 加载挑战数据
+    challengeStore.loadChallengeData();
   });
 </script>
 

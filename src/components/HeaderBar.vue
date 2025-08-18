@@ -21,14 +21,27 @@
       </div>
     </div>
 
-    <a
-      v-if="rightIcon"
-      href="#"
-      @click.prevent="handleRightIconClick"
-      class="text-gray-600 hover:bg-gray-100 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
-    >
-      <img :src="rightIcon" class="w-5 h-5" />
-    </a>
+    <div class="flex items-center space-x-2">
+      <button
+        v-for="(button, index) in rightButtons"
+        :key="index"
+        @click="button.onClick"
+        :class="[
+          'text-gray-600 hover:bg-gray-100 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0',
+          button.className || '',
+        ]"
+      >
+        <span class="text-lg">{{ button.icon }}</span>
+      </button>
+      <a
+        v-if="rightIcon"
+        href="#"
+        @click.prevent="handleRightIconClick"
+        class="text-gray-600 hover:bg-gray-100 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
+      >
+        <img :src="rightIcon" class="w-5 h-5" />
+      </a>
+    </div>
   </div>
 </template>
 
@@ -37,12 +50,19 @@
 
   const router = useRouter();
 
+  interface RightButton {
+    icon: string;
+    onClick: () => void;
+    className?: string;
+  }
+
   const props = withDefaults(
     defineProps<{
       title: string;
       centerTitle?: boolean;
       showBackButton?: boolean;
       rightIcon?: string;
+      rightButtons?: RightButton[];
       onBack?: () => void;
       onRightIconClick?: () => void;
     }>(),
@@ -50,6 +70,7 @@
       centerTitle: false,
       showBackButton: true,
       rightIcon: '',
+      rightButtons: () => [],
       onBack: undefined,
       onRightIconClick: undefined,
     }
