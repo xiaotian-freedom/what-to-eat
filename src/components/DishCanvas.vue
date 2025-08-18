@@ -468,10 +468,10 @@
       }
 
       // 重新设计：使用一个统一的时间控制器
-      let animationStartTime = performance.now();
-      let animationTotalTime = 4000; // 总动画时间
+      const animationStartTime = performance.now();
+      const animationTotalTime = 4000; // 总动画时间
       let lastDishTime = animationStartTime;
-      let dishesToAdd = 20; // 总共会生成的菜品数量
+      const dishesToAdd = 20; // 总共会生成的菜品数量
       let addedDishes = 0;
       let finalDishSet = false; // 标记是否已设置最终菜品
 

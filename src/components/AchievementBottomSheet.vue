@@ -101,10 +101,10 @@
     visible: boolean;
   }
 
-  const props = defineProps<Props>();
+  defineProps<Props>();
   const challengeStore = useChallengeStore();
 
-  const emit = defineEmits<{
+  defineEmits<{
     (e: 'close'): void;
   }>();
 
