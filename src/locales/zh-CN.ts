@@ -66,12 +66,26 @@ export default {
     nameRequired: '请输入菜品名称',
   },
 
+  // 标签页
+  tabs: {
+    presetDishes: '预设菜品',
+    customAdd: '自定义添加',
+  },
+
+  // 搜索相关
+  search: {
+    placeholder: '搜索菜品...',
+    noResults: '没有找到相关菜品',
+  },
+
   // 提示信息
   messages: {
     addSuccess: '添加成功',
+    addFailed: '添加失败',
     editSuccess: '修改成功',
     deleteSuccess: '删除成功',
     deleteConfirm: '确定要删除这个菜品吗？',
+    duplicateFood: '该菜品已存在，无需重复添加',
     noDishes: '还没有添加任何菜品',
     addDishFirst: '请先添加一些菜品',
     todayLimitReached: '今日随机次数已用完',

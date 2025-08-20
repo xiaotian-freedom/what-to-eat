@@ -8,7 +8,7 @@ import App from './App.vue';
 import router from './router';
 import i18n from './locales';
 import 'vant/lib/index.css';
-import { Button, Toast, Empty, Field, Dialog, SwipeCell } from 'vant';
+import { Button, Toast, Empty, Field, Dialog, SwipeCell, Tabs, Tab, Icon } from 'vant';
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -21,6 +21,9 @@ app.use(Empty);
 app.use(Field);
 app.use(Dialog);
 app.use(SwipeCell);
+app.use(Tabs);
+app.use(Tab);
+app.use(Icon);
 
 // 创建扩展的触摸事件接口
 interface TouchEventWithScale extends TouchEvent {

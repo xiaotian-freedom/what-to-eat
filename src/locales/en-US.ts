@@ -66,12 +66,26 @@ export default {
     nameRequired: 'Please enter dish name',
   },
 
+  // Tabs
+  tabs: {
+    presetDishes: 'Preset Dishes',
+    customAdd: 'Custom Add',
+  },
+
+  // Search related
+  search: {
+    placeholder: 'Search dishes...',
+    noResults: 'No dishes found',
+  },
+
   // Messages
   messages: {
     addSuccess: 'Added successfully',
+    addFailed: 'Add failed',
     editSuccess: 'Modified successfully',
     deleteSuccess: 'Deleted successfully',
     deleteConfirm: 'Are you sure you want to delete this dish?',
+    duplicateFood: 'This dish already exists, no need to add again',
     noDishes: 'No dishes added yet',
     addDishFirst: 'Please add some dishes first',
     todayLimitReached: "Today's random limit reached",
