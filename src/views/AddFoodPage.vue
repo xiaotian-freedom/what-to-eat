@@ -30,7 +30,6 @@
                 :src="previewSrc"
                 class="w-full h-full object-cover"
                 :style="{ opacity: imageSelected ? '1' : '0.7' }"
-                alt="菜品示例"
                 @error="handleImageError"
               />
             </div>
@@ -62,7 +61,7 @@
           <div class="space-y-1">
             <van-field
               v-model="foodName"
-              placeholder="输入菜品名称"
+              :placeholder="t('form.dishNamePlaceholder')"
               class="rounded-xl !py-3 !px-4 !text-base !border-1 !border-purple-500"
               :border="false"
               input-align="center"
