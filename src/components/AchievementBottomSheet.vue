@@ -55,25 +55,24 @@
                 class="font-semibold text-gray-800 truncate"
                 :class="achievement.isUnlocked ? 'text-green-700' : ''"
               >
-                {{ $t(achievement.nameKey) }}
+                {{ $t(achievement.name) }}
               </h3>
               <span v-if="achievement.isUnlocked" class="text-green-500 text-sm flex-shrink-0">
                 ✓
               </span>
             </div>
 
-            <p class="text-sm text-gray-600 mb-2">{{ $t(achievement.descriptionKey) }}</p>
+            <p class="text-sm text-gray-600 mb-2">{{ $t(achievement.description) }}</p>
 
-            <!-- 进度条 -->
-            <div class="space-y-1">
+            <!-- 进度条 - 只在未解锁时显示 -->
+            <div v-if="!achievement.isUnlocked" class="space-y-1">
               <div class="flex justify-between text-xs text-gray-500">
                 <span>{{ $t('achievements.progress') }}</span>
                 <span>{{ achievement.progress }}/{{ achievement.maxProgress }}</span>
               </div>
               <div class="w-full bg-gray-200 rounded-full h-2">
                 <div
-                  class="h-2 rounded-full transition-all duration-300"
-                  :class="achievement.isUnlocked ? 'bg-green-500' : 'bg-blue-500'"
+                  class="h-2 rounded-full transition-all duration-300 bg-blue-500"
                   :style="{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }"
                 ></div>
               </div>

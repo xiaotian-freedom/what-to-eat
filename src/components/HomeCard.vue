@@ -5,7 +5,7 @@
   >
     <!-- 顶部状态栏 -->
     <HeaderBar
-      :title="$t('pages.home')"
+      :title="$t('今天吃什么')"
       :showBackButton="false"
       :centerTitle="true"
       :rightButtons="[
@@ -24,16 +24,20 @@
 
     <!-- 内容区域 -->
     <div class="flex-1 flex flex-col items-center p-6 overflow-hidden relative">
-      <!-- 挑战状态浮动面板 -->
-      <div class="absolute top-2 left-2 right-2 z-10">
-        <ChallengeStatus />
+      <!-- 挑战状态浮动面板 - 可折叠 -->
+      <div v-if="!showResult" class="absolute top-4 left-4 z-10">
+        <ChallengeStatus ref="challengeStatusRef" />
       </div>
 
       <!-- 成就BottomSheet -->
       <AchievementBottomSheet :visible="showAchievements" @close="showAchievements = false" />
 
       <!-- 占位区域 -->
-      <div ref="canvasContainer" class="flex-grow w-full flex items-center justify-center relative">
+      <div
+        ref="canvasContainer"
+        class="flex-grow w-full flex items-center justify-center relative"
+        @click="handleCanvasClick"
+      >
         <DishCanvas
           ref="dishCanvasRef"
           :dishList="combinedDishList"
@@ -68,6 +72,7 @@
   import HeaderBar from '@/components/HeaderBar.vue';
   import { useFoodStore } from '@/stores';
   import { useChallengeStore } from '@/stores/challenge';
+  import { useDevModeStore } from '@/stores/devMode';
   import { showFailToast } from 'vant';
 
   const { t } = useI18n();
@@ -75,10 +80,12 @@
 
   const props = defineProps<{
     dishList: Dish[];
+    showResult: boolean;
   }>();
 
   const foodStore = useFoodStore();
   const challengeStore = useChallengeStore();
+  const devModeStore = useDevModeStore();
 
   // 优先使用 store 中的数据，如果为空才使用 dishList
   const combinedDishList = computed(() => {
@@ -107,6 +114,7 @@
   const showAchievements = ref(false);
   const dishCanvasRef = ref<InstanceType<typeof DishCanvas> | null>(null);
   const canvasContainer = ref<HTMLDivElement | null>(null);
+  const challengeStatusRef = ref<InstanceType<typeof ChallengeStatus> | null>(null);
 
   const canUseToday = computed(() => challengeStore.canUseToday);
 
@@ -119,14 +127,12 @@
   // 处理随机选菜
   const handleRandomFood = async () => {
     if (!canUseToday.value) {
-      showFailToast(t('messages.todayLimitReached'));
-      return;
-    }
-
-    // 使用挑战模式
-    const success = challengeStore.useRandomFood();
-    if (!success) {
-      showFailToast(t('messages.todayLimitReached'));
+      // 开发模式下显示不同的提示
+      if (devModeStore.isUnlimitedUsesEnabled) {
+        showFailToast('开发模式下应该可以无限使用，请检查配置');
+      } else {
+        showFailToast(t('messages.todayLimitReached'));
+      }
       return;
     }
 
@@ -145,8 +151,22 @@
 
   // 动画完成回调
   const onAnimationComplete = (finalDish: Dish) => {
+    // 使用挑战模式并记录菜品
+    const success = challengeStore.useRandomFood(finalDish.name);
+    if (!success) {
+      showFailToast(t('messages.todayLimitReached'));
+      return;
+    }
+
     emit('selected-dish', finalDish);
     isAnimating.value = false;
+  };
+
+  // 处理转盘区域点击 - 收起挑战状态面板
+  const handleCanvasClick = () => {
+    if (challengeStatusRef.value && challengeStatusRef.value.isExpanded) {
+      challengeStatusRef.value.toggleExpand();
+    }
   };
 
   // 将方法暴露给父组件

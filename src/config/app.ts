@@ -12,4 +12,15 @@ export const APP_CONFIG = {
     'app.features.dailyChallenge',
     'app.features.animations',
   ],
+  // 开发模式配置
+  devMode: {
+    enabled: false, // 默认关闭开发模式
+    unlimitedUses: true, // 开发模式下无限使用
+  },
 } as const;
+
+// 开发模式配置类型
+export interface DevModeConfig {
+  enabled: boolean;
+  unlimitedUses: boolean;
+}

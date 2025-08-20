@@ -8,6 +8,7 @@
       <HomeCard
         ref="homeCardRef"
         :dishList="dishList"
+        :showResult="showResult"
         @random-food="randomFood"
         @add-food="addFood"
         @show-food-list="showFoodList"

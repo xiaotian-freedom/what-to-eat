@@ -14,6 +14,30 @@
         <!-- 内容区域 -->
         <div class="flex-1 flex flex-col p-6 overflow-y-auto">
           <div class="space-y-4">
+            <!-- 开发模式开关 -->
+            <div
+              @click="toggleDevMode"
+              class="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-4 border border-orange-100 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-95"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <h3 class="text-lg font-semibold text-gray-800">{{ $t('settings.devMode') }}</h3>
+                  <p class="text-sm text-gray-600 mt-1">{{ $t('settings.devModeDesc') }}</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <div
+                    class="w-12 h-6 rounded-full transition-colors duration-200 relative"
+                    :class="devModeStore.isDevModeEnabled ? 'bg-orange-500' : 'bg-gray-300'"
+                  >
+                    <div
+                      class="w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200 absolute top-0.5"
+                      :class="devModeStore.isDevModeEnabled ? 'translate-x-6' : 'translate-x-0.5'"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- 语言设置 -->
             <div
               @click="showLanguageSelector = true"
@@ -179,14 +203,21 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed } from 'vue';
+  import { ref, computed, onMounted } from 'vue';
   import { useI18n } from 'vue-i18n';
 
   import HeaderBar from '@/components/HeaderBar.vue';
   import BottomSheet from '@/components/BottomSheet.vue';
   import { APP_CONFIG } from '@/config/app';
+  import { useDevModeStore } from '@/stores/devMode';
 
   const { locale } = useI18n();
+  const devModeStore = useDevModeStore();
+
+  // 页面加载时加载开发模式状态
+  onMounted(() => {
+    devModeStore.loadDevModeState();
+  });
 
   // 响应式数据
   const showLanguageSelector = ref(false);
@@ -201,5 +232,10 @@
     locale.value = newLocale;
     localStorage.setItem('locale', newLocale);
     showLanguageSelector.value = false;
+  };
+
+  // 切换开发模式
+  const toggleDevMode = () => {
+    devModeStore.toggleDevMode();
   };
 </script>

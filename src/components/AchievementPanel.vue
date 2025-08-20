@@ -19,13 +19,13 @@
               class="font-medium text-xs truncate"
               :class="achievement.isUnlocked ? 'text-green-700' : 'text-gray-600'"
             >
-              {{ $t(achievement.nameKey) }}
+              {{ $t(achievement.name) }}
             </span>
             <span v-if="achievement.isUnlocked" class="text-green-500 text-xs flex-shrink-0"
               >✓</span
             >
           </div>
-          <div class="text-xs text-gray-500 truncate">{{ $t(achievement.descriptionKey) }}</div>
+          <div class="text-xs text-gray-500 truncate">{{ $t(achievement.description) }}</div>
           <div v-if="!achievement.isUnlocked" class="mt-1">
             <div class="flex items-center space-x-1">
               <div class="flex-1 bg-gray-200 rounded-full h-1">

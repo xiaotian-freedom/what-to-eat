@@ -4,7 +4,12 @@
     class="card-face bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative flex flex-col w-full h-full"
   >
     <!-- 顶部状态栏 -->
-    <HeaderBar :title="$t('pages.result')" :showBackButton="false" :centerTitle="true" />
+    <HeaderBar
+      :title="$t('pages.result')"
+      :showBackButton="true"
+      :centerTitle="true"
+      @back="$emit('choose-again')"
+    />
 
     <!-- 内容区域 -->
     <div
@@ -12,7 +17,7 @@
     >
       <!-- 选中结果展示 -->
       <div
-        class="w-64 h-64 rounded-full bg-white backdrop-filter backdrop-blur-lg shadow-xl flex flex-col items-center justify-center mt-3"
+        class="w-64 h-64 rounded-full bg-white backdrop-filter backdrop-blur-lg shadow-xl flex flex-col items-center justify-center mt-5"
       >
         <div class="w-full h-full rounded-full overflow-hidden shadow-lg relative">
           <!-- 有图片时显示图片 -->

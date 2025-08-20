@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { useDevModeStore } from './devMode';
 
 // 成就类型
 export interface Achievement {
   id: string;
-  nameKey: string;
-  descriptionKey: string;
+  name: string;
+  description: string;
   icon: string;
   isUnlocked: boolean;
   unlockDate?: string;
@@ -21,10 +22,13 @@ export interface ChallengeData {
   luckyValue: number;
   totalUses: number;
   consecutiveDays: number;
+  triedDishes: string[]; // 记录尝试过的菜品名称
   achievements: Achievement[];
 }
 
 export const useChallengeStore = defineStore('challenge', () => {
+  const devModeStore = useDevModeStore();
+
   // 挑战数据
   const challengeData = ref<ChallengeData>({
     dailyUses: 0,
@@ -33,11 +37,12 @@ export const useChallengeStore = defineStore('challenge', () => {
     luckyValue: 0,
     totalUses: 0,
     consecutiveDays: 0,
+    triedDishes: [],
     achievements: [
       {
         id: 'first_use',
-        nameKey: 'achievements.firstUse',
-        descriptionKey: 'achievements.firstUseDesc',
+        name: '初次尝试',
+        description: '第一次使用随机选菜',
         icon: '🎯',
         isUnlocked: false,
         progress: 0,
@@ -45,8 +50,8 @@ export const useChallengeStore = defineStore('challenge', () => {
       },
       {
         id: 'daily_streak_3',
-        nameKey: 'achievements.dailyStreak3',
-        descriptionKey: 'achievements.dailyStreak3Desc',
+        name: '坚持三天',
+        description: '连续使用3天',
         icon: '🔥',
         isUnlocked: false,
         progress: 0,
@@ -54,8 +59,8 @@ export const useChallengeStore = defineStore('challenge', () => {
       },
       {
         id: 'daily_streak_7',
-        nameKey: 'achievements.dailyStreak7',
-        descriptionKey: 'achievements.dailyStreak7Desc',
+        name: '一周坚持',
+        description: '连续使用7天',
         icon: '🌟',
         isUnlocked: false,
         progress: 0,
@@ -63,8 +68,8 @@ export const useChallengeStore = defineStore('challenge', () => {
       },
       {
         id: 'daily_streak_30',
-        nameKey: 'achievements.dailyStreak30',
-        descriptionKey: 'achievements.dailyStreak30Desc',
+        name: '月度达人',
+        description: '连续使用30天',
         icon: '👑',
         isUnlocked: false,
         progress: 0,
@@ -72,8 +77,8 @@ export const useChallengeStore = defineStore('challenge', () => {
       },
       {
         id: 'lucky_master',
-        nameKey: 'achievements.luckyMaster',
-        descriptionKey: 'achievements.luckyMasterDesc',
+        name: '幸运大师',
+        description: '累计获得100点幸运值',
         icon: '🍀',
         isUnlocked: false,
         progress: 0,
@@ -81,8 +86,8 @@ export const useChallengeStore = defineStore('challenge', () => {
       },
       {
         id: 'food_explorer',
-        nameKey: 'achievements.foodExplorer',
-        descriptionKey: 'achievements.foodExplorerDesc',
+        name: '美食探索者',
+        description: '尝试过50种不同的菜品',
         icon: '🌍',
         isUnlocked: false,
         progress: 0,
@@ -92,15 +97,30 @@ export const useChallengeStore = defineStore('challenge', () => {
   });
 
   // 计算属性
-  const canUseToday = computed(
-    () => challengeData.value.dailyUses < challengeData.value.maxDailyUses
-  );
-  const remainingUses = computed(
-    () => challengeData.value.maxDailyUses - challengeData.value.dailyUses
-  );
-  const progressPercentage = computed(
-    () => (challengeData.value.dailyUses / challengeData.value.maxDailyUses) * 100
-  );
+  const canUseToday = computed(() => {
+    // 开发模式下无限使用
+    if (devModeStore.isUnlimitedUsesEnabled) {
+      return true;
+    }
+    // 正常模式下检查使用次数
+    return challengeData.value.dailyUses < challengeData.value.maxDailyUses;
+  });
+
+  const remainingUses = computed(() => {
+    // 开发模式下显示无限
+    if (devModeStore.isUnlimitedUsesEnabled) {
+      return Infinity;
+    }
+    return challengeData.value.maxDailyUses - challengeData.value.dailyUses;
+  });
+
+  const progressPercentage = computed(() => {
+    // 开发模式下显示100%
+    if (devModeStore.isUnlimitedUsesEnabled) {
+      return 100;
+    }
+    return (challengeData.value.dailyUses / challengeData.value.maxDailyUses) * 100;
+  });
 
   // 从localStorage加载数据
   const loadChallengeData = (): void => {
@@ -111,6 +131,7 @@ export const useChallengeStore = defineStore('challenge', () => {
         challengeData.value = { ...challengeData.value, ...data };
       }
       checkAndResetDaily();
+      checkAchievements(); // 加载数据后检查成就状态
     } catch (error) {
       console.error('加载挑战数据出错:', error);
     }
@@ -158,15 +179,23 @@ export const useChallengeStore = defineStore('challenge', () => {
   };
 
   // 使用随机选菜
-  const useRandomFood = (): boolean => {
+  const useRandomFood = (dishName?: string): boolean => {
     checkAndResetDaily();
 
     if (!canUseToday.value) {
       return false;
     }
 
-    challengeData.value.dailyUses++;
+    // 开发模式下不增加使用次数
+    if (!devModeStore.isUnlimitedUsesEnabled) {
+      challengeData.value.dailyUses++;
+    }
     challengeData.value.totalUses++;
+
+    // 记录尝试过的菜品
+    if (dishName && !challengeData.value.triedDishes.includes(dishName)) {
+      challengeData.value.triedDishes.push(dishName);
+    }
 
     // 增加幸运值（每次使用增加1-3点）
     const luckyGain = Math.floor(Math.random() * 3) + 1;
@@ -188,6 +217,7 @@ export const useChallengeStore = defineStore('challenge', () => {
 
       switch (achievement.id) {
         case 'first_use':
+          achievement.progress = challengeData.value.totalUses;
           if (challengeData.value.totalUses >= 1) {
             unlockAchievement(achievement.id);
           }
@@ -213,6 +243,12 @@ export const useChallengeStore = defineStore('challenge', () => {
         case 'lucky_master':
           achievement.progress = challengeData.value.luckyValue;
           if (challengeData.value.luckyValue >= 100) {
+            unlockAchievement(achievement.id);
+          }
+          break;
+        case 'food_explorer':
+          achievement.progress = challengeData.value.triedDishes.length;
+          if (challengeData.value.triedDishes.length >= 50) {
             unlockAchievement(achievement.id);
           }
           break;
@@ -246,6 +282,7 @@ export const useChallengeStore = defineStore('challenge', () => {
       luckyValue: 0,
       totalUses: 0,
       consecutiveDays: 0,
+      triedDishes: [],
       achievements: challengeData.value.achievements.map(a => ({
         ...a,
         isUnlocked: false,
