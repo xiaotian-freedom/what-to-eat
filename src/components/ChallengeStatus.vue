@@ -4,7 +4,7 @@
     <div class="flex items-center justify-between mb-2">
       <div class="flex items-center space-x-1">
         <span class="text-sm">🎯</span>
-        <span class="font-semibold text-gray-800 text-sm">每日挑战</span>
+        <span class="font-semibold text-gray-800 text-sm">{{ $t('challenge.title') }}</span>
       </div>
       <div class="text-xs text-gray-600 font-medium">
         {{ remainingUses }}/{{ challengeStore.challengeData.maxDailyUses }}
@@ -27,7 +27,9 @@
       </div>
       <div class="flex items-center space-x-1">
         <span>🔥</span>
-        <span class="text-gray-700">{{ challengeStore.challengeData.consecutiveDays }}天</span>
+        <span class="text-gray-700"
+          >{{ challengeStore.challengeData.consecutiveDays }}{{ $t('challenge.times') }}</span
+        >
       </div>
     </div>
 
@@ -35,7 +37,7 @@
     <div v-if="!canUseToday" class="mt-2 p-1.5 bg-orange-100 rounded-lg">
       <div class="flex items-center space-x-1 text-orange-700">
         <span class="text-xs">⏰</span>
-        <span class="text-xs">今日次数已用完</span>
+        <span class="text-xs">{{ $t('challenge.todayLimitReached') }}</span>
       </div>
     </div>
   </div>

@@ -1,11 +1,13 @@
 <script setup lang="ts">
   import { onMounted, ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
   import HeaderBar from '@/components/HeaderBar.vue';
   import { useFoodStore } from '@/stores';
   import { showConfirmDialog } from 'vant';
   import IconEmpty from '@/assets/icons/empty.svg';
 
+  const { t } = useI18n();
   const router = useRouter();
   const foodStore = useFoodStore();
 
@@ -28,12 +30,12 @@
   };
 
   // 删除菜品
-  const deleteFood = (id: string, name: string): void => {
+  const deleteFood = (id: string): void => {
     showConfirmDialog({
-      title: '确认删除',
-      message: `确定要删除"${name}"吗？`,
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+      title: t('common.confirm'),
+      message: t('messages.deleteConfirm'),
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       confirmButtonColor: '#ee0a24',
     })
       .then(() => {
@@ -66,7 +68,7 @@
     >
       <!-- 顶部状态栏 -->
       <HeaderBar
-        title="菜品管理"
+        :title="$t('pages.foodManagement')"
         rightIcon="https://unpkg.com/lucide-static@latest/icons/plus.svg"
         :onRightIconClick="addNewDish"
       />
@@ -124,13 +126,13 @@
                     @click="editFood(item.id)"
                     class="h-full flex items-center justify-center px-4 bg-blue-500 text-white"
                   >
-                    编辑
+                    {{ $t('common.edit') }}
                   </button>
                   <button
-                    @click="deleteFood(item.id, item.name)"
+                    @click="deleteFood(item.id)"
                     class="h-full flex items-center justify-center px-4 bg-red-500 text-white"
                   >
-                    删除
+                    {{ $t('common.delete') }}
                   </button>
                 </div>
               </template>
@@ -142,7 +144,7 @@
               class="flex flex-col items-center justify-center"
             >
               <img :src="IconEmpty" alt="空状态" class="w-32 h-32 mx-auto mt-16" />
-              <p class="text-center text-gray-500 mt-6">还没有添加任何菜品</p>
+              <p class="text-center text-gray-500 mt-6">{{ $t('messages.noDishes') }}</p>
             </div>
           </div>
         </div>

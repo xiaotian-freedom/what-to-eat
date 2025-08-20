@@ -2,7 +2,7 @@
   <BottomSheet :visible="visible" @close="$emit('close')" maxHeight="70vh">
     <!-- 标题 -->
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-bold text-gray-800">成就系统</h2>
+      <h2 class="text-xl font-bold text-gray-800">{{ $t('achievements.system') }}</h2>
       <button
         @click="$emit('close')"
         class="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors"
@@ -16,15 +16,15 @@
       <div class="flex justify-between items-center">
         <div class="text-center">
           <div class="text-2xl font-bold text-blue-600">{{ unlockedCount }}</div>
-          <div class="text-sm text-gray-600">已解锁</div>
+          <div class="text-sm text-gray-600">{{ $t('achievements.unlocked') }}</div>
         </div>
         <div class="text-center">
           <div class="text-2xl font-bold text-purple-600">{{ totalCount }}</div>
-          <div class="text-sm text-gray-600">总成就</div>
+          <div class="text-sm text-gray-600">{{ $t('achievements.total') }}</div>
         </div>
         <div class="text-center">
           <div class="text-2xl font-bold text-green-600">{{ progressPercentage }}%</div>
-          <div class="text-sm text-gray-600">完成度</div>
+          <div class="text-sm text-gray-600">{{ $t('achievements.completion') }}</div>
         </div>
       </div>
     </div>
@@ -55,19 +55,19 @@
                 class="font-semibold text-gray-800 truncate"
                 :class="achievement.isUnlocked ? 'text-green-700' : ''"
               >
-                {{ achievement.name }}
+                {{ $t(achievement.nameKey) }}
               </h3>
               <span v-if="achievement.isUnlocked" class="text-green-500 text-sm flex-shrink-0">
                 ✓
               </span>
             </div>
 
-            <p class="text-sm text-gray-600 mb-2">{{ achievement.description }}</p>
+            <p class="text-sm text-gray-600 mb-2">{{ $t(achievement.descriptionKey) }}</p>
 
             <!-- 进度条 -->
             <div class="space-y-1">
               <div class="flex justify-between text-xs text-gray-500">
-                <span>进度</span>
+                <span>{{ $t('achievements.progress') }}</span>
                 <span>{{ achievement.progress }}/{{ achievement.maxProgress }}</span>
               </div>
               <div class="w-full bg-gray-200 rounded-full h-2">
@@ -82,7 +82,7 @@
             <!-- 解锁时间 -->
             <div v-if="achievement.isUnlocked && achievement.unlockDate" class="mt-2">
               <p class="text-xs text-green-600">
-                解锁时间: {{ formatDate(achievement.unlockDate) }}
+                {{ $t('achievements.unlockTime') }}: {{ formatDate(achievement.unlockDate) }}
               </p>
             </div>
           </div>
@@ -94,8 +94,11 @@
 
 <script setup lang="ts">
   import { computed } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import BottomSheet from './BottomSheet.vue';
   import { useChallengeStore } from '@/stores/challenge';
+
+  const { locale } = useI18n();
 
   interface Props {
     visible: boolean;
@@ -122,7 +125,7 @@
   // 格式化日期
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('zh-CN', {
+    return date.toLocaleDateString(locale.value === 'zh-CN' ? 'zh-CN' : 'en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

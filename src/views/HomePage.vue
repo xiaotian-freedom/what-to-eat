@@ -26,6 +26,7 @@
 
 <script setup lang="ts">
   import { ref, onMounted, useTemplateRef } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import HomeCard from '@/components/HomeCard.vue';
   import ResultCard from '@/components/ResultCard.vue';
   import type { Dish } from '@/types';
@@ -34,6 +35,7 @@
   import { showFailToast, showSuccessToast } from 'vant';
   import { useChallengeStore } from '@/stores/challenge';
 
+  const { t } = useI18n();
   const router = useRouter();
   const challengeStore = useChallengeStore();
 
@@ -76,9 +78,9 @@
     // 暂时复制当前页面到剪贴板
     try {
       navigator.clipboard.writeText(window.location.href);
-      showSuccessToast('已复制到剪贴板');
+      showSuccessToast(t('messages.copySuccess'));
     } catch (error) {
-      showFailToast('复制失败');
+      showFailToast(t('messages.copyFailed'));
     }
   };
 

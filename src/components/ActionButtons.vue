@@ -8,7 +8,7 @@
         @click="$emit('randomFood')"
       >
         <img :src="shuffle" class="w-5 h-5 mr-2" />
-        随机选菜
+        {{ $t('buttons.randomFood') }}
       </button>
 
       <div class="flex justify-between mt-4">

@@ -2,7 +2,7 @@
   <div class="achievement-panel bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-lg">
     <div class="flex items-center space-x-2 mb-2">
       <span class="text-sm">🏆</span>
-      <span class="font-semibold text-gray-800 text-sm">成就</span>
+      <span class="font-semibold text-gray-800 text-sm">{{ $t('achievements.title') }}</span>
     </div>
 
     <div class="space-y-1.5 max-h-32 overflow-y-auto">
@@ -19,13 +19,13 @@
               class="font-medium text-xs truncate"
               :class="achievement.isUnlocked ? 'text-green-700' : 'text-gray-600'"
             >
-              {{ achievement.name }}
+              {{ $t(achievement.nameKey) }}
             </span>
             <span v-if="achievement.isUnlocked" class="text-green-500 text-xs flex-shrink-0"
               >✓</span
             >
           </div>
-          <div class="text-xs text-gray-500 truncate">{{ achievement.description }}</div>
+          <div class="text-xs text-gray-500 truncate">{{ $t(achievement.descriptionKey) }}</div>
           <div v-if="!achievement.isUnlocked" class="mt-1">
             <div class="flex items-center space-x-1">
               <div class="flex-1 bg-gray-200 rounded-full h-1">

@@ -13,7 +13,7 @@
           class="py-1.5 px-3 bg-white/50 backdrop-filter backdrop-blur-sm border border-white rounded-full text-sm !text-[#a855f7]"
           @click="$emit('skip')"
         >
-          跳过
+          {{ $t('common.skip') }}
         </button>
       </div>
 
@@ -59,9 +59,9 @@
 
         <!-- 引导内容：文字说明 -->
         <div class="text-center z-10">
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">不知道吃什么？</h2>
-          <p class="text-gray-600 mb-1 text-sm">点击随机按钮，让我来帮你决定！</p>
-          <p class="text-gray-600 text-sm">精美动画，高效决策，不再纠结。</p>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ $t('guide.step1.title') }}</h2>
+          <p class="text-gray-600 mb-1 text-sm">{{ $t('guide.step1.subtitle1') }}</p>
+          <p class="text-gray-600 text-sm">{{ $t('guide.step1.subtitle2') }}</p>
         </div>
       </div>
 
@@ -79,7 +79,7 @@
           class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg transform transition hover:scale-105 active:scale-95"
           @click="$emit('next', 2)"
         >
-          下一步
+          {{ $t('buttons.nextStep') }}
         </button>
       </div>
     </div>
@@ -87,6 +87,7 @@
 </template>
 
 <script setup>
+  import { useI18n } from 'vue-i18n';
   import ImgTofu from '@/assets/images/tofu.jpg';
   import ImgHamburger from '@/assets/images/hamburger.jpg';
   import ImgNoodles from '@/assets/images/noodles.jpg';

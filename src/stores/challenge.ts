@@ -4,8 +4,8 @@ import { ref, computed } from 'vue';
 // 成就类型
 export interface Achievement {
   id: string;
-  name: string;
-  description: string;
+  nameKey: string;
+  descriptionKey: string;
   icon: string;
   isUnlocked: boolean;
   unlockDate?: string;
@@ -36,8 +36,8 @@ export const useChallengeStore = defineStore('challenge', () => {
     achievements: [
       {
         id: 'first_use',
-        name: '初次尝试',
-        description: '第一次使用随机选菜',
+        nameKey: 'achievements.firstUse',
+        descriptionKey: 'achievements.firstUseDesc',
         icon: '🎯',
         isUnlocked: false,
         progress: 0,
@@ -45,8 +45,8 @@ export const useChallengeStore = defineStore('challenge', () => {
       },
       {
         id: 'daily_streak_3',
-        name: '坚持三天',
-        description: '连续使用3天',
+        nameKey: 'achievements.dailyStreak3',
+        descriptionKey: 'achievements.dailyStreak3Desc',
         icon: '🔥',
         isUnlocked: false,
         progress: 0,
@@ -54,8 +54,8 @@ export const useChallengeStore = defineStore('challenge', () => {
       },
       {
         id: 'daily_streak_7',
-        name: '一周坚持',
-        description: '连续使用7天',
+        nameKey: 'achievements.dailyStreak7',
+        descriptionKey: 'achievements.dailyStreak7Desc',
         icon: '🌟',
         isUnlocked: false,
         progress: 0,
@@ -63,8 +63,8 @@ export const useChallengeStore = defineStore('challenge', () => {
       },
       {
         id: 'daily_streak_30',
-        name: '月度达人',
-        description: '连续使用30天',
+        nameKey: 'achievements.dailyStreak30',
+        descriptionKey: 'achievements.dailyStreak30Desc',
         icon: '👑',
         isUnlocked: false,
         progress: 0,
@@ -72,8 +72,8 @@ export const useChallengeStore = defineStore('challenge', () => {
       },
       {
         id: 'lucky_master',
-        name: '幸运大师',
-        description: '累计获得100点幸运值',
+        nameKey: 'achievements.luckyMaster',
+        descriptionKey: 'achievements.luckyMasterDesc',
         icon: '🍀',
         isUnlocked: false,
         progress: 0,
@@ -81,8 +81,8 @@ export const useChallengeStore = defineStore('challenge', () => {
       },
       {
         id: 'food_explorer',
-        name: '美食探索者',
-        description: '尝试过50种不同的菜品',
+        nameKey: 'achievements.foodExplorer',
+        descriptionKey: 'achievements.foodExplorerDesc',
         icon: '🌍',
         isUnlocked: false,
         progress: 0,

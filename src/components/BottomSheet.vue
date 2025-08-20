@@ -27,8 +27,6 @@
 </template>
 
 <script setup lang="ts">
-  import { Teleport } from 'vue';
-
   interface Props {
     visible: boolean;
     maxHeight?: string;

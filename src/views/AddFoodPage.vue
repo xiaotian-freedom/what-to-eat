@@ -8,7 +8,7 @@
     >
       <!-- 使用封装的顶部状态栏组件 -->
       <HeaderBar
-        :title="isEdit ? '修改菜品' : '添加菜品'"
+        :title="isEdit ? $t('pages.editFood') : $t('pages.addFood')"
         :showBackButton="true"
         :onBack="goBack"
       />
@@ -77,7 +77,7 @@
           class="w-full py-4 my-5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg transform transition flex items-center justify-center focus:outline-none focus:ring-0"
         >
           <img :src="IconConfirm" class="w-5 h-5 mr-2" />
-          {{ isEdit ? '确认修改' : '确认添加' }}
+          {{ isEdit ? $t('common.save') : $t('common.add') }}
         </button>
       </div>
     </div>
@@ -85,6 +85,7 @@
 </template>
 <script setup lang="ts">
   import { ref, onMounted } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import { useRouter, useRoute } from 'vue-router';
   import HeaderBar from '@/components/HeaderBar.vue';
   import { useFoodStore } from '@/stores';
@@ -98,6 +99,7 @@
   import { upload } from '@/utils/qiniu';
   // import { useUserStore } from '@/stores/user';
 
+  const { t } = useI18n();
   const route = useRoute();
   const router = useRouter();
   // 菜品store
@@ -158,11 +160,11 @@
 
     // 验证文件类型和大小
     if (!file.type.startsWith('image/')) {
-      showToast('请上传图片格式文件');
+      showToast(t('form.imageRequired'));
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      showToast('图片大小不能超过 10M');
+      showToast(t('messages.imageSizeLimit'));
       return;
     }
     uploadToQiniu(file);
@@ -178,25 +180,25 @@
         upload(
           file,
           (res: any) => {
-            showToast('上传成功');
+            showToast(t('messages.uploadSuccess'));
             const imgUrl = uploadToken.data.data.domain + '/' + res.key;
             console.log(imgUrl, 'imgUrl');
             updateFoodImage(imgUrl);
           },
           (error: any) => {
             console.log(error);
-            showFailToast('上传失败');
+            showFailToast(t('messages.uploadFailed'));
           },
           () => {
             closeToast();
           }
         );
       } else {
-        showFailToast('获取上传token失败');
+        showFailToast(t('messages.uploadTokenFailed'));
       }
     } catch (error) {
       console.log(error);
-      showFailToast('上传失败，请重试');
+      showFailToast(t('messages.uploadRetry'));
     } finally {
       // 重置 input
       if (fileInput.value) {
@@ -238,7 +240,7 @@
   // 提交表单
   const submitForm = () => {
     if (!foodName.value.trim()) {
-      showToast('请输入菜品名称');
+      showToast(t('form.nameRequired'));
       return;
     }
 
@@ -254,7 +256,7 @@
 
       // 使用 store 更新菜品
       foodStore.updateFood(updatedFood);
-      showSuccessToast('修改成功');
+      showSuccessToast(t('messages.editSuccess'));
     } else {
       // 创建新菜品对象
       const newFood: Omit<Food, 'id'> = {
@@ -269,7 +271,7 @@
 
       // 使用 store 添加菜品
       foodStore.addFood(newFood);
-      showSuccessToast('添加成功');
+      showSuccessToast(t('messages.addSuccess'));
     }
 
     // 操作完成后返回

@@ -4,7 +4,7 @@
     class="card-face bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative flex flex-col w-full h-full"
   >
     <!-- 顶部状态栏 -->
-    <HeaderBar title="选择结果" :showBackButton="false" :centerTitle="true" />
+    <HeaderBar :title="$t('pages.result')" :showBackButton="false" :centerTitle="true" />
 
     <!-- 内容区域 -->
     <div
@@ -57,6 +57,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue';
+
   import type { Dish } from '@/types';
   import ActionButtons from './ActionButtons.vue';
   import HeaderBar from '@/components/HeaderBar.vue';

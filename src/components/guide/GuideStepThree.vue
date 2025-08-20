@@ -57,8 +57,8 @@
 
         <!-- 引导内容：文字说明 -->
         <div class="text-center z-10 max-w-xs">
-          <h2 class="text-2xl font-bold text-gray-800 mb-3">一切准备就绪！</h2>
-          <p class="text-gray-600 mb-3 text-sm">您的美食决策助手已经准备好了</p>
+          <h2 class="text-2xl font-bold text-gray-800 mb-3">{{ $t('guide.step3.title') }}</h2>
+          <p class="text-gray-600 mb-3 text-sm">{{ $t('guide.step3.subtitle1') }}</p>
           <div class="space-y-2 mb-4">
             <div class="flex items-center justify-start">
               <div
@@ -66,23 +66,7 @@
               >
                 <img :src="CheckIcon" class="w-3 h-3 text-white" />
               </div>
-              <p class="text-sm text-gray-600">随机选择喜爱的美食</p>
-            </div>
-            <div class="flex items-center justify-start">
-              <div
-                class="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mr-2"
-              >
-                <img :src="CheckIcon" class="w-3 h-3 text-white" />
-              </div>
-              <p class="text-sm text-gray-600">自定义个人菜品库</p>
-            </div>
-            <div class="flex items-center justify-start">
-              <div
-                class="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mr-2"
-              >
-                <img :src="CheckIcon" class="w-3 h-3 text-white" />
-              </div>
-              <p class="text-sm text-gray-600">精美动画与统计数据</p>
+              <p class="text-sm text-gray-600">{{ $t('guide.step3.subtitle2') }}</p>
             </div>
           </div>
         </div>
@@ -103,7 +87,7 @@
           @click="$emit('start')"
         >
           <img :src="SmileIcon" class="w-5 h-5 mr-2" />
-          开始使用
+          {{ $t('buttons.startApp') }}
         </button>
       </div>
     </div>
@@ -111,6 +95,7 @@
 </template>
 
 <script setup>
+  import { useI18n } from 'vue-i18n';
   import UtensilsIcon from '@/assets/icons/utensils.svg';
   import CheckIcon from '@/assets/icons/check.svg';
   import SmileIcon from '@/assets/icons/smile.svg';

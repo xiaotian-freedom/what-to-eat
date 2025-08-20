@@ -5,7 +5,7 @@
   >
     <!-- 顶部状态栏 -->
     <HeaderBar
-      title="今天吃什么"
+      :title="$t('pages.home')"
       :showBackButton="false"
       :centerTitle="true"
       :rightButtons="[
@@ -13,6 +13,11 @@
           icon: '🏆',
           onClick: () => (showAchievements = !showAchievements),
           className: 'achievement-button',
+        },
+        {
+          icon: '⚙️',
+          onClick: () => router.push('/settings'),
+          className: 'settings-button',
         },
       ]"
     />
@@ -53,6 +58,8 @@
 
 <script setup lang="ts">
   import { ref, computed, onMounted } from 'vue';
+  import { useI18n } from 'vue-i18n';
+  import { useRouter } from 'vue-router';
   import DishCanvas from './DishCanvas.vue';
   import ActionButtons from './ActionButtons.vue';
   import ChallengeStatus from './ChallengeStatus.vue';
@@ -62,6 +69,9 @@
   import { useFoodStore } from '@/stores';
   import { useChallengeStore } from '@/stores/challenge';
   import { showFailToast } from 'vant';
+
+  const { t } = useI18n();
+  const router = useRouter();
 
   const props = defineProps<{
     dishList: Dish[];
@@ -109,14 +119,14 @@
   // 处理随机选菜
   const handleRandomFood = async () => {
     if (!canUseToday.value) {
-      showFailToast('今日次数已用完，明天再来吧！');
+      showFailToast(t('messages.todayLimitReached'));
       return;
     }
 
     // 使用挑战模式
     const success = challengeStore.useRandomFood();
     if (!success) {
-      showFailToast('今日次数已用完，明天再来吧！');
+      showFailToast(t('messages.todayLimitReached'));
       return;
     }
 

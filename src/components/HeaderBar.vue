@@ -1,8 +1,9 @@
 <template>
   <div
-    class="bg-white/70 backdrop-filter backdrop-blur-lg p-4 flex justify-between items-center border-b border-gray-100"
+    class="bg-white/70 backdrop-filter backdrop-blur-lg p-4 relative flex justify-between items-center border-b border-gray-100"
   >
-    <div class="flex items-center" :class="{ 'w-full': centerTitle }">
+    <!-- 左侧区域 -->
+    <div class="flex items-center z-10">
       <a
         v-if="showBackButton"
         href="#"
@@ -11,17 +12,30 @@
       >
         <img src="@/assets/icons/left.svg" class="w-5 h-5" />
       </a>
+    </div>
+
+    <!-- 居中的标题 -->
+    <div
+      v-if="centerTitle"
+      class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-0"
+    >
       <div
-        :class="[
-          'text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500',
-          centerTitle ? 'text-center flex-1' : '',
-        ]"
+        class="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 text-center"
       >
         {{ title }}
       </div>
     </div>
 
-    <div class="flex items-center space-x-2">
+    <!-- 非居中时的标题 -->
+    <div
+      v-else
+      class="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500"
+    >
+      {{ title }}
+    </div>
+
+    <!-- 右侧按钮组 -->
+    <div class="flex items-center space-x-2 z-10">
       <button
         v-for="(button, index) in rightButtons"
         :key="index"

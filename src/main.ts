@@ -6,6 +6,7 @@ import './assets/css/ripple.css';
 // import './assets/css/wheel-animation.css';
 import App from './App.vue';
 import router from './router';
+import i18n from './locales';
 import 'vant/lib/index.css';
 import { Button, Toast, Empty, Field, Dialog, SwipeCell } from 'vant';
 
@@ -13,6 +14,7 @@ const app = createApp(App);
 const pinia = createPinia();
 app.use(router);
 app.use(pinia);
+app.use(i18n);
 app.use(Button);
 app.use(Toast);
 app.use(Empty);
