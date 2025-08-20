@@ -6,7 +6,13 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "./deploy.sh",
+    "docker:build": "docker-compose build --no-cache",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f what-to-eat",
+    "docker:restart": "docker-compose restart"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.14",
