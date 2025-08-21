@@ -7,13 +7,12 @@
     "dev": "vite --host",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
-    "docker:build": "docker-compose build --no-cache",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f what-to-eat",
-    "docker:restart": "docker-compose restart",
-    "server:upload": "./upload-to-server.sh root@47.122.112.197",
-    "server:deploy": "./server-deploy.sh"
+    "deploy": "npm run build && ./upload-to-server.sh all",
+    "deploy:upload": "npm run build && ./upload-to-server.sh upload",
+    "deploy:init": "./upload-to-server.sh init",
+    "deploy:test": "./upload-to-server.sh test",
+    "clean": "rm -rf dist node_modules/.vite",
+    "clean:all": "rm -rf dist node_modules package-lock.json && npm install"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.14",
