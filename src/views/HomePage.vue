@@ -75,12 +75,76 @@
   };
 
   // 分享结果
-  const shareResult = () => {
-    // 暂时复制当前页面到剪贴板
+  const shareResult = async () => {
+    // 准备分享数据
+    const shareData = {
+      title: t('app.name'),
+      text: t('messages.shareText'),
+      url: window.location.href,
+    };
+
+    // 检查是否支持 Web Share API
+    if (navigator.share && navigator.canShare) {
+      try {
+        // 检查是否可以分享当前数据
+        if (navigator.canShare(shareData)) {
+          await navigator.share(shareData);
+          showSuccessToast(t('messages.shareSuccess'));
+          return;
+        }
+      } catch (error) {
+        console.log('Web Share API error:', error);
+        // 用户取消分享或分享失败，回退到复制链接
+      }
+    }
+
+    // 回退到复制链接
+    fallbackToCopy();
+  };
+
+  // 回退到复制链接的方法
+  const fallbackToCopy = () => {
+    // 尝试使用现代 Clipboard API
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(window.location.href)
+        .then(() => {
+          showSuccessToast(t('messages.copySuccess'));
+        })
+        .catch(error => {
+          console.log('Clipboard API failed:', error);
+          // 如果 Clipboard API 失败，尝试传统方法
+          fallbackToLegacyCopy();
+        });
+    } else {
+      // 不支持 Clipboard API，使用传统方法
+      fallbackToLegacyCopy();
+    }
+  };
+
+  // 传统的复制方法（兼容性更好）
+  const fallbackToLegacyCopy = () => {
     try {
-      navigator.clipboard.writeText(window.location.href);
-      showSuccessToast(t('messages.copySuccess'));
+      // 创建临时文本区域
+      const textArea = document.createElement('textarea');
+      textArea.value = window.location.href;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+
+      if (successful) {
+        showSuccessToast(t('messages.copySuccess'));
+      } else {
+        showFailToast(t('messages.copyFailed'));
+      }
     } catch (error) {
+      console.log('Legacy copy failed:', error);
       showFailToast(t('messages.copyFailed'));
     }
   };

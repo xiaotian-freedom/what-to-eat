@@ -14,8 +14,9 @@
         <!-- 内容区域 -->
         <div class="flex-1 flex flex-col p-6 overflow-y-auto">
           <div class="space-y-4">
-            <!-- 开发模式开关 -->
+            <!-- 开发模式开关 - 仅在开发环境下显示 -->
             <div
+              v-if="isDevelopment"
               @click="toggleDevMode"
               class="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-4 border border-orange-100 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-95"
             >
@@ -226,6 +227,7 @@
   // 计算属性
   const currentLocale = computed(() => locale.value);
   const appVersion = computed(() => APP_CONFIG.version);
+  const isDevelopment = computed(() => import.meta.env.MODE === 'development');
 
   // 切换语言
   const changeLanguage = (newLocale: string) => {

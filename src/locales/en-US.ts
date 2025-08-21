@@ -76,6 +76,8 @@ export default {
   'messages.uploadRetry': 'Upload failed, please retry',
   'messages.copySuccess': 'Copied to clipboard',
   'messages.copyFailed': 'Copy failed',
+  'messages.shareSuccess': 'Shared successfully',
+  'messages.shareText': 'I randomly selected this dish using "What to Eat Today", try it too!',
   'messages.imageSizeLimit': 'Image size cannot exceed 10M',
 
   // Achievement system

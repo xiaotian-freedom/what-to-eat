@@ -76,6 +76,8 @@ export default {
   'messages.uploadRetry': '上传失败，请重试',
   'messages.copySuccess': '已复制到剪贴板',
   'messages.copyFailed': '复制失败',
+  'messages.shareSuccess': '分享成功',
+  'messages.shareText': '我用"今天吃什么"随机选到了这个菜品，你也来试试吧！',
   'messages.imageSizeLimit': '图片大小不能超过 10M',
 
   // 成就系统
