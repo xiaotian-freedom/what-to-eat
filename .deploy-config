@@ -1,0 +1,4 @@
+# What To Eat 部署配置
+SERVER="root@47.122.112.197"
+REMOTE_PATH="/opt/what-to-eat"
+LOCAL_PATH="."

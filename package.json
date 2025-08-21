@@ -1,0 +1,37 @@
+{
+  "name": "what-to-eat",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "deploy": "npm run build && ./upload-to-server.sh all",
+    "deploy:upload": "npm run build && ./upload-to-server.sh upload",
+    "deploy:init": "./upload-to-server.sh init",
+    "deploy:test": "./upload-to-server.sh test",
+    "clean": "rm -rf dist node_modules/.vite",
+    "clean:all": "rm -rf dist node_modules package-lock.json && npm install"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.14",
+    "axios": "^1.8.3",
+    "gsap": "^3.12.7",
+    "pinia": "^3.0.1",
+    "tailwindcss": "^4.0.14",
+    "vant": "^4.9.18",
+    "vue": "^3.5.13",
+    "vue-i18n": "^9.14.5",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/tsconfig": "^0.7.0",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "typescript": "~5.7.2",
+    "vite": "^6.2.0",
+    "vue-tsc": "^2.2.4"
+  }
+}

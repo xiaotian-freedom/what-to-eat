@@ -1,0 +1,37 @@
+/* 拨轮动画效果 - 应用于设备容器 */
+.device-wheel-next {
+    animation: deviceWheelNext 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    transform-style: preserve-3d;
+}
+
+.device-wheel-prev {
+    animation: deviceWheelPrev 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    transform-style: preserve-3d;
+}
+
+@keyframes deviceWheelNext {
+    from {
+        transform: rotateY(0deg);
+    }
+
+    to {
+        transform: rotateY(-90deg);
+    }
+}
+
+@keyframes deviceWheelPrev {
+    from {
+        transform: rotateY(-90deg);
+    }
+
+    to {
+        transform: rotateY(0deg);
+    }
+}
+
+/* 设置容器的3D效果 */
+.device-container {
+    perspective: 1200px;
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease;
+}
