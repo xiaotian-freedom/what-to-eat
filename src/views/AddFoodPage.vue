@@ -39,14 +39,25 @@
                 v-for="dish in filteredDishes"
                 :key="dish.name"
                 class="dish-card"
-                :class="{ 'already-added': isDishAdded(dish.name) }"
-                @click="selectPresetDish(dish, $event)"
+                :class="{
+                  'already-added': isDishAdded(dish.name),
+                  'show-remove': showRemoveButtons.has(dish.name),
+                }"
+                @click="handleDishClick(dish, $event)"
               >
                 <div class="dish-image-container">
                   <img :src="dish.image" :alt="dish.name" class="dish-image" />
                   <div class="dish-overlay">
                     <van-icon name="plus" class="add-icon" />
                     <van-icon name="success" class="success-icon" />
+                  </div>
+                  <!-- 移除按钮 -->
+                  <div
+                    v-if="showRemoveButtons.has(dish.name)"
+                    class="remove-button"
+                    @click="removeDish(dish, $event)"
+                  >
+                    <van-icon name="cross" class="remove-icon" />
                   </div>
                 </div>
                 <div class="dish-info">
@@ -174,6 +185,9 @@
   // 搜索关键词
   const searchKeyword = ref('');
 
+  // 显示移除按钮的菜品集合
+  const showRemoveButtons = ref<Set<string>>(new Set());
+
   // 预设菜品数据 - 使用导入的dishList
   const presetDishes = ref(dishList);
 
@@ -212,6 +226,21 @@
       }
     }
     // 预设菜品已经在computed中处理，无需手动初始化
+
+    // 添加点击外部区域关闭移除按钮的事件监听
+    const handleClickOutside = (event: Event) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.dish-card')) {
+        showRemoveButtons.value.clear();
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    // 组件卸载时移除事件监听
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
   });
 
   // 触发文件选择
@@ -351,15 +380,56 @@
     router.back();
   };
 
+  // 处理菜品点击
+  const handleDishClick = (dish: (typeof presetDishes.value)[0], event: Event) => {
+    const isAdded = isDishAdded(dish.name);
+
+    if (isAdded) {
+      // 如果已添加，切换移除按钮显示状态
+      if (showRemoveButtons.value.has(dish.name)) {
+        showRemoveButtons.value.delete(dish.name);
+      } else {
+        // 清除其他显示移除按钮的菜品
+        showRemoveButtons.value.clear();
+        showRemoveButtons.value.add(dish.name);
+      }
+    } else {
+      // 如果未添加，直接添加菜品
+      selectPresetDish(dish, event);
+    }
+  };
+
+  // 移除菜品
+  const removeDish = async (dish: (typeof presetDishes.value)[0], event: Event) => {
+    event.stopPropagation(); // 阻止事件冒泡
+
+    try {
+      showLoadingToast(t('messages.removing'));
+
+      // 使用 store 删除菜品
+      const success = foodStore.deleteFoodByName(dish.name);
+
+      if (success) {
+        showRemoveButtons.value.delete(dish.name);
+        showSuccessToast(t('messages.removeSuccess'));
+      } else {
+        showFailToast(t('messages.removeFailed'));
+      }
+    } catch (error) {
+      console.error('移除预设菜品失败:', error);
+      showFailToast(t('messages.operationFailed'));
+    }
+  };
+
   // 选择预设菜品 - 直接添加到用户菜品库
   const selectPresetDish = async (dish: (typeof presetDishes.value)[0], event: Event) => {
     const target = event.currentTarget as HTMLElement;
 
     // 检查是否已存在相同名称的菜品
     const existingFood = foodStore.foodItems.find((food: Food) => food.name === dish.name);
+
     if (existingFood) {
-      showToast(t('messages.duplicateFood'));
-      return;
+      return; // 如果已存在，不执行任何操作
     }
 
     // 添加点击动效
@@ -371,7 +441,7 @@
     }, 300);
 
     try {
-      showLoadingToast('添加中...');
+      showLoadingToast(t('messages.adding'));
 
       // 创建新菜品对象
       const newFood: Omit<Food, 'id'> = {
@@ -386,8 +456,6 @@
       foodStore.addFood(newFood);
 
       showSuccessToast(t('messages.addSuccess'));
-
-      // 不再自动返回，支持连续添加
     } catch (error) {
       console.error('添加预设菜品失败:', error);
       showFailToast(t('messages.addFailed'));
@@ -406,11 +474,6 @@
 
   .image-upload-area {
     transition: all 0.3s ease;
-  }
-
-  .image-upload-area:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 25px rgba(167, 139, 250, 0.5);
   }
 
   .upload-icon-pulse {
@@ -488,12 +551,6 @@
     user-select: none;
   }
 
-  .dish-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border-color: rgba(139, 92, 246, 0.3);
-  }
-
   .dish-card:active {
     transform: translateY(-4px) scale(0.98);
     transition: all 0.1s ease;
@@ -522,14 +579,34 @@
 
   /* 已添加菜品的样式 */
   .dish-card.already-added {
-    opacity: 0.6;
-    filter: grayscale(0.3);
-    border-color: rgba(34, 197, 94, 0.5);
+    opacity: 0.9;
+    filter: grayscale(0.1);
+    border-color: rgba(34, 197, 94, 0.8);
+    position: relative;
+  }
+
+  .dish-card.already-added::after {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+    background: rgba(34, 197, 94, 0.9);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 2;
   }
 
   .dish-card.already-added .dish-overlay {
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.7), rgba(16, 185, 129, 0.7));
-    opacity: 1;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(220, 38, 38, 0.8));
+    opacity: 0;
+    transition: opacity 0.3s ease;
   }
 
   .dish-card.already-added .add-icon {
@@ -537,12 +614,62 @@
   }
 
   .dish-card.already-added .success-icon {
+    opacity: 0;
+  }
+
+  .dish-card.already-added:active {
+    transform: translateY(-2px) scale(0.98);
+    opacity: 1;
+    border-color: rgba(239, 68, 68, 0.8);
+  }
+
+  .dish-card.already-added:active .dish-overlay {
     opacity: 1;
   }
 
-  .dish-card.already-added:hover {
-    transform: translateY(-4px) scale(1.01);
-    opacity: 0.8;
+  .dish-card.already-added:active .add-icon {
+    opacity: 1;
+  }
+
+  .dish-card.already-added:active::after {
+    background: rgba(239, 68, 68, 0.9);
+    content: '−';
+  }
+
+  /* 移除按钮样式 */
+  .remove-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    background: rgba(239, 68, 68, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 3;
+    transition: all 0.2s ease;
+  }
+
+  .remove-button:active {
+    transform: scale(0.9);
+    background: rgba(220, 38, 38, 0.9);
+  }
+
+  .remove-icon {
+    color: white;
+    font-size: 14px;
+  }
+
+  /* 显示移除按钮时的菜品样式 */
+  .dish-card.show-remove {
+    border-color: rgba(239, 68, 68, 0.8);
+  }
+
+  .dish-card.show-remove::after {
+    display: none;
   }
 
   .dish-image-container {
@@ -559,10 +686,6 @@
     transition: transform 0.3s ease;
   }
 
-  .dish-card:hover .dish-image {
-    transform: scale(1.1);
-  }
-
   .dish-overlay {
     position: absolute;
     top: 0;
@@ -575,10 +698,6 @@
     align-items: center;
     opacity: 0;
     transition: opacity 0.3s ease;
-  }
-
-  .dish-card:hover .dish-overlay {
-    opacity: 1;
   }
 
   .dish-card.clicked .dish-overlay {

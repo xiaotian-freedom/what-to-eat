@@ -73,6 +73,17 @@ export const useFoodStore = defineStore('food', () => {
     return foodItems.value.find(item => item.id === id);
   };
 
+  // 根据名称删除菜品
+  const deleteFoodByName = (name: string): boolean => {
+    const index = foodItems.value.findIndex(item => item.name === name);
+    if (index !== -1) {
+      foodItems.value.splice(index, 1);
+      saveFoodItems();
+      return true;
+    }
+    return false;
+  };
+
   return {
     foodItems,
     loadFoodItems,
@@ -80,5 +91,6 @@ export const useFoodStore = defineStore('food', () => {
     updateFood,
     deleteFood,
     getFoodById,
+    deleteFoodByName,
   };
 });
