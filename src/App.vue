@@ -6,7 +6,16 @@
       <component :is="Component" :key="route.path" />
     </transition>
   </router-view>
+
+  <!-- PWA 功能组件 -->
+  <PWAInstallPrompt />
+  <PWAUpdatePrompt />
 </template>
+
+<script setup lang="ts">
+  import PWAUpdatePrompt from '@/components/PWAUpdatePrompt.vue';
+  import PWAInstallPrompt from '@/components/PWAInstallPrompt.vue';
+</script>
 
 <style>
   /* 滑动转场效果 */

@@ -1,0 +1,96 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#818CF8;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#A855F7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="plateGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.98" />
+      <stop offset="100%" style="stop-color:#F8FAFC;stop-opacity:0.95" />
+    </linearGradient>
+    <linearGradient id="hongshaoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#DC2626;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B91C1C;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="mapoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D97706;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="shuizhuGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.12"/>
+    </filter>
+    <filter id="innerShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.08"/>
+    </filter>
+    <filter id="dishShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#000000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  
+  <!-- 背景圆形 -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgGradient)" filter="url(#shadow)"/>
+  
+  <!-- 餐盘外圈装饰 -->
+  <circle cx="256" cy="256" r="160" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="8,8"/>
+  
+  <!-- 餐盘主体 -->
+  <circle cx="256" cy="256" r="140" fill="url(#plateGradient)" filter="url(#innerShadow)"/>
+  
+  <!-- 餐盘内圈 -->
+  <circle cx="256" cy="256" r="120" fill="none" stroke="#E2E8F0" stroke-width="1.5" opacity="0.7"/>
+  
+  <!-- 红烧肉 - 左下弧形位置 -->
+  <circle cx="200" cy="320" r="45" fill="url(#hongshaoGradient)" filter="url(#dishShadow)"/>
+  <!-- 红烧肉 - 简化的肉块形状 -->
+  <ellipse cx="200" cy="320" rx="25" ry="15" fill="#B91C1C" filter="url(#dishShadow)"/>
+  <ellipse cx="200" cy="320" rx="20" ry="12" fill="#DC2626" filter="url(#dishShadow)"/>
+  <!-- 简单的肥瘦分层 -->
+  <ellipse cx="200" cy="315" rx="15" ry="3" fill="#FEF3C7"/>
+  <ellipse cx="200" cy="325" rx="12" ry="3" fill="#FEF3C7"/>
+  
+  <!-- 麻婆豆腐 - 右下弧形位置 -->
+  <circle cx="312" cy="320" r="45" fill="url(#mapoGradient)" filter="url(#dishShadow)"/>
+  <!-- 麻婆豆腐 - 豆腐块 -->
+  <rect x="287" y="305" width="50" height="30" rx="6" fill="#FEF3C7" filter="url(#dishShadow)"/>
+  <rect x="292" y="300" width="40" height="26" rx="4" fill="#FDE68A" filter="url(#dishShadow)"/>
+  <!-- 豆腐纹理 -->
+  <rect x="294" y="302" width="36" height="3" fill="#F59E0B" opacity="0.7"/>
+  <rect x="294" y="310" width="36" height="3" fill="#F59E0B" opacity="0.7"/>
+  <rect x="294" y="318" width="36" height="3" fill="#F59E0B" opacity="0.7"/>
+  <!-- 辣椒和花椒 -->
+  <circle cx="299" cy="308" r="2" fill="#DC2626"/>
+  <circle cx="314" cy="315" r="2" fill="#DC2626"/>
+  <circle cx="304" cy="322" r="1.5" fill="#92400E"/>
+  
+  <!-- 水煮鱼 - 顶部弧形位置 -->
+  <circle cx="256" cy="200" r="45" fill="url(#shuizhuGradient)" filter="url(#dishShadow)"/>
+  <!-- 水煮鱼 - 鱼片 -->
+  <ellipse cx="256" cy="200" rx="30" ry="18" fill="#F0FDF4" filter="url(#dishShadow)"/>
+  <ellipse cx="256" cy="200" rx="24" ry="14" fill="#DCFCE7" filter="url(#dishShadow)"/>
+  <!-- 鱼片纹理 -->
+  <path d="M 234 185 Q 256 180 278 185" stroke="#10B981" stroke-width="2" fill="none"/>
+  <path d="M 234 192 Q 256 187 278 192" stroke="#10B981" stroke-width="2" fill="none"/>
+  <path d="M 234 199 Q 256 194 278 199" stroke="#10B981" stroke-width="2" fill="none"/>
+  <path d="M 234 206 Q 256 201 278 206" stroke="#10B981" stroke-width="2" fill="none"/>
+  <path d="M 234 213 Q 256 208 278 213" stroke="#10B981" stroke-width="2" fill="none"/>
+  <!-- 鱼鳞效果 -->
+  <circle cx="244" cy="190" r="1.5" fill="#059669" opacity="0.6"/>
+  <circle cx="268" cy="190" r="1.5" fill="#059669" opacity="0.6"/>
+  <circle cx="256" cy="205" r="1.5" fill="#059669" opacity="0.6"/>
+  <!-- 辣椒和豆芽 -->
+  <circle cx="244" cy="185" r="2" fill="#DC2626"/>
+  <circle cx="268" cy="190" r="2" fill="#DC2626"/>
+  <path d="M 244 215 L 244 222 M 252 215 L 252 222 M 260 215 L 260 222 M 268 215 L 268 222" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round"/>
+  
+  <!-- 中心装饰 -->
+  <circle cx="256" cy="256" r="3" fill="#6B7280" opacity="0.4"/>
+  
+  <!-- 动态装饰线 -->
+  <path d="M 200 120 Q 240 100 280 120" stroke="rgba(255,255,255,0.4)" stroke-width="2" fill="none" opacity="0.6"/>
+  <path d="M 232 392 Q 256 412 280 392" stroke="rgba(255,255,255,0.4)" stroke-width="2" fill="none" opacity="0.6"/>
+</svg>

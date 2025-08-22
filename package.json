@@ -11,6 +11,7 @@
     "deploy:upload": "npm run build && ./upload-to-server.sh upload",
     "deploy:init": "./upload-to-server.sh init",
     "deploy:test": "./upload-to-server.sh test",
+    "generate-icons": "node scripts/generate-icons.js",
     "clean": "rm -rf dist node_modules/.vite",
     "clean:all": "rm -rf dist node_modules package-lock.json && npm install"
   },
@@ -26,12 +27,15 @@
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
+    "@types/node": "^24.3.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/tsconfig": "^0.7.0",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.3",
+    "sharp": "^0.34.3",
     "typescript": "~5.7.2",
     "vite": "^6.2.0",
+    "vite-plugin-pwa": "^1.0.3",
     "vue-tsc": "^2.2.4"
   }
 }
