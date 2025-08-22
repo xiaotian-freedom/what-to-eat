@@ -45,47 +45,47 @@
   <circle cx="256" cy="256" r="120" fill="none" stroke="#E2E8F0" stroke-width="1.5" opacity="0.7"/>
   
   <!-- 红烧肉 - 左下弧形位置 -->
-  <circle cx="200" cy="320" r="45" fill="url(#hongshaoGradient)" filter="url(#dishShadow)"/>
+  <circle cx="200" cy="310" r="45" fill="url(#hongshaoGradient)" filter="url(#dishShadow)"/>
   <!-- 红烧肉 - 简化的肉块形状 -->
-  <ellipse cx="200" cy="320" rx="25" ry="15" fill="#B91C1C" filter="url(#dishShadow)"/>
-  <ellipse cx="200" cy="320" rx="20" ry="12" fill="#DC2626" filter="url(#dishShadow)"/>
+  <ellipse cx="200" cy="310" rx="25" ry="15" fill="#B91C1C" filter="url(#dishShadow)"/>
+  <ellipse cx="200" cy="310" rx="20" ry="12" fill="#DC2626" filter="url(#dishShadow)"/>
   <!-- 简单的肥瘦分层 -->
-  <ellipse cx="200" cy="315" rx="15" ry="3" fill="#FEF3C7"/>
-  <ellipse cx="200" cy="325" rx="12" ry="3" fill="#FEF3C7"/>
+  <ellipse cx="200" cy="305" rx="15" ry="3" fill="#FEF3C7"/>
+  <ellipse cx="200" cy="315" rx="12" ry="3" fill="#FEF3C7"/>
   
   <!-- 麻婆豆腐 - 右下弧形位置 -->
-  <circle cx="312" cy="320" r="45" fill="url(#mapoGradient)" filter="url(#dishShadow)"/>
+  <circle cx="312" cy="310" r="45" fill="url(#mapoGradient)" filter="url(#dishShadow)"/>
   <!-- 麻婆豆腐 - 豆腐块 -->
-  <rect x="287" y="305" width="50" height="30" rx="6" fill="#FEF3C7" filter="url(#dishShadow)"/>
-  <rect x="292" y="300" width="40" height="26" rx="4" fill="#FDE68A" filter="url(#dishShadow)"/>
+  <rect x="287" y="295" width="50" height="30" rx="6" fill="#FEF3C7" filter="url(#dishShadow)"/>
+  <rect x="292" y="290" width="40" height="26" rx="4" fill="#FDE68A" filter="url(#dishShadow)"/>
   <!-- 豆腐纹理 -->
-  <rect x="294" y="302" width="36" height="3" fill="#F59E0B" opacity="0.7"/>
-  <rect x="294" y="310" width="36" height="3" fill="#F59E0B" opacity="0.7"/>
-  <rect x="294" y="318" width="36" height="3" fill="#F59E0B" opacity="0.7"/>
+  <rect x="294" y="292" width="36" height="3" fill="#F59E0B" opacity="0.7"/>
+  <rect x="294" y="300" width="36" height="3" fill="#F59E0B" opacity="0.7"/>
+  <rect x="294" y="308" width="36" height="3" fill="#F59E0B" opacity="0.7"/>
   <!-- 辣椒和花椒 -->
-  <circle cx="299" cy="308" r="2" fill="#DC2626"/>
-  <circle cx="314" cy="315" r="2" fill="#DC2626"/>
-  <circle cx="304" cy="322" r="1.5" fill="#92400E"/>
+  <circle cx="299" cy="298" r="2" fill="#DC2626"/>
+  <circle cx="314" cy="305" r="2" fill="#DC2626"/>
+  <circle cx="304" cy="312" r="1.5" fill="#92400E"/>
   
   <!-- 水煮鱼 - 顶部弧形位置 -->
-  <circle cx="256" cy="200" r="45" fill="url(#shuizhuGradient)" filter="url(#dishShadow)"/>
+  <circle cx="256" cy="181" r="45" fill="url(#shuizhuGradient)" filter="url(#dishShadow)"/>
   <!-- 水煮鱼 - 鱼片 -->
-  <ellipse cx="256" cy="200" rx="30" ry="18" fill="#F0FDF4" filter="url(#dishShadow)"/>
-  <ellipse cx="256" cy="200" rx="24" ry="14" fill="#DCFCE7" filter="url(#dishShadow)"/>
+  <ellipse cx="256" cy="181" rx="30" ry="18" fill="#F0FDF4" filter="url(#dishShadow)"/>
+  <ellipse cx="256" cy="181" rx="24" ry="14" fill="#DCFCE7" filter="url(#dishShadow)"/>
   <!-- 鱼片纹理 -->
-  <path d="M 234 185 Q 256 180 278 185" stroke="#10B981" stroke-width="2" fill="none"/>
-  <path d="M 234 192 Q 256 187 278 192" stroke="#10B981" stroke-width="2" fill="none"/>
-  <path d="M 234 199 Q 256 194 278 199" stroke="#10B981" stroke-width="2" fill="none"/>
-  <path d="M 234 206 Q 256 201 278 206" stroke="#10B981" stroke-width="2" fill="none"/>
-  <path d="M 234 213 Q 256 208 278 213" stroke="#10B981" stroke-width="2" fill="none"/>
+  <path d="M 234 166 Q 256 161 278 166" stroke="#10B981" stroke-width="2" fill="none"/>
+  <path d="M 234 173 Q 256 168 278 173" stroke="#10B981" stroke-width="2" fill="none"/>
+  <path d="M 234 180 Q 256 175 278 180" stroke="#10B981" stroke-width="2" fill="none"/>
+  <path d="M 234 187 Q 256 182 278 187" stroke="#10B981" stroke-width="2" fill="none"/>
+  <path d="M 234 194 Q 256 189 278 194" stroke="#10B981" stroke-width="2" fill="none"/>
   <!-- 鱼鳞效果 -->
-  <circle cx="244" cy="190" r="1.5" fill="#059669" opacity="0.6"/>
-  <circle cx="268" cy="190" r="1.5" fill="#059669" opacity="0.6"/>
-  <circle cx="256" cy="205" r="1.5" fill="#059669" opacity="0.6"/>
+  <circle cx="244" cy="171" r="1.5" fill="#059669" opacity="0.6"/>
+  <circle cx="268" cy="171" r="1.5" fill="#059669" opacity="0.6"/>
+  <circle cx="256" cy="186" r="1.5" fill="#059669" opacity="0.6"/>
   <!-- 辣椒和豆芽 -->
-  <circle cx="244" cy="185" r="2" fill="#DC2626"/>
-  <circle cx="268" cy="190" r="2" fill="#DC2626"/>
-  <path d="M 244 215 L 244 222 M 252 215 L 252 222 M 260 215 L 260 222 M 268 215 L 268 222" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="244" cy="166" r="2" fill="#DC2626"/>
+  <circle cx="268" cy="171" r="2" fill="#DC2626"/>
+  <path d="M 244 196 L 244 203 M 252 196 L 252 203 M 260 196 L 260 203 M 268 196 L 268 203" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round"/>
   
   <!-- 中心装饰 -->
   <circle cx="256" cy="256" r="3" fill="#6B7280" opacity="0.4"/>
