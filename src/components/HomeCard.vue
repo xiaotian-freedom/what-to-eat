@@ -166,14 +166,7 @@
       recommendedDish.value && finalDish.name === recommendedDish.value.name;
 
     if (isRecommendedDish) {
-      // 推荐菜品动画完成，记录挑战数据
-      const success = challengeStore.useRandomFood(finalDish.name);
-      if (!success) {
-        showFailToast(t('messages.todayLimitReached'));
-        isAnimating.value = false;
-        return;
-      }
-
+      // 推荐菜品动画完成，不需要再次记录挑战数据（已在推荐时记录）
       // 发送选择事件
       emit('selected-dish', finalDish);
 

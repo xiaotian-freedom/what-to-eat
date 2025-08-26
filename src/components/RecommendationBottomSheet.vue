@@ -45,6 +45,16 @@
           </div>
         </div>
 
+        <!-- 网络状态指示器 -->
+        <div class="network-status" :class="{ offline: networkStatus === 'offline' }">
+          <div class="status-item">
+            <span class="status-icon">
+              {{ networkStatus === 'offline' ? '📴' : canUseAI ? '🤖' : '🔌' }}
+            </span>
+            <span class="status-text">{{ networkStatusText }}</span>
+          </div>
+        </div>
+
         <!-- 心情选择 -->
         <div class="mood-selector">
           <label class="input-label">现在的心情：</label>
@@ -79,7 +89,7 @@
 
           <!-- 按钮文字 -->
           <span class="button-text">
-            {{ isLoading ? '🔮 智能分析中...' : '🔮 智能推荐' }}
+            {{ recommendationButtonText }}
           </span>
         </button>
       </div>
@@ -94,15 +104,18 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, onMounted } from 'vue';
+  import { ref, computed, onMounted, onUnmounted } from 'vue';
   import BottomSheet from './BottomSheet.vue';
   import { useRecommendationStore } from '@/stores/recommendation';
   import { useUserPreferenceStore } from '@/stores/userPreference';
   import { useFoodStore } from '@/stores/food';
+  import { useChallengeStore } from '@/stores/challenge';
+  import { useDevModeStore } from '@/stores/devMode';
   import { getCurrentWeather } from '@/utils/weatherService';
+  import { hybridRecommendationService } from '@/utils/hybridRecommendationService';
   import { showFailToast } from 'vant';
-  import type { RecommendationResult, WeatherData, MoodType } from '@/types';
-  import { MoodType as MoodEnum, TimeOfDay } from '@/types';
+  import type { RecommendationResult, WeatherData, MoodType, NetworkStatus } from '@/types';
+  import { MoodType as MoodEnum, TimeOfDay, NetworkStatus as NetStatus } from '@/types';
   import '@/assets/css/glow-animation.css';
 
   // Props
@@ -126,6 +139,8 @@
   const recommendationStore = useRecommendationStore();
   const userPreferenceStore = useUserPreferenceStore();
   const foodStore = useFoodStore();
+  const challengeStore = useChallengeStore();
+  const devModeStore = useDevModeStore();
 
   // 响应式数据
   const isLoading = ref(false);
@@ -135,6 +150,8 @@
   const currentMood = ref<MoodType | null>(null);
   const recommendations = ref<RecommendationResult[]>([]);
   const showSuccessEffect = ref(false);
+  const networkStatus = ref<NetworkStatus>(hybridRecommendationService.getNetworkStatus());
+  const usingAI = ref(false);
 
   // DOM 引用
   const rippleContainer = ref<HTMLDivElement | null>(null);
@@ -173,29 +190,34 @@
     return userPreferenceStore.choiceHistory.length;
   });
 
-  // 方法
-  // 加权随机选择推荐结果
-  const getWeightedRandomRecommendation = (
-    recommendations: RecommendationResult[]
-  ): RecommendationResult => {
-    if (recommendations.length === 1) return recommendations[0];
+  const canUseAI = computed(() => {
+    return hybridRecommendationService.canUseAI();
+  });
 
-    // 为每个推荐分配权重，分数越高权重越大
-    const weights = recommendations.map(rec => rec.score * rec.confidence);
-    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+  // 检查今日是否可以使用智能推荐
+  const canUseToday = computed(() => challengeStore.canUseToday);
 
-    let random = Math.random() * totalWeight;
-
-    for (let i = 0; i < recommendations.length; i++) {
-      random -= weights[i];
-      if (random <= 0) {
-        return recommendations[i];
-      }
+  const recommendationButtonText = computed(() => {
+    if (isLoading.value) {
+      return usingAI.value ? '🤖 AI 分析中...' : '🔮 智能分析中...';
     }
+    return canUseAI.value ? '🤖 AI 智能推荐' : '🔮 智能推荐';
+  });
 
-    // 备选返回第一个
-    return recommendations[0];
-  };
+  const networkStatusText = computed(() => {
+    switch (networkStatus.value) {
+      case NetStatus.ONLINE:
+        return canUseAI.value ? 'AI 推荐可用' : '仅本地推荐';
+      case NetStatus.OFFLINE:
+        return '离线模式';
+      case NetStatus.CHECKING:
+        return '检查网络...';
+      default:
+        return '未知状态';
+    }
+  });
+
+  // 方法
 
   const loadWeatherData = async () => {
     try {
@@ -256,10 +278,24 @@
     }, 1500);
   };
 
+  // 清理粒子效果
+  const clearSparkleEffect = () => {
+    const container = sparklesContainer.value;
+    if (!container) return;
+
+    // 清除所有粒子
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
+  };
+
   // 创建粒子效果
   const createSparkleEffect = () => {
     const container = sparklesContainer.value;
     if (!container) return;
+
+    // 先清理之前的粒子
+    clearSparkleEffect();
 
     const sparkleCount = 8;
 
@@ -275,21 +311,25 @@
       sparkle.style.animationDelay = Math.random() * 2 + 's';
 
       container.appendChild(sparkle);
-
-      // 动画结束后移除元素
-      setTimeout(() => {
-        if (container.contains(sparkle)) {
-          container.removeChild(sparkle);
-        }
-      }, 2000 + Math.random() * 1000);
     }
   };
 
   const getRecommendations = async (event?: MouseEvent) => {
-    if (foodStore.foodItems.length === 0) {
-      showFailToast('请先添加一些菜品');
+    // 检查今日使用次数限制
+    if (!canUseToday.value) {
+      // 开发模式下显示不同的提示
+      if (devModeStore.isUnlimitedUsesEnabled) {
+        showFailToast('开发模式下应该可以无限使用，请检查配置');
+      } else {
+        showFailToast('今日使用次数已用完，请明天再试');
+      }
       return;
     }
+
+    // if (foodStore.foodItems.length === 0) {
+    //   showFailToast('请先添加一些菜品');
+    //   return;
+    // }
 
     // 创建点击波纹效果
     if (event) {
@@ -297,9 +337,9 @@
     }
 
     isLoading.value = true;
+    usingAI.value = canUseAI.value;
 
     // 延迟启动粒子效果，让用户看到光效动画
-    await new Promise(resolve => setTimeout(resolve, 1300));
     createSparkleEffect();
 
     try {
@@ -308,28 +348,32 @@
         await loadWeatherData();
       }
 
-      // 获取推荐
-      const recs = recommendationStore.getRecommendations(foodStore.foodItems);
+      // 构建推荐上下文
+      const context = {
+        currentWeather: weatherData.value?.weatherType,
+        currentTime: recommendationStore.getCurrentTimeOfDay(),
+        userMood: currentMood.value || undefined,
+        currentSeason: recommendationStore.getCurrentSeason(),
+        location: weatherData.value?.location,
+        temperature: weatherData.value?.temperature,
+        humidity: weatherData.value?.humidity,
+      };
 
-      // 结合用户偏好调整推荐分数
-      const adjustedRecs = recs.map(rec => {
-        const preferenceScore = userPreferenceStore.getPreferenceScore(rec.food);
-        const diversityScore = userPreferenceStore.getDiversityScore(rec.food.id);
+      // 使用混合推荐服务获取推荐
+      const selectedRec = await hybridRecommendationService.getRecommendation(
+        context,
+        foodStore.foodItems
+      );
 
-        // 综合计算最终分数
-        const finalScore = rec.score * 0.7 + preferenceScore * 0.2 + diversityScore * 0.1;
-
-        return {
-          ...rec,
-          score: finalScore,
-          confidence: Math.min(rec.confidence + (hasPreferenceData.value ? 0.2 : 0), 1),
-        };
-      });
-
-      // 获取前5个高分推荐，然后使用加权随机选择
-      const topRecs = adjustedRecs.sort((a, b) => b.score - a.score).slice(0, 5);
-      const selectedRec = getWeightedRandomRecommendation(topRecs);
       recommendations.value = [selectedRec];
+
+      // 记录用户选择到偏好系统（用于学习）
+      userPreferenceStore.recordChoice(selectedRec.food, context);
+
+      // 记录智能推荐使用次数（开发模式下不增加使用次数）
+      if (!devModeStore.isUnlimitedUsesEnabled) {
+        challengeStore.useRandomFood(selectedRec.food.name);
+      }
 
       emit('recommendationsUpdated', recommendations.value);
 
@@ -355,15 +399,35 @@
       }
     } catch (error) {
       console.error('获取推荐失败:', error);
-      showFailToast('推荐失败，请重试');
+
+      // 根据错误类型显示不同的提示
+      if (error instanceof Error) {
+        if (error.message.includes('网络') || error.message.includes('超时')) {
+          showFailToast('网络连接问题，已切换到本地推荐');
+        } else if (error.message.includes('API')) {
+          showFailToast('AI 服务暂不可用，使用本地推荐');
+        } else {
+          showFailToast('推荐失败，请重试');
+        }
+      } else {
+        showFailToast('推荐失败，请重试');
+      }
     } finally {
       isLoading.value = false;
+      usingAI.value = false;
+
+      // 清理粒子效果
+      clearSparkleEffect();
+
       // 重置成功状态
       setTimeout(() => {
         showSuccessEffect.value = false;
       }, 1000);
     }
   };
+
+  // 网络状态监听器清理函数
+  let networkStatusInterval: number | null = null;
 
   // 生命周期
   onMounted(async () => {
@@ -373,8 +437,37 @@
     // 加载菜品数据
     foodStore.loadFoodItems();
 
+    // 加载挑战数据
+    challengeStore.loadChallengeData();
+
     // 加载天气数据
     await loadWeatherData();
+
+    // 监听网络状态变化
+    const updateNetworkStatus = () => {
+      networkStatus.value = hybridRecommendationService.getNetworkStatus();
+    };
+
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+
+    // 定期更新网络状态
+    networkStatusInterval = setInterval(updateNetworkStatus, 3000);
+  });
+
+  onUnmounted(() => {
+    // 清理网络状态监听器
+    if (networkStatusInterval) {
+      clearInterval(networkStatusInterval);
+    }
+
+    // 移除事件监听器
+    const updateNetworkStatus = () => {
+      networkStatus.value = hybridRecommendationService.getNetworkStatus();
+    };
+
+    window.removeEventListener('online', updateNetworkStatus);
+    window.removeEventListener('offline', updateNetworkStatus);
   });
 </script>
 
@@ -394,7 +487,8 @@
   }
 
   .location-status,
-  .current-status {
+  .current-status,
+  .network-status {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
@@ -403,6 +497,11 @@
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     color: white;
+  }
+
+  .network-status.offline {
+    background: rgba(255, 152, 0, 0.2);
+    border: 1px solid rgba(255, 152, 0, 0.3);
   }
 
   .location-error {
@@ -557,25 +656,6 @@
   .recommendation-action {
     margin-top: 20px;
     text-align: center;
-  }
-
-  .use-recommendation-btn {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(45deg, #4ecdc4, #44a08d);
-    border: none;
-    border-radius: 12px;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  }
-
-  .use-recommendation-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
   }
 
   .learning-hint {

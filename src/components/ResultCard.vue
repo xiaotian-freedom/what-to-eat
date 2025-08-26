@@ -43,6 +43,14 @@
             class="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-filter backdrop-blur-sm p-2 text-center"
           >
             <p class="text-lg font-medium text-white">{{ selectedDish?.name }}</p>
+            <!-- AI 扩展推荐标识 -->
+            <div v-if="isAIExtendedRecommendation" class="flex items-center justify-center mt-1">
+              <span
+                class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full"
+              >
+                🤖 AI 推荐
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -61,14 +69,14 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue';
+  import { ref, computed } from 'vue';
 
-  import type { Dish } from '@/types';
+  import type { Food } from '@/types';
   import ActionButtons from './ActionButtons.vue';
   import HeaderBar from '@/components/HeaderBar.vue';
 
   const props = defineProps<{
-    selectedDish: Dish | null;
+    selectedDish: Food | null;
   }>();
 
   // 存储图片加载失败的状态
@@ -83,6 +91,13 @@
   const shouldShowImage = (): boolean => {
     return !!(props.selectedDish?.image && !imageLoadFailed.value);
   };
+
+  // 检查是否为 AI 扩展推荐
+  const isAIExtendedRecommendation = computed(() => {
+    return (
+      props.selectedDish?.category === '智能推荐' && props.selectedDish?.tags?.includes('AI推荐')
+    );
+  });
 
   defineEmits<{
     (e: 'choose-again'): void;

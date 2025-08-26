@@ -5,7 +5,7 @@ import { showFailToast } from 'vant';
 // 创建 axios 实例
 const request = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  timeout: import.meta.env.VITE_REQUEST_TIMEOUT,
+  timeout: parseInt(import.meta.env.VITE_REQUEST_TIMEOUT) || 10000,
   headers: {
     'Content-Type': 'application/json',
   },

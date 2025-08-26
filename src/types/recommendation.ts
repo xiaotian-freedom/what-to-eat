@@ -29,6 +29,8 @@ export interface RecommendationResult {
   score: number; // 推荐分数 0-1
   reasons: RecommendationReason[]; // 推荐原因
   confidence: number; // 置信度 0-1
+  explanation?: string; // 详细推荐解释（AI 推荐时提供）
+  source?: 'ai' | 'local'; // 推荐来源
 }
 
 // 推荐原因接口
@@ -48,6 +50,7 @@ export enum RecommendationReasonType {
   POPULARITY = 'popularity', // 基于热门程度
   HEALTH = 'health', // 基于健康考虑
   VARIETY = 'variety', // 基于多样性
+  AI = 'ai', // 基于 AI 推荐
 }
 
 // 用户偏好数据接口
@@ -93,4 +96,29 @@ export interface RecommendationAlgorithmConfig {
   enablePreferenceRecommendation: boolean; // 是否启用偏好推荐
   learningRate: number; // 学习率 0-1
   decayFactor: number; // 衰减因子 0-1 (历史数据的权重衰减)
+}
+
+// AI 推荐策略配置
+export interface AIRecommendationConfig {
+  preferAI: boolean; // 是否优先使用 AI 推荐
+  fallbackToLocal: boolean; // AI 失败时是否降级到本地算法
+  timeoutMs: number; // AI 请求超时时间（毫秒）
+  maxRetries: number; // 最大重试次数
+  cacheResults: boolean; // 是否缓存 AI 推荐结果
+  cacheExpiryMs: number; // 缓存过期时间（毫秒）
+}
+
+// 网络状态枚举
+export enum NetworkStatus {
+  ONLINE = 'online',
+  OFFLINE = 'offline',
+  CHECKING = 'checking',
+}
+
+// 推荐策略枚举
+export enum RecommendationStrategy {
+  AI_ONLY = 'ai_only', // 仅使用 AI
+  LOCAL_ONLY = 'local_only', // 仅使用本地算法
+  HYBRID = 'hybrid', // 混合模式：优先 AI，降级到本地
+  COMPARE = 'compare', // 对比模式：同时使用两种算法
 }
