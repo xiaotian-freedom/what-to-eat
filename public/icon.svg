@@ -103,40 +103,34 @@
   <!-- 麻婆豆腐两行摆放 - 居中展示 -->
   
   <!-- 上排 - 3块豆腐 -->
-  <rect x="299" y="278" width="15" height="15" rx="2" fill="#FEF3C7"/>
-  <rect x="301" y="280" width="11" height="3" rx="1" fill="#FFFBEB" opacity="0.7"/>
-  <rect x="299" y="278" width="15" height="6" rx="1" fill="rgba(186,28,28,0.7)"/>
+  <rect x="295" y="270" width="15" height="15" rx="2" fill="#FEF3C7"/>
+  <rect x="297" y="272" width="11" height="3" rx="1" fill="#FFFBEB" opacity="0.7"/>
   
-  <rect x="319" y="278" width="15" height="15" rx="2" fill="#FEF3C7"/>
-  <rect x="321" y="280" width="11" height="3" rx="1" fill="#FFFBEB" opacity="0.7"/>
-  <rect x="319" y="278" width="15" height="6" rx="1" fill="rgba(186,28,28,0.7)"/>
+  <rect x="315" y="270" width="15" height="15" rx="2" fill="#FEF3C7"/>
+  <rect x="317" y="272" width="11" height="3" rx="1" fill="#FFFBEB" opacity="0.7"/>
   
-  <rect x="339" y="278" width="15" height="15" rx="2" fill="#FEF3C7"/>
-  <rect x="341" y="280" width="11" height="3" rx="1" fill="#FFFBEB" opacity="0.7"/>
-  <rect x="339" y="278" width="15" height="6" rx="1" fill="rgba(186,28,28,0.7)"/>
+  <rect x="335" y="270" width="15" height="15" rx="2" fill="#FEF3C7"/>
+  <rect x="337" y="272" width="11" height="3" rx="1" fill="#FFFBEB" opacity="0.7"/>
   
   <!-- 下排 - 3块豆腐 -->
-  <rect x="299" y="299" width="15" height="15" rx="2" fill="#FEF3C7"/>
-  <rect x="301" y="301" width="11" height="3" rx="1" fill="#FFFBEB" opacity="0.7"/>
-  <rect x="299" y="299" width="15" height="6" rx="1" fill="rgba(186,28,28,0.7)"/>
+  <rect x="295" y="290" width="15" height="15" rx="2" fill="#FEF3C7"/>
+  <rect x="297" y="292" width="11" height="3" rx="1" fill="#FFFBEB" opacity="0.7"/>
   
-  <rect x="319" y="299" width="15" height="15" rx="2" fill="#FEF3C7"/>
-  <rect x="321" y="301" width="11" height="3" rx="1" fill="#FFFBEB" opacity="0.7"/>
-  <rect x="319" y="299" width="15" height="6" rx="1" fill="rgba(186,28,28,0.7)"/>
+  <rect x="315" y="290" width="15" height="15" rx="2" fill="#FEF3C7"/>
+  <rect x="317" y="292" width="11" height="3" rx="1" fill="#FFFBEB" opacity="0.7"/>
   
-  <rect x="339" y="299" width="15" height="15" rx="2" fill="#FEF3C7"/>
-  <rect x="341" y="301" width="11" height="3" rx="1" fill="#FFFBEB" opacity="0.7"/>
-  <rect x="339" y="299" width="15" height="6" rx="1" fill="rgba(186,28,28,0.7)"/>
+  <rect x="335" y="290" width="15" height="15" rx="2" fill="#FEF3C7"/>
+  <rect x="337" y="292" width="11" height="3" rx="1" fill="#FFFBEB" opacity="0.7"/>
   
   <!-- 辣椒和花椒 -->
-  <circle cx="298" cy="274" r="2" fill="#DC2626"/>
+  <circle cx="310" cy="260" r="2" fill="#DC2626"/>
   <circle cx="348" cy="276" r="2" fill="#DC2626"/>
-  <circle cx="296" cy="317" r="2" fill="#DC2626"/>
-  <circle cx="350" cy="319" r="2" fill="#DC2626"/>
+  <circle cx="305" cy="317" r="2" fill="#DC2626"/>
+  <circle cx="350" cy="300" r="2" fill="#DC2626"/>
   <circle cx="310" cy="272" r="1.5" fill="#92400E"/>
   <circle cx="336" cy="274" r="1.5" fill="#92400E"/>
-  <circle cx="308" cy="318" r="1.5" fill="#92400E"/>
-  <circle cx="338" cy="320" r="1.5" fill="#92400E"/>
+  <circle cx="315" cy="300" r="1.5" fill="#92400E"/>
+  <circle cx="338" cy="310" r="1.5" fill="#92400E"/>
   
   <!-- 葱花 -->
   <path d="M 295 290 L 292 287 M 349 292 L 352 289 M 293 305 L 290 302 M 351 307 L 354 304" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round"/>
