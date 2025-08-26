@@ -30,6 +30,8 @@ export default {
   'buttons.shareResult': '分享结果',
   'buttons.startApp': '开始使用',
   'buttons.nextStep': '下一步',
+  'buttons.smartRecommendation': '智能推荐',
+  'buttons.toggleRecommendation': '切换推荐',
 
   // 引导页面
   'guide.step1.title': '不知道吃什么？',
@@ -84,6 +86,12 @@ export default {
   'messages.shareSuccess': '分享成功',
   'messages.shareText': '我用"今天吃什么"随机选到了这个菜品，你也来试试吧！',
   'messages.imageSizeLimit': '图片大小不能超过 10M',
+  'messages.recommendationEnabled': '智能推荐已开启',
+  'messages.recommendationDisabled': '智能推荐已关闭',
+  'messages.recommendationSelected': '智能推荐选择',
+  'messages.noRecommendations': '暂无合适的推荐',
+  'messages.weatherLoadFailed': '获取天气信息失败',
+  'messages.recommendationFailed': '推荐失败，请重试',
 
   // 成就系统
   'achievements.title': '成就',
@@ -116,7 +124,15 @@ export default {
   'challenge.inProgress': '进行中',
   'challenge.todayLimitReached': '今日次数已用完',
   'challenge.luckyValue': '幸运值',
+  'challenge.luckyDesc': '影响随机选择的幸运程度',
   'challenge.consecutiveDays': '连续天数',
+  'challenge.consecutiveDesc': '连续使用挑战的天数',
+  'challenge.usedToday': '今日已用',
+  'challenge.maxDaily': '每日上限',
+  'challenge.dailyProgress': '今日进度',
+  'challenge.limitReached': '次数已用完',
+  'challenge.devMode': '开发模式',
+  'challenge.unlimitedUse': '无限使用次数',
 
   // 设置页面
   'settings.title': '设置',
@@ -145,4 +161,27 @@ export default {
   'app.features.achievements': '🏆 成就系统',
   'app.features.dailyChallenge': '🔥 每日挑战',
   'app.features.animations': '🎨 精美动画效果',
+  'app.features.smartRecommendation': '🧠 智能推荐系统',
+  'app.features.weatherIntegration': '🌤️ 天气感知推荐',
+  'app.features.moodBasedRecommendation': '😊 心情感知推荐',
+  'app.features.personalizedLearning': '📊 个性化学习',
+
+  // 推荐系统
+  'recommendation.title': '智能推荐',
+  'recommendation.subtitle': '基于天气、时间、心情的个性化推荐',
+  'recommendation.currentMood': '当前心情',
+  'recommendation.currentWeather': '当前天气',
+  'recommendation.currentTime': '当前时间',
+  'recommendation.analyzing': '分析中...',
+  'recommendation.getRecommendations': '获取推荐',
+  'recommendation.matchScore': '匹配度',
+  'recommendation.reasons': '推荐原因',
+  'recommendation.selectFood': '选择菜品',
+  'recommendation.learningHint': '系统已根据您的选择优化推荐',
+
+  // 菜单
+  'menu.smartRecommendation': '智能推荐',
+  'menu.dailyChallenge': '每日挑战',
+  'menu.achievements': '成就系统',
+  'menu.settings': '系统设置',
 };

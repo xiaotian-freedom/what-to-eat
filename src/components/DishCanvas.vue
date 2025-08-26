@@ -8,6 +8,7 @@
 
   const props = defineProps<{
     dishList: Dish[];
+    targetDish?: Dish; // 可选的目标菜品，当传入时直接显示该菜品的最终动画
   }>();
 
   const emit = defineEmits<{
@@ -58,7 +59,15 @@
 
   // 预加载所有图片
   const preloadAllImages = () => {
-    props.dishList.forEach(dish => {
+    // 创建需要预加载的菜品列表
+    const dishesToLoad = [...props.dishList];
+
+    // 如果有目标菜品且不在列表中，添加到预加载列表
+    if (props.targetDish && !props.dishList.find(dish => dish.name === props.targetDish!.name)) {
+      dishesToLoad.push(props.targetDish);
+    }
+
+    dishesToLoad.forEach(dish => {
       if (!dish.image) {
         // 无图片情况直接创建颜色块缓存
         const cachedImg = createCachedDishImage(dish);
@@ -443,6 +452,109 @@
     }
   };
 
+  // 显示目标菜品的最终动画
+  const showTargetDish = (dish?: Dish): Promise<void> => {
+    return new Promise(resolve => {
+      const targetDish = dish || props.targetDish;
+
+      if (!targetDish) {
+        console.warn('没有指定目标菜品');
+        resolve();
+        return;
+      }
+
+      // 如果动画已经在运行，先停止
+      if (isRunningAnimation.value) {
+        isRunningAnimation.value = false;
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = null;
+        }
+        if (animationTimer) {
+          cancelAnimationFrame(animationTimer);
+          animationTimer = null;
+        }
+      }
+
+      // 清除所有活跃菜品
+      dishes.value = [];
+      selectedDish.value = targetDish;
+      isRunningAnimation.value = true;
+
+      // 确保目标菜品的图片已加载
+      if (!dishImages.value[targetDish.name]) {
+        // 如果图片未缓存，先加载
+        if (targetDish.image) {
+          const img = new Image();
+          img.crossOrigin = 'Anonymous';
+
+          img.onload = () => {
+            const cachedImg = createCachedDishImage(targetDish, img);
+            dishImages.value[targetDish.name] = {
+              original: img,
+              cached: cachedImg,
+            };
+            startFinalAnimation(targetDish, resolve);
+          };
+
+          img.onerror = () => {
+            console.warn(`无法加载图片: ${targetDish.name}`);
+            const cachedImg = createCachedDishImage(targetDish);
+            dishImages.value[targetDish.name] = {
+              original: null,
+              cached: cachedImg,
+            };
+            startFinalAnimation(targetDish, resolve);
+          };
+
+          img.src = targetDish.image;
+        } else {
+          // 无图片情况直接创建颜色块缓存
+          const cachedImg = createCachedDishImage(targetDish);
+          dishImages.value[targetDish.name] = {
+            original: null,
+            cached: cachedImg,
+          };
+          startFinalAnimation(targetDish, resolve);
+        }
+      } else {
+        // 图片已缓存，直接开始动画
+        startFinalAnimation(targetDish, resolve);
+      }
+    });
+  };
+
+  // 启动最终动画的辅助函数
+  const startFinalAnimation = (targetDish: Dish, resolve: () => void) => {
+    // 确保 Canvas 已经初始化
+    if (!canvas.value || !ctx) {
+      console.error('Canvas 未初始化');
+      resolve();
+      return;
+    }
+
+    // 创建最终菜品动画对象
+    const finalDish = createDish(targetDish);
+    finalDish.stage = 3; // 直接设置为最终动画阶段
+    finalDish.stageTime = performance.now();
+    finalDish.x = canvas.value?.width ? canvas.value.width / 2 : 0;
+    finalDish.y = canvas.value?.height ? canvas.value.height / 2 : 0;
+    finalDish.scale = 1.0;
+    finalDish.rotation = 0;
+    finalDish.opacity = 1;
+
+    dishes.value.push(finalDish);
+
+    // 启动动画循环
+    animationFrameId = requestAnimationFrame(animateCanvas);
+
+    // 设置动画完成后的回调
+    animationTimer = rafTimeout(() => {
+      isRunningAnimation.value = false;
+      resolve();
+    }, 3000); // 最终动画持续时间
+  };
+
   // 开始随机动画
   const startRandomAnimation = (): Promise<void> => {
     return new Promise(resolve => {
@@ -635,9 +747,21 @@
     { deep: true }
   );
 
+  // 监听targetDish变化，重新预加载图片
+  watch(
+    () => props.targetDish,
+    newTargetDish => {
+      if (newTargetDish) {
+        preloadAllImages();
+      }
+    },
+    { deep: true }
+  );
+
   // 导出方法以供父组件调用
   defineExpose({
     startRandomAnimation,
+    showTargetDish,
     clearCanvas,
   });
 </script>

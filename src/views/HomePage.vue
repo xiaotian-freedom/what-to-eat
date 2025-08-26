@@ -13,6 +13,7 @@
         @add-food="addFood"
         @show-food-list="showFoodList"
         @selected-dish="selectedDish = $event"
+        @show-result="showResult = true"
       />
 
       <!-- 结果页面 -->
@@ -48,10 +49,8 @@
   const randomFood = async () => {
     if (homeCardRef.value) {
       // 调用HomePage组件中的方法启动菜品选择动画
+      // 动画完成后会自动触发 show-result 事件
       await homeCardRef.value.startRandomAnimation();
-
-      // 动画完成后，显示结果
-      showResult.value = true;
     }
   };
 

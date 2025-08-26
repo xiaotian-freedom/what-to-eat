@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { Food } from '@/types/food';
 import { ColorManager } from '@/utils/ColorManager';
+import { enhancedDishList } from '@/data/enhancedDishList';
 
 export const useFoodStore = defineStore('food', () => {
   // 菜品列表状态
@@ -19,10 +20,28 @@ export const useFoodStore = defineStore('food', () => {
             item.backgroundColor = ColorManager.getRandomColor();
           }
         });
+      } else {
+        // 如果没有存储的数据，使用默认的增强菜品列表
+        initializeWithDefaultData();
       }
     } catch (error) {
       console.error('加载菜品数据出错:', error);
+      // 加载失败时也使用默认数据
+      initializeWithDefaultData();
     }
+  };
+
+  // 初始化默认菜品数据
+  const initializeWithDefaultData = (): void => {
+    foodItems.value = [...enhancedDishList];
+    // 确保每个菜品都有背景颜色
+    foodItems.value.forEach(item => {
+      if (!item.backgroundColor) {
+        item.backgroundColor = ColorManager.getRandomColor();
+      }
+    });
+    // 保存到localStorage
+    saveFoodItems();
   };
 
   // 保存菜品数据到localStorage
@@ -87,6 +106,7 @@ export const useFoodStore = defineStore('food', () => {
   return {
     foodItems,
     loadFoodItems,
+    initializeWithDefaultData,
     addFood,
     updateFood,
     deleteFood,

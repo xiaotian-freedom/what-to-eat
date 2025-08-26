@@ -36,25 +36,31 @@
 
     <!-- 右侧按钮组 -->
     <div class="flex items-center space-x-2 z-10">
-      <button
-        v-for="(button, index) in rightButtons"
-        :key="index"
-        @click="button.onClick"
-        :class="[
-          'text-gray-600 hover:bg-gray-100 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0',
-          button.className || '',
-        ]"
-      >
-        <span class="text-lg">{{ button.icon }}</span>
-      </button>
-      <a
-        v-if="rightIcon"
-        href="#"
-        @click.prevent="handleRightIconClick"
-        class="text-gray-600 hover:bg-gray-100 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
-      >
-        <img :src="rightIcon" class="w-5 h-5" />
-      </a>
+      <!-- 自定义右侧内容插槽 -->
+      <slot name="rightContent">
+        <!-- 默认右侧按钮组 -->
+        <template v-if="rightButtons.length > 0 || rightIcon">
+          <button
+            v-for="(button, index) in rightButtons"
+            :key="index"
+            @click="button.onClick"
+            :class="[
+              'text-gray-600 hover:bg-gray-100 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0',
+              button.className || '',
+            ]"
+          >
+            <span class="text-lg">{{ button.icon }}</span>
+          </button>
+          <a
+            v-if="rightIcon"
+            href="#"
+            @click.prevent="handleRightIconClick"
+            class="text-gray-600 hover:bg-gray-100 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
+          >
+            <img :src="rightIcon" class="w-5 h-5" />
+          </a>
+        </template>
+      </slot>
     </div>
   </div>
 </template>

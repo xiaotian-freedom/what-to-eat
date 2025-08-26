@@ -2,23 +2,39 @@
   <Teleport to="body">
     <!-- 遮罩层 -->
     <Transition name="fade">
-      <div v-if="visible" class="fixed inset-0 bg-black/50 z-40" @click="handleBackdropClick"></div>
+      <div
+        v-if="visible"
+        class="fixed inset-0 backdrop-blur-sm z-40"
+        @click="handleBackdropClick"
+      ></div>
     </Transition>
 
     <!-- BottomSheet内容 -->
     <Transition name="slide-up">
       <div
         v-if="visible"
-        class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl"
-        :style="{ maxHeight: maxHeight }"
+        class="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl shadow-2xl"
+        :class="[customClass]"
+        :style="{
+          maxHeight: maxHeight,
+          background: backgroundStyle.background,
+          backgroundColor: backgroundStyle.backgroundColor,
+        }"
       >
         <!-- 拖拽指示器 -->
         <div class="flex justify-center pt-3 pb-2">
-          <div class="w-12 h-1 bg-gray-300 rounded-full"></div>
+          <div class="w-12 h-1 rounded-full" :style="{ backgroundColor: indicatorColor }"></div>
         </div>
 
         <!-- 内容区域 -->
-        <div class="px-6 pb-6 overflow-y-auto" :style="{ maxHeight: `calc(${maxHeight} - 60px)` }">
+        <div
+          class="px-6 pb-6 overflow-y-auto"
+          :style="{
+            maxHeight: `calc(${maxHeight} - 60px)`,
+            background: backgroundStyle.background,
+            backgroundColor: backgroundStyle.backgroundColor,
+          }"
+        >
           <slot></slot>
         </div>
       </div>
@@ -27,15 +43,39 @@
 </template>
 
 <script setup lang="ts">
+  import { computed } from 'vue';
+
   interface Props {
     visible: boolean;
     maxHeight?: string;
     closeOnBackdrop?: boolean;
+    backgroundColor?: string;
+    backgroundStyle?: string | Record<string, string>;
+    customClass?: string;
+    indicatorColor?: string;
   }
 
   const props = withDefaults(defineProps<Props>(), {
     maxHeight: '80vh',
     closeOnBackdrop: true,
+    backgroundColor: '#ffffff',
+    backgroundStyle: undefined,
+    customClass: '',
+    indicatorColor: '#d1d5db',
+  });
+
+  // 计算背景样式
+  const backgroundStyle = computed((): Record<string, string> => {
+    if (props.backgroundStyle) {
+      // 如果提供了 backgroundStyle，优先使用
+      if (typeof props.backgroundStyle === 'string') {
+        return { background: props.backgroundStyle };
+      }
+      return props.backgroundStyle as Record<string, string>;
+    } else {
+      // 否则使用 backgroundColor
+      return { backgroundColor: props.backgroundColor };
+    }
   });
 
   const emit = defineEmits<{

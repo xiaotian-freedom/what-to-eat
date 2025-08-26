@@ -4,43 +4,47 @@
     class="card-face bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative flex flex-col w-full h-full"
   >
     <!-- 顶部状态栏 -->
-    <HeaderBar
-      :title="$t('今天吃什么')"
-      :showBackButton="false"
-      :centerTitle="true"
-      :rightButtons="[
-        {
-          icon: '🏆',
-          onClick: () => (showAchievements = !showAchievements),
-          className: 'achievement-button',
-        },
-        {
-          icon: '⚙️',
-          onClick: () => router.push('/settings'),
-          className: 'settings-button',
-        },
-      ]"
-    />
+    <HeaderBar :title="$t('今天吃什么')" :showBackButton="false" :centerTitle="true">
+      <!-- 右侧菜单按钮 -->
+      <template #rightContent>
+        <button
+          @click.stop="toggleMenu"
+          class="text-gray-600 hover:bg-gray-100 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
+        >
+          <img src="@/assets/icons/menu.svg" class="w-5 h-5" />
+        </button>
+      </template>
+    </HeaderBar>
+
+    <!-- 弹出菜单 - 移到根级别 -->
+    <MenuPopover :visible="showMenu" @close="showMenu = false" @menu-click="handleMenuClick" />
 
     <!-- 内容区域 -->
     <div class="flex-1 flex flex-col items-center p-6 overflow-hidden relative">
-      <!-- 挑战状态浮动面板 - 可折叠 -->
-      <div v-if="!showResult" class="absolute top-4 left-4 z-10">
-        <ChallengeStatus ref="challengeStatusRef" />
-      </div>
-
       <!-- 成就BottomSheet -->
       <AchievementBottomSheet :visible="showAchievements" @close="showAchievements = false" />
+
+      <!-- 每日挑战BottomSheet -->
+      <ChallengeBottomSheet :visible="showChallenge" @close="showChallenge = false" />
+
+      <!-- 推荐面板 - 底部弹出 -->
+      <RecommendationBottomSheet
+        :visible="showRecommendation"
+        :maxRecommendations="3"
+        @close="showRecommendation = false"
+        @foodSelected="handleRecommendationSelected"
+        @recommendationsUpdated="onRecommendationsUpdated"
+      />
 
       <!-- 占位区域 -->
       <div
         ref="canvasContainer"
-        class="flex-grow w-full flex items-center justify-center relative"
-        @click="handleCanvasClick"
+        class="w-full flex items-center justify-center relative transition-all duration-300 flex-grow"
       >
         <DishCanvas
           ref="dishCanvasRef"
           :dishList="combinedDishList"
+          :targetDish="recommendedDish || undefined"
           @animation-complete="onAnimationComplete"
         />
         <div class="w-52 h-52"></div>
@@ -66,9 +70,11 @@
   import { useRouter } from 'vue-router';
   import DishCanvas from './DishCanvas.vue';
   import ActionButtons from './ActionButtons.vue';
-  import ChallengeStatus from './ChallengeStatus.vue';
   import AchievementBottomSheet from './AchievementBottomSheet.vue';
-  import type { Dish } from '@/types';
+  import ChallengeBottomSheet from './ChallengeBottomSheet.vue';
+  import RecommendationBottomSheet from './RecommendationBottomSheet.vue';
+  import MenuPopover from './MenuPopover.vue';
+  import type { Dish, RecommendationResult } from '@/types';
   import HeaderBar from '@/components/HeaderBar.vue';
   import { useFoodStore } from '@/stores';
   import { useChallengeStore } from '@/stores/challenge';
@@ -108,13 +114,17 @@
     (e: 'add-food'): void;
     (e: 'show-food-list'): void;
     (e: 'selected-dish', dish: Dish): void;
+    (e: 'show-result'): void;
   }>();
 
   const isAnimating = ref(false);
   const showAchievements = ref(false);
+  const showChallenge = ref(false);
+  const showRecommendation = ref(false);
+  const showMenu = ref(false);
   const dishCanvasRef = ref<InstanceType<typeof DishCanvas> | null>(null);
   const canvasContainer = ref<HTMLDivElement | null>(null);
-  const challengeStatusRef = ref<InstanceType<typeof ChallengeStatus> | null>(null);
+  const recommendedDish = ref<Dish | null>(null);
 
   const canUseToday = computed(() => challengeStore.canUseToday);
 
@@ -151,21 +161,105 @@
 
   // 动画完成回调
   const onAnimationComplete = (finalDish: Dish) => {
-    // 使用挑战模式并记录菜品
-    const success = challengeStore.useRandomFood(finalDish.name);
-    if (!success) {
-      showFailToast(t('messages.todayLimitReached'));
-      return;
+    // 检查是否是推荐菜品的动画完成
+    const isRecommendedDish =
+      recommendedDish.value && finalDish.name === recommendedDish.value.name;
+
+    if (isRecommendedDish) {
+      // 推荐菜品动画完成，记录挑战数据
+      const success = challengeStore.useRandomFood(finalDish.name);
+      if (!success) {
+        showFailToast(t('messages.todayLimitReached'));
+        isAnimating.value = false;
+        return;
+      }
+
+      // 发送选择事件
+      emit('selected-dish', finalDish);
+
+      // 清除推荐菜品状态
+      recommendedDish.value = null;
+    } else {
+      // 正常随机选择流程
+      const success = challengeStore.useRandomFood(finalDish.name);
+      if (!success) {
+        showFailToast(t('messages.todayLimitReached'));
+        return;
+      }
+      emit('selected-dish', finalDish);
     }
 
-    emit('selected-dish', finalDish);
     isAnimating.value = false;
+
+    // 动画完成后显示结果页面
+    emit('show-result');
   };
 
-  // 处理转盘区域点击 - 收起挑战状态面板
-  const handleCanvasClick = () => {
-    if (challengeStatusRef.value && challengeStatusRef.value.isExpanded) {
-      challengeStatusRef.value.toggleExpand();
+  // 切换推荐面板显示/隐藏
+  const toggleRecommendation = () => {
+    showRecommendation.value = !showRecommendation.value;
+  };
+
+  // 处理推荐选择
+  const handleRecommendationSelected = async (recommendation: RecommendationResult) => {
+    // 将推荐的Food转换为Dish格式
+    const selectedDish: Dish = {
+      name: recommendation.food.name,
+      image: recommendation.food.image || '',
+      desc: recommendation.food.category || '智能推荐',
+      backgroundColor: recommendation.food.backgroundColor || '#667eea',
+    };
+
+    // 设置为推荐菜品
+    recommendedDish.value = selectedDish;
+
+    if (dishCanvasRef.value && !isAnimating.value) {
+      isAnimating.value = true;
+      try {
+        // 直接传递菜品参数，确保目标菜品正确设置
+        await dishCanvasRef.value.showTargetDish(selectedDish);
+        // 动画完成后会自动调用 onAnimationComplete
+      } catch (error) {
+        console.error('显示推荐菜品动画失败:', error);
+        isAnimating.value = false;
+      }
+    }
+
+    // 隐藏推荐面板
+    showRecommendation.value = false;
+  };
+
+  // 推荐更新回调 - 现在主要用于日志记录
+  const onRecommendationsUpdated = (recommendations: RecommendationResult[]) => {
+    if (recommendations.length > 0) {
+      console.log(`获得${recommendations.length}个推荐`, recommendations);
+    }
+  };
+
+  // 切换菜单显示状态
+  const toggleMenu = () => {
+    showMenu.value = !showMenu.value;
+  };
+
+  // 处理菜单点击事件
+  const handleMenuClick = (action: string) => {
+    switch (action) {
+      case 'recommendation':
+        // 智能推荐：切换推荐面板显示状态
+        toggleRecommendation();
+        break;
+      case 'challenge':
+        // 每日挑战：显示挑战面板
+        showChallenge.value = true;
+        break;
+      case 'achievements':
+        // 成就系统：显示成就面板
+        showAchievements.value = true;
+        break;
+      case 'settings':
+        // 系统设置：跳转到设置页面
+        router.push('/settings');
+        break;
     }
   };
 

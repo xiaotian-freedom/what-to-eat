@@ -1,3 +1,7 @@
+// 导出推荐系统相关类型
+export * from './food';
+export * from './recommendation';
+
 // 菜品数据接口
 export interface Dish {
   name: string;

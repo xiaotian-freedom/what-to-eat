@@ -1,0 +1,206 @@
+/* 光效动画样式 */
+
+/* 基础光环动画 */
+@keyframes glowPulse {
+    0% {
+        box-shadow:
+            0 0 5px rgba(99, 102, 241, 0.3),
+            0 0 10px rgba(99, 102, 241, 0.2),
+            0 0 15px rgba(99, 102, 241, 0.1),
+            inset 0 0 10px rgba(255, 255, 255, 0.1);
+        transform: scale(1);
+    }
+
+    50% {
+        box-shadow:
+            0 0 20px rgba(99, 102, 241, 0.6),
+            0 0 30px rgba(99, 102, 241, 0.4),
+            0 0 40px rgba(99, 102, 241, 0.3),
+            inset 0 0 15px rgba(255, 255, 255, 0.2);
+        transform: scale(1.02);
+    }
+
+    100% {
+        box-shadow:
+            0 0 5px rgba(99, 102, 241, 0.3),
+            0 0 10px rgba(99, 102, 241, 0.2),
+            0 0 15px rgba(99, 102, 241, 0.1),
+            inset 0 0 10px rgba(255, 255, 255, 0.1);
+        transform: scale(1);
+    }
+}
+
+/* 旋转光线动画 */
+@keyframes rotatingGlow {
+    0% {
+        transform: rotate(0deg);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: rotate(360deg);
+        opacity: 0.8;
+    }
+}
+
+/* 波纹扩散动画 */
+@keyframes rippleEffect {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* 粒子效果动画 */
+@keyframes sparkle {
+
+    0%,
+    100% {
+        opacity: 0;
+        transform: scale(0) rotate(0deg);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1) rotate(180deg);
+    }
+}
+
+/* 光效按钮基础样式 */
+.glow-button {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(45deg, #818cf8, #6366f1);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* 激活光效状态 */
+.glow-button.active {
+    animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* 光效背景 */
+.glow-button::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #818cf8, #6366f1, #8b5cf6, #a855f7);
+    border-radius: 14px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.glow-button.active::before {
+    opacity: 1;
+    animation: rotatingGlow 3s linear infinite;
+}
+
+/* 波纹效果容器 */
+.glow-button .ripple-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* 单个波纹 */
+.glow-button .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    animation: rippleEffect 1.5s ease-out;
+    pointer-events: none;
+}
+
+/* 粒子效果容器 */
+.glow-button .sparkles-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* 单个粒子 */
+.glow-button .sparkle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: white;
+    border-radius: 50%;
+    animation: sparkle 2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* 加载状态的特殊效果 */
+.glow-button.loading {
+    animation: glowPulse 1.5s ease-in-out infinite;
+}
+
+.glow-button.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid transparent;
+    border-top: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* 成功状态光效 */
+.glow-button.success {
+    background: linear-gradient(45deg, #10b981, #059669);
+    animation: glowPulse 0.6s ease-out;
+}
+
+.glow-button.success::before {
+    background: linear-gradient(45deg, #10b981, #059669, #047857, #065f46);
+    opacity: 1;
+    animation: none;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .glow-button .sparkle {
+        width: 3px;
+        height: 3px;
+    }
+
+    .glow-button.active {
+        animation-duration: 2.5s;
+    }
+}

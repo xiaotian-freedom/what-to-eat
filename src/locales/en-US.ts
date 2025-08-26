@@ -116,7 +116,15 @@ export default {
   'challenge.inProgress': 'In Progress',
   'challenge.todayLimitReached': "Today's limit reached",
   'challenge.luckyValue': 'Lucky Value',
+  'challenge.luckyDesc': 'Affects the luck level of random selection',
   'challenge.consecutiveDays': 'Consecutive Days',
+  'challenge.consecutiveDesc': 'Consecutive days of using challenge',
+  'challenge.usedToday': 'Used Today',
+  'challenge.maxDaily': 'Daily Limit',
+  'challenge.dailyProgress': 'Daily Progress',
+  'challenge.limitReached': 'Limit Reached',
+  'challenge.devMode': 'Dev Mode',
+  'challenge.unlimitedUse': 'Unlimited uses',
 
   // Settings page
   'settings.title': 'Settings',
@@ -145,4 +153,10 @@ export default {
   'app.features.achievements': '🏆 Achievement System',
   'app.features.dailyChallenge': '🔥 Daily Challenge',
   'app.features.animations': '🎨 Beautiful Animations',
+
+  // Menu
+  'menu.smartRecommendation': 'Smart Recommendation',
+  'menu.dailyChallenge': 'Daily Challenge',
+  'menu.achievements': 'Achievements',
+  'menu.settings': 'Settings',
 };

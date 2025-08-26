@@ -3,12 +3,13 @@ import { createPinia } from 'pinia';
 import './assets/css/style.css';
 // import './assets/css/card-flip.css';
 import './assets/css/ripple.css';
+import './assets/css/glow-animation.css';
 // import './assets/css/wheel-animation.css';
 import App from './App.vue';
 import router from './router';
 import i18n, { $t } from './locales';
 import 'vant/lib/index.css';
-import { Button, Toast, Empty, Field, Dialog, SwipeCell, Tabs, Tab, Icon } from 'vant';
+import { Button, Toast, Empty, Field, Dialog, SwipeCell, Tabs, Tab, Icon, Popup, Cell } from 'vant';
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -27,6 +28,8 @@ app.use(SwipeCell);
 app.use(Tabs);
 app.use(Tab);
 app.use(Icon);
+app.use(Popup);
+app.use(Cell);
 
 // 创建扩展的触摸事件接口
 interface TouchEventWithScale extends TouchEvent {

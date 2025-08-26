@@ -9,6 +9,7 @@
           <img :src="plus" class="w-7 h-7" />
         </button>
 
+        <!-- 主随机按钮 -->
         <button
           class="w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg transform transition flex items-center justify-center ripple-btn"
           :class="{ 'opacity-50': disabled }"

@@ -35,6 +35,19 @@
   <!-- 背景圆形 -->
   <circle cx="256" cy="256" r="240" fill="url(#bgGradient)" filter="url(#shadow)"/>
   
+  <!-- 大问号背景装饰 -->
+  <g opacity="0.3">
+    <!-- 问号主体弧形 - 覆盖90%区域，延伸到y=430 -->
+    <path d="M 140 150 C 140 90 180 50 256 50 C 332 50 372 90 372 150 C 372 190 355 220 325 245 L 290 280 C 275 295 268 315 268 410" 
+          stroke="rgba(255,255,255,0.95)" 
+          stroke-width="20" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          fill="none"/>
+    <!-- 问号圆点 - 调整到合适位置 -->
+    <circle cx="268" cy="460" r="12" fill="rgba(255,255,255,0.95)"/>
+  </g>
+  
   <!-- 餐盘外圈装饰 -->
   <circle cx="256" cy="256" r="160" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="8,8"/>
   
