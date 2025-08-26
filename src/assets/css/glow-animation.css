@@ -30,15 +30,13 @@
     }
 }
 
-/* 旋转光线动画 */
+/* 光线动画（已移除旋转效果） */
 @keyframes rotatingGlow {
     0% {
-        transform: rotate(0deg);
         opacity: 0.8;
     }
 
     100% {
-        transform: rotate(360deg);
         opacity: 0.8;
     }
 }
@@ -56,18 +54,18 @@
     }
 }
 
-/* 粒子效果动画 */
+/* 粒子效果动画（已移除旋转效果） */
 @keyframes sparkle {
 
     0%,
     100% {
         opacity: 0;
-        transform: scale(0) rotate(0deg);
+        transform: scale(0);
     }
 
     50% {
         opacity: 1;
-        transform: scale(1) rotate(180deg);
+        transform: scale(1);
     }
 }
 
@@ -105,7 +103,7 @@
 
 .glow-button.active::before {
     opacity: 1;
-    animation: rotatingGlow 3s linear infinite;
+    /* 移除旋转动画，保持静态光线效果 */
 }
 
 /* 波纹效果容器 */

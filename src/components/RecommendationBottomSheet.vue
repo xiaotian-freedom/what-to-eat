@@ -174,6 +174,29 @@
   });
 
   // 方法
+  // 加权随机选择推荐结果
+  const getWeightedRandomRecommendation = (
+    recommendations: RecommendationResult[]
+  ): RecommendationResult => {
+    if (recommendations.length === 1) return recommendations[0];
+
+    // 为每个推荐分配权重，分数越高权重越大
+    const weights = recommendations.map(rec => rec.score * rec.confidence);
+    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+
+    let random = Math.random() * totalWeight;
+
+    for (let i = 0; i < recommendations.length; i++) {
+      random -= weights[i];
+      if (random <= 0) {
+        return recommendations[i];
+      }
+    }
+
+    // 备选返回第一个
+    return recommendations[0];
+  };
+
   const loadWeatherData = async () => {
     try {
       isLoadingLocation.value = true;
@@ -303,8 +326,10 @@
         };
       });
 
-      // 重新排序并只保留一个推荐结果
-      recommendations.value = adjustedRecs.sort((a, b) => b.score - a.score).slice(0, 1);
+      // 获取前5个高分推荐，然后使用加权随机选择
+      const topRecs = adjustedRecs.sort((a, b) => b.score - a.score).slice(0, 5);
+      const selectedRec = getWeightedRandomRecommendation(topRecs);
+      recommendations.value = [selectedRec];
 
       emit('recommendationsUpdated', recommendations.value);
 
@@ -317,7 +342,7 @@
         // 等待一小段时间让用户看到成功动画
         await new Promise(resolve => setTimeout(resolve, 800));
 
-        // 直接使用第一个推荐结果
+        // 直接使用选中的推荐结果
         const topRecommendation = recommendations.value[0];
 
         // 先触发选择事件

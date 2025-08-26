@@ -14,9 +14,9 @@ export const useRecommendationStore = defineStore('recommendation', () => {
   // 状态
   const currentContext = ref<RecommendationContext>({});
   const recommendationConfig = ref<RecommendationConfig>({
-    weatherWeight: 0.2,
-    timeWeight: 0.25,
-    moodWeight: 0.15,
+    weatherWeight: 0.15,
+    timeWeight: 0.2,
+    moodWeight: 0.25, // 增加心情权重
     seasonWeight: 0.15,
     preferenceWeight: 0.15,
     popularityWeight: 0.1,
@@ -137,20 +137,24 @@ export const useRecommendationStore = defineStore('recommendation', () => {
   // 计算心情匹配分数
   const calculateMoodScore = (food: Food): { score: number; reasons: RecommendationReason[] } => {
     const reasons: RecommendationReason[] = [];
-    let score = 0.5;
+    let score = 0.3; // 降低默认分数，增加心情匹配的重要性
 
     if (!food.suitableMood || !currentContext.value.userMood) {
       return { score, reasons };
     }
 
     const isMoodSuitable = food.suitableMood.includes(currentContext.value.userMood);
+
     if (isMoodSuitable) {
-      score = 0.9;
+      score = 0.95; // 提高匹配分数
       reasons.push({
         type: RecommendationReasonType.MOOD,
         message: `适合${getMoodDescription(currentContext.value.userMood)}时享用`,
-        weight: recommendationConfig.value.moodWeight || 0.15,
+        weight: recommendationConfig.value.moodWeight || 0.25,
       });
+    } else {
+      // 心情不匹配时给予更明显的惩罚
+      score = 0.1;
     }
 
     // 安慰食物的特殊处理
@@ -159,11 +163,44 @@ export const useRecommendationStore = defineStore('recommendation', () => {
       currentContext.value.userMood === MoodType.STRESSED
     ) {
       if (food.isComfortFood) {
-        score += 0.3;
+        score = Math.min(score + 0.4, 1); // 增强安慰食物的加分
         reasons.push({
           type: RecommendationReasonType.MOOD,
           message: '安慰食物，帮助缓解压力',
+          weight: 0.3,
+        });
+      }
+    }
+
+    // 针对不同心情的特殊处理
+    if (currentContext.value.userMood === MoodType.HAPPY) {
+      // 开心时偏爱甜食和酸甜口味
+      if (food.sweetLevel && food.sweetLevel > 2) {
+        score += 0.2;
+        reasons.push({
+          type: RecommendationReasonType.MOOD,
+          message: '甜食能让心情更好',
+          weight: 0.1,
+        });
+      }
+    } else if (currentContext.value.userMood === MoodType.SAD) {
+      // 难过时特别偏爱安慰食物和温暖的食物
+      if (food.isComfortFood || food.tags?.includes('温补')) {
+        score = Math.min(score + 0.3, 1);
+        reasons.push({
+          type: RecommendationReasonType.MOOD,
+          message: '温暖的食物能带来安慰',
           weight: 0.2,
+        });
+      }
+    } else if (currentContext.value.userMood === MoodType.ENERGETIC) {
+      // 精力充沛时偏爱辣味和刺激性食物
+      if (food.spicyLevel && food.spicyLevel > 2) {
+        score += 0.2;
+        reasons.push({
+          type: RecommendationReasonType.MOOD,
+          message: '辣味能激发更多活力',
+          weight: 0.1,
         });
       }
     }
@@ -274,10 +311,17 @@ export const useRecommendationStore = defineStore('recommendation', () => {
       });
     });
 
-    // 按分数排序并返回前N个
-    return results
-      .sort((a, b) => b.score - a.score)
-      .slice(0, recommendationConfig.value.maxRecommendations || 5);
+    // 按分数排序，对于相近分数的菜品增加随机性
+    const sortedResults = results.sort((a, b) => {
+      const scoreDiff = b.score - a.score;
+      // 如果分数差异很小（小于0.1），引入随机性
+      if (Math.abs(scoreDiff) < 0.1) {
+        return Math.random() - 0.5;
+      }
+      return scoreDiff;
+    });
+
+    return sortedResults.slice(0, recommendationConfig.value.maxRecommendations || 5);
   };
 
   // 获取单个推荐（用于随机选择时的智能推荐）
