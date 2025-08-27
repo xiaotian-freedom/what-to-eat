@@ -7,7 +7,7 @@
       <!-- 主页面 -->
       <HomeCard
         ref="homeCardRef"
-        :dishList="dishList"
+        :dishList="enhancedDishList"
         :showResult="showResult"
         @random-food="randomFood"
         @add-food="addFood"
@@ -31,8 +31,8 @@
   import { useI18n } from 'vue-i18n';
   import HomeCard from '@/components/HomeCard.vue';
   import ResultCard from '@/components/ResultCard.vue';
-  import type { Dish } from '@/types';
-  import { dishList } from '@/data/dishList';
+  import type { Food } from '@/types';
+  import { enhancedDishList } from '@/data/enhancedDishList';
   import { useRouter } from 'vue-router';
   import { showFailToast, showSuccessToast } from 'vant';
   import { useChallengeStore } from '@/stores/challenge';
@@ -41,7 +41,7 @@
   const router = useRouter();
   const challengeStore = useChallengeStore();
 
-  const selectedDish = ref<Dish | null>(null);
+  const selectedDish = ref<Food | null>(null);
   const showResult = ref(false);
   const homeCardRef = useTemplateRef('homeCardRef');
 

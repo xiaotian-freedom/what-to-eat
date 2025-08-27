@@ -74,7 +74,7 @@
   import ChallengeBottomSheet from './ChallengeBottomSheet.vue';
   import RecommendationBottomSheet from './RecommendationBottomSheet.vue';
   import MenuPopover from './MenuPopover.vue';
-  import type { Dish, RecommendationResult } from '@/types';
+  import type { Food, RecommendationResult } from '@/types';
   import HeaderBar from '@/components/HeaderBar.vue';
   import { useFoodStore } from '@/stores';
   import { useChallengeStore } from '@/stores/challenge';
@@ -85,7 +85,7 @@
   const router = useRouter();
 
   const props = defineProps<{
-    dishList: Dish[];
+    dishList: Food[];
     showResult: boolean;
   }>();
 
@@ -96,13 +96,8 @@
   // 优先使用 store 中的数据，如果为空才使用 dishList
   const combinedDishList = computed(() => {
     if (foodStore.foodItems.length > 0) {
-      // 将 Food 类型转换为 Dish 类型
-      return foodStore.foodItems.map(food => ({
-        name: food.name,
-        image: food.image || '',
-        desc: food.category || '美味佳肴',
-        backgroundColor: food.backgroundColor || food.categoryColor || '#4A5568',
-      }));
+      // 直接返回 Food 类型
+      return foodStore.foodItems;
     } else {
       // 如果 store 中没有数据，使用默认 dishList
       return props.dishList;
@@ -113,7 +108,7 @@
     (e: 'random-food'): void;
     (e: 'add-food'): void;
     (e: 'show-food-list'): void;
-    (e: 'selected-dish', dish: Dish): void;
+    (e: 'selected-dish', dish: Food): void;
     (e: 'show-result'): void;
   }>();
 
@@ -124,7 +119,7 @@
   const showMenu = ref(false);
   const dishCanvasRef = ref<InstanceType<typeof DishCanvas> | null>(null);
   const canvasContainer = ref<HTMLDivElement | null>(null);
-  const recommendedDish = ref<Dish | null>(null);
+  const recommendedDish = ref<Food | null>(null);
 
   const canUseToday = computed(() => challengeStore.canUseToday);
 
@@ -160,7 +155,7 @@
   };
 
   // 动画完成回调
-  const onAnimationComplete = (finalDish: Dish) => {
+  const onAnimationComplete = (finalDish: Food) => {
     // 检查是否是推荐菜品的动画完成
     const isRecommendedDish =
       recommendedDish.value && finalDish.name === recommendedDish.value.name;
@@ -195,22 +190,17 @@
 
   // 处理推荐选择
   const handleRecommendationSelected = async (recommendation: RecommendationResult) => {
-    // 将推荐的Food转换为Dish格式
-    const selectedDish: Dish = {
-      name: recommendation.food.name,
-      image: recommendation.food.image || '',
-      desc: recommendation.food.category || '智能推荐',
-      backgroundColor: recommendation.food.backgroundColor || '#667eea',
-    };
+    // 直接使用推荐的Food对象
+    const selectedFood = recommendation.food;
 
     // 设置为推荐菜品
-    recommendedDish.value = selectedDish;
+    recommendedDish.value = selectedFood;
 
     if (dishCanvasRef.value && !isAnimating.value) {
       isAnimating.value = true;
       try {
         // 直接传递菜品参数，确保目标菜品正确设置
-        await dishCanvasRef.value.showTargetDish(selectedDish);
+        await dishCanvasRef.value.showTargetDish(selectedFood);
         // 动画完成后会自动调用 onAnimationComplete
       } catch (error) {
         console.error('显示推荐菜品动画失败:', error);

@@ -2,6 +2,9 @@
 export * from './food';
 export * from './recommendation';
 
+// 导入 Food 类型用于 DishAnimation
+import type { Food } from './food';
+
 // 菜品数据接口
 export interface Dish {
   name: string;
@@ -12,7 +15,7 @@ export interface Dish {
 
 // 菜品动画对象接口
 export interface DishAnimation {
-  dish: Dish;
+  dish: Food;
   x: number;
   y: number;
   scale: number;

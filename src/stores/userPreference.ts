@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { MoodType } from '@/types';
+import { MoodType, ActivityLevel, WorkType, DietaryRestriction } from '@/types';
 import type { Food, UserPreference, UserChoiceHistory, RecommendationContext } from '@/types';
 
 export const useUserPreferenceStore = defineStore('userPreference', () => {
@@ -15,6 +15,17 @@ export const useUserPreferenceStore = defineStore('userPreference', () => {
     sweetTolerance: 2,
     healthPriority: 0.5,
     adventurousness: 0.5,
+
+    // 新增：身体状态相关偏好
+    preferredPhysicalStates: [],
+    defaultActivityLevel: ActivityLevel.LIGHT,
+    workType: WorkType.MENTAL,
+
+    // 新增：特殊需求
+    dietaryRestrictions: [DietaryRestriction.NONE],
+    allergens: [],
+    avoidIngredients: [],
+
     lastUpdated: new Date(),
   });
 
@@ -294,6 +305,84 @@ export const useUserPreferenceStore = defineStore('userPreference', () => {
       factors++;
     }
 
+    // 新增：身体状态相关偏好
+    if (food.suitablePhysicalState && userPreference.value.preferredPhysicalStates) {
+      const physicalStateMatches = food.suitablePhysicalState.filter(state =>
+        userPreference.value.preferredPhysicalStates?.includes(state)
+      ).length;
+      if (physicalStateMatches > 0) {
+        score += 0.15 * physicalStateMatches;
+        factors++;
+      }
+    }
+
+    // 新增：活动水平匹配
+    if (food.suitableActivityLevel && userPreference.value.defaultActivityLevel) {
+      const activityMatches = food.suitableActivityLevel.includes(
+        userPreference.value.defaultActivityLevel
+      );
+      if (activityMatches) {
+        score += 0.1;
+        factors++;
+      }
+    }
+
+    // 新增：工作类型匹配
+    if (food.suitableWorkType && userPreference.value.workType) {
+      const workTypeMatches = food.suitableWorkType.includes(userPreference.value.workType);
+      if (workTypeMatches) {
+        score += 0.1;
+        factors++;
+      }
+    }
+
+    // 新增：饮食限制检查（这是硬性要求，违反会大幅减分）
+    if (
+      userPreference.value.dietaryRestrictions &&
+      userPreference.value.dietaryRestrictions.length > 0
+    ) {
+      const userRestrictions = userPreference.value.dietaryRestrictions.filter(
+        r => r !== DietaryRestriction.NONE
+      );
+      if (userRestrictions.length > 0 && food.dietaryRestrictions) {
+        // 检查是否符合用户的饮食限制
+        const isCompliant = userRestrictions.every(restriction =>
+          food.dietaryRestrictions?.includes(restriction)
+        );
+        if (!isCompliant) {
+          score -= 0.5; // 不符合饮食限制，大幅减分
+        } else {
+          score += 0.1; // 符合饮食限制，小幅加分
+          factors++;
+        }
+      }
+    }
+
+    // 新增：过敏原检查（这是硬性要求，违反会严重减分）
+    if (userPreference.value.allergens && userPreference.value.allergens.length > 0) {
+      if (food.allergens) {
+        const hasAllergen = userPreference.value.allergens.some(allergen =>
+          food.allergens?.includes(allergen)
+        );
+        if (hasAllergen) {
+          score -= 0.8; // 含有过敏原，严重减分
+        }
+      }
+    }
+
+    // 新增：需要避免的食材检查
+    if (userPreference.value.avoidIngredients && userPreference.value.avoidIngredients.length > 0) {
+      const hasAvoidIngredient = userPreference.value.avoidIngredients.some(
+        ingredient =>
+          food.name.includes(ingredient) ||
+          food.description?.includes(ingredient) ||
+          food.tags?.some(tag => tag.includes(ingredient))
+      );
+      if (hasAvoidIngredient) {
+        score -= 0.3; // 含有需要避免的食材，中度减分
+      }
+    }
+
     return Math.max(0, Math.min(1, score));
   };
 
@@ -352,6 +441,17 @@ export const useUserPreferenceStore = defineStore('userPreference', () => {
       sweetTolerance: 2,
       healthPriority: 0.5,
       adventurousness: 0.5,
+
+      // 新增：身体状态相关偏好
+      preferredPhysicalStates: [],
+      defaultActivityLevel: ActivityLevel.LIGHT,
+      workType: WorkType.MENTAL,
+
+      // 新增：特殊需求
+      dietaryRestrictions: [DietaryRestriction.NONE],
+      allergens: [],
+      avoidIngredients: [],
+
       lastUpdated: new Date(),
     };
     saveUserPreference();

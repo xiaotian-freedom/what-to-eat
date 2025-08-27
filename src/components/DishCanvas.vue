@@ -4,15 +4,15 @@
 
 <script setup lang="ts">
   import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
-  import type { Dish, DishAnimation, CachedDishImage } from '@/types';
+  import type { Food, Dish, DishAnimation, CachedDishImage } from '@/types';
 
   const props = defineProps<{
-    dishList: Dish[];
-    targetDish?: Dish; // 可选的目标菜品，当传入时直接显示该菜品的最终动画
+    dishList: Food[];
+    targetDish?: Food; // 可选的目标菜品，当传入时直接显示该菜品的最终动画
   }>();
 
   const emit = defineEmits<{
-    (e: 'animation-complete', dish: Dish): void;
+    (e: 'animation-complete', dish: Food): void;
   }>();
 
   const canvas = ref<HTMLCanvasElement | null>(null);
@@ -20,7 +20,7 @@
 
   // 状态变量
   const isRunningAnimation = ref(false);
-  const selectedDish = ref<Dish | null>(null);
+  const selectedDish = ref<Food | null>(null);
   const dishes = ref<DishAnimation[]>([]);
   let animationFrameId: number | null = null;
   let animationTimer: number | null = null;
@@ -109,7 +109,12 @@
   };
 
   // 创建缓存的菜品图像
-  const createCachedDishImage = (dish: Dish, img?: HTMLImageElement): HTMLCanvasElement => {
+  const createCachedDishImage = (
+    dishOrFood: Food | Dish,
+    img?: HTMLImageElement
+  ): HTMLCanvasElement => {
+    // 确保转换为 Dish 类型
+    const dish = 'id' in dishOrFood ? convertFoodToDish(dishOrFood) : dishOrFood;
     const cacheCanvas = document.createElement('canvas');
     const size = 120;
     cacheCanvas.width = size;
@@ -175,14 +180,36 @@
     cacheCtx.drawImage(img, x, y, scaledWidth, scaledHeight);
   };
 
+  // 辅助函数：将 Food 转换为 Dish
+  const convertFoodToDish = (food: Food): Dish => {
+    return {
+      name: food.name,
+      image: food.image,
+      desc: food.description || '美味佳肴',
+      backgroundColor: food.backgroundColor || food.categoryColor,
+    };
+  };
+
   // 创建单个菜品对象
-  const createDish = (dish: Dish): DishAnimation => {
+  const createDish = (dishOrFood: Food | Dish): DishAnimation => {
     if (!canvas.value) {
       throw new Error('Canvas not initialized');
     }
 
+    // 如果输入是 Dish，需要转换回 Food；如果已经是 Food，保持不变
+    const foodDish =
+      'id' in dishOrFood
+        ? dishOrFood
+        : ({
+            id: `dish_${Date.now()}_${Math.random()}`,
+            name: dishOrFood.name,
+            image: dishOrFood.image,
+            description: dishOrFood.desc,
+            backgroundColor: dishOrFood.backgroundColor,
+          } as Food);
+
     return {
-      dish: dish,
+      dish: foodDish,
       x: canvas.value.width / 2,
       y: canvas.value.height / 2,
       scale: 0,
@@ -453,7 +480,7 @@
   };
 
   // 显示目标菜品的最终动画
-  const showTargetDish = (dish?: Dish): Promise<void> => {
+  const showTargetDish = (dish?: Food): Promise<void> => {
     return new Promise(resolve => {
       const targetDish = dish || props.targetDish;
 
@@ -478,6 +505,8 @@
 
       // 清除所有活跃菜品
       dishes.value = [];
+
+      // 确保 selectedDish 是 Food 类型，targetDish 现在已经是 Food 类型
       selectedDish.value = targetDish;
       isRunningAnimation.value = true;
 
@@ -525,7 +554,18 @@
   };
 
   // 启动最终动画的辅助函数
-  const startFinalAnimation = (targetDish: Dish, resolve: () => void) => {
+  const startFinalAnimation = (targetDishOrFood: Food | Dish, resolve: () => void) => {
+    // 确保我们有 Food 格式
+    const targetFood =
+      'id' in targetDishOrFood
+        ? targetDishOrFood
+        : ({
+            id: `dish_${Date.now()}_${Math.random()}`,
+            name: targetDishOrFood.name,
+            image: targetDishOrFood.image,
+            description: targetDishOrFood.desc,
+            backgroundColor: targetDishOrFood.backgroundColor,
+          } as Food);
     // 确保 Canvas 已经初始化
     if (!canvas.value || !ctx) {
       console.error('Canvas 未初始化');
@@ -534,7 +574,7 @@
     }
 
     // 创建最终菜品动画对象
-    const finalDish = createDish(targetDish);
+    const finalDish = createDish(targetFood);
     finalDish.stage = 3; // 直接设置为最终动画阶段
     finalDish.stageTime = performance.now();
     finalDish.x = canvas.value?.width ? canvas.value.width / 2 : 0;

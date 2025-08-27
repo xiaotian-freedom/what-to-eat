@@ -1,6 +1,16 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { WeatherType, TimeOfDay, MoodType, Season, RecommendationReasonType } from '@/types';
+import {
+  WeatherType,
+  TimeOfDay,
+  MoodType,
+  Season,
+  PhysicalState,
+  ActivityLevel,
+  WorkType,
+  DietaryRestriction,
+  RecommendationReasonType,
+} from '@/types';
 import type {
   Food,
   RecommendationContext,
@@ -14,13 +24,21 @@ export const useRecommendationStore = defineStore('recommendation', () => {
   // 状态
   const currentContext = ref<RecommendationContext>({});
   const recommendationConfig = ref<RecommendationConfig>({
-    weatherWeight: 0.15,
-    timeWeight: 0.2,
-    moodWeight: 0.25, // 增加心情权重
-    seasonWeight: 0.15,
+    // 基础维度权重
+    weatherWeight: 0.12,
+    timeWeight: 0.15,
+    moodWeight: 0.2, // 心情权重
+    seasonWeight: 0.1,
     preferenceWeight: 0.15,
-    popularityWeight: 0.1,
+    popularityWeight: 0.08,
     diversityFactor: 0.3,
+
+    // 新增维度权重
+    physicalStateWeight: 0.15, // 身体状态权重较高，因为影响健康
+    activityLevelWeight: 0.08, // 活动水平权重
+    workTypeWeight: 0.05, // 工作类型权重
+    dietaryRestrictionsWeight: 0.12, // 饮食限制权重较高，因为是硬性要求
+
     maxRecommendations: 5,
   });
   const currentWeatherData = ref<WeatherData | null>(null);
@@ -249,6 +267,172 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     return { score, reasons };
   };
 
+  // 计算身体状态匹配分数
+  const calculatePhysicalStateScore = (
+    food: Food
+  ): { score: number; reasons: RecommendationReason[] } => {
+    const reasons: RecommendationReason[] = [];
+    let score = 0.5;
+
+    if (!food.suitablePhysicalState || !currentContext.value.physicalState) {
+      return { score, reasons };
+    }
+
+    const isPhysicalStateSuitable = food.suitablePhysicalState.includes(
+      currentContext.value.physicalState
+    );
+    if (isPhysicalStateSuitable) {
+      score = 0.9;
+      reasons.push({
+        type: RecommendationReasonType.PHYSICAL_STATE,
+        message: `适合${getPhysicalStateDescription(currentContext.value.physicalState)}时享用`,
+        weight: recommendationConfig.value.physicalStateWeight || 0.15,
+      });
+
+      // 特殊身体状态的额外处理
+      if (currentContext.value.physicalState === PhysicalState.SICK && food.isRecoveryFood) {
+        score += 0.1;
+        reasons.push({
+          type: RecommendationReasonType.PHYSICAL_STATE,
+          message: '有助于病后恢复',
+          weight: 0.1,
+        });
+      }
+
+      if (currentContext.value.physicalState === PhysicalState.EXERCISED && food.isEnergyBooster) {
+        score += 0.1;
+        reasons.push({
+          type: RecommendationReasonType.PHYSICAL_STATE,
+          message: '运动后能量补充',
+          weight: 0.1,
+        });
+      }
+
+      if (currentContext.value.physicalState === PhysicalState.INSOMNIA && food.isSleepFriendly) {
+        score += 0.1;
+        reasons.push({
+          type: RecommendationReasonType.PHYSICAL_STATE,
+          message: '有助于改善睡眠',
+          weight: 0.1,
+        });
+      }
+    }
+
+    return { score: Math.min(score, 1), reasons };
+  };
+
+  // 计算活动水平匹配分数
+  const calculateActivityLevelScore = (
+    food: Food
+  ): { score: number; reasons: RecommendationReason[] } => {
+    const reasons: RecommendationReason[] = [];
+    let score = 0.5;
+
+    if (!food.suitableActivityLevel || !currentContext.value.activityLevel) {
+      return { score, reasons };
+    }
+
+    const isActivityLevelSuitable = food.suitableActivityLevel.includes(
+      currentContext.value.activityLevel
+    );
+    if (isActivityLevelSuitable) {
+      score = 0.8;
+      reasons.push({
+        type: RecommendationReasonType.ACTIVITY_LEVEL,
+        message: `适合${getActivityLevelDescription(currentContext.value.activityLevel)}的活动水平`,
+        weight: recommendationConfig.value.activityLevelWeight || 0.08,
+      });
+    }
+
+    return { score, reasons };
+  };
+
+  // 计算工作类型匹配分数
+  const calculateWorkTypeScore = (
+    food: Food
+  ): { score: number; reasons: RecommendationReason[] } => {
+    const reasons: RecommendationReason[] = [];
+    let score = 0.5;
+
+    if (!food.suitableWorkType || !currentContext.value.workType) {
+      return { score, reasons };
+    }
+
+    const isWorkTypeSuitable = food.suitableWorkType.includes(currentContext.value.workType);
+    if (isWorkTypeSuitable) {
+      score = 0.8;
+      reasons.push({
+        type: RecommendationReasonType.WORK_TYPE,
+        message: `适合${getWorkTypeDescription(currentContext.value.workType)}`,
+        weight: recommendationConfig.value.workTypeWeight || 0.05,
+      });
+    }
+
+    return { score, reasons };
+  };
+
+  // 计算饮食限制匹配分数
+  const calculateDietaryRestrictionsScore = (
+    food: Food
+  ): { score: number; reasons: RecommendationReason[] } => {
+    const reasons: RecommendationReason[] = [];
+    let score = 0.5;
+
+    if (
+      !currentContext.value.dietaryRestrictions ||
+      currentContext.value.dietaryRestrictions.length === 0
+    ) {
+      return { score, reasons };
+    }
+
+    const userRestrictions = currentContext.value.dietaryRestrictions.filter(
+      r => r !== DietaryRestriction.NONE
+    );
+    if (userRestrictions.length === 0) {
+      return { score, reasons };
+    }
+
+    // 检查菜品是否符合饮食限制
+    if (food.dietaryRestrictions) {
+      const isCompliant = userRestrictions.every(restriction =>
+        food.dietaryRestrictions?.includes(restriction)
+      );
+
+      if (isCompliant) {
+        score = 0.9;
+        reasons.push({
+          type: RecommendationReasonType.DIETARY_RESTRICTION,
+          message: `符合${userRestrictions.map(getDietaryRestrictionDescription).join('、')}要求`,
+          weight: recommendationConfig.value.dietaryRestrictionsWeight || 0.12,
+        });
+      } else {
+        score = 0.1; // 不符合饮食限制，严重减分
+      }
+    } else {
+      // 菜品没有饮食限制标记，给予中等分数
+      score = 0.3;
+    }
+
+    // 过敏原检查
+    if (currentContext.value.allergens && currentContext.value.allergens.length > 0) {
+      if (food.allergens) {
+        const hasAllergen = currentContext.value.allergens.some(allergen =>
+          food.allergens?.includes(allergen)
+        );
+        if (hasAllergen) {
+          score = 0.05; // 含有过敏原，几乎完全排除
+          reasons.push({
+            type: RecommendationReasonType.DIETARY_RESTRICTION,
+            message: '⚠️ 含有过敏原，不推荐',
+            weight: -0.8,
+          });
+        }
+      }
+    }
+
+    return { score, reasons };
+  };
+
   // 主推荐算法
   const getRecommendations = (foods: Food[]): RecommendationResult[] => {
     const results: RecommendationResult[] = [];
@@ -257,6 +441,7 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     const hasWeatherData = currentWeatherData.value !== null;
 
     foods.forEach(food => {
+      // 基础维度评分
       const weatherResult = hasWeatherData
         ? calculateWeatherScore(food)
         : { score: 0.5, reasons: [] };
@@ -265,20 +450,34 @@ export const useRecommendationStore = defineStore('recommendation', () => {
       const seasonResult = calculateSeasonScore(food);
       const popularityResult = calculatePopularityScore(food);
 
-      // 动态调整权重：如果没有天气数据，将天气权重分配给其他因素
-      let weatherWeight = recommendationConfig.value.weatherWeight || 0.2;
-      let timeWeight = recommendationConfig.value.timeWeight || 0.25;
-      let moodWeight = recommendationConfig.value.moodWeight || 0.15;
-      let seasonWeight = recommendationConfig.value.seasonWeight || 0.15;
-      let popularityWeight = recommendationConfig.value.popularityWeight || 0.1;
+      // 新增维度评分
+      const physicalStateResult = calculatePhysicalStateScore(food);
+      const activityLevelResult = calculateActivityLevelScore(food);
+      const workTypeResult = calculateWorkTypeScore(food);
+      const dietaryRestrictionsResult = calculateDietaryRestrictionsScore(food);
+
+      // 获取权重配置
+      let weatherWeight = recommendationConfig.value.weatherWeight || 0.12;
+      let timeWeight = recommendationConfig.value.timeWeight || 0.15;
+      let moodWeight = recommendationConfig.value.moodWeight || 0.2;
+      let seasonWeight = recommendationConfig.value.seasonWeight || 0.1;
+      let popularityWeight = recommendationConfig.value.popularityWeight || 0.08;
       const preferenceWeight = recommendationConfig.value.preferenceWeight || 0.15;
 
+      // 新增维度权重
+      let physicalStateWeight = recommendationConfig.value.physicalStateWeight || 0.15;
+      let activityLevelWeight = recommendationConfig.value.activityLevelWeight || 0.08;
+      let workTypeWeight = recommendationConfig.value.workTypeWeight || 0.05;
+      let dietaryRestrictionsWeight = recommendationConfig.value.dietaryRestrictionsWeight || 0.12;
+
+      // 动态调整权重：如果没有天气数据，将天气权重分配给其他因素
       if (!hasWeatherData) {
-        // 将天气权重平均分配给时间、心情和季节因素
-        const redistribution = weatherWeight / 3;
+        const redistribution = weatherWeight / 4;
         timeWeight += redistribution;
         moodWeight += redistribution;
         seasonWeight += redistribution;
+        // 将部分权重分配给身体状态，因为它同样重要
+        physicalStateWeight += redistribution;
         weatherWeight = 0;
       }
 
@@ -289,15 +488,23 @@ export const useRecommendationStore = defineStore('recommendation', () => {
         moodResult.score * moodWeight +
         seasonResult.score * seasonWeight +
         popularityResult.score * popularityWeight +
+        physicalStateResult.score * physicalStateWeight +
+        activityLevelResult.score * activityLevelWeight +
+        workTypeResult.score * workTypeWeight +
+        dietaryRestrictionsResult.score * dietaryRestrictionsWeight +
         0.5 * preferenceWeight; // 偏好分数暂时设为0.5
 
-      // 合并所有推荐原因（排除空的天气原因）
+      // 合并所有推荐原因
       const allReasons = [
         ...(hasWeatherData ? weatherResult.reasons : []),
         ...timeResult.reasons,
         ...moodResult.reasons,
         ...seasonResult.reasons,
         ...popularityResult.reasons,
+        ...physicalStateResult.reasons,
+        ...activityLevelResult.reasons,
+        ...workTypeResult.reasons,
+        ...dietaryRestrictionsResult.reasons,
       ];
 
       // 计算置信度（基于匹配的因素数量）
@@ -399,6 +606,61 @@ export const useRecommendationStore = defineStore('recommendation', () => {
       [Season.WINTER]: '冬季',
     };
     return descriptions[season] || season;
+  };
+
+  // 辅助函数 - 获取身体状态描述
+  const getPhysicalStateDescription = (state: PhysicalState): string => {
+    const descriptions = {
+      [PhysicalState.NORMAL]: '正常状态',
+      [PhysicalState.SICK]: '感冒生病',
+      [PhysicalState.RECOVERING]: '病后恢复',
+      [PhysicalState.EXERCISED]: '刚运动完',
+      [PhysicalState.HANGOVER]: '宿醉',
+      [PhysicalState.INSOMNIA]: '失眠',
+      [PhysicalState.PREGNANT]: '孕期',
+      [PhysicalState.MENSTRUAL]: '生理期',
+      [PhysicalState.PMS]: '经前综合征',
+    };
+    return descriptions[state] || state;
+  };
+
+  // 辅助函数 - 获取活动水平描述
+  const getActivityLevelDescription = (level: ActivityLevel): string => {
+    const descriptions = {
+      [ActivityLevel.SEDENTARY]: '久坐少动',
+      [ActivityLevel.LIGHT]: '轻度活动',
+      [ActivityLevel.MODERATE]: '中度活动',
+      [ActivityLevel.INTENSIVE]: '高强度活动',
+    };
+    return descriptions[level] || level;
+  };
+
+  // 辅助函数 - 获取工作类型描述
+  const getWorkTypeDescription = (workType: WorkType): string => {
+    const descriptions = {
+      [WorkType.MENTAL]: '脑力工作',
+      [WorkType.PHYSICAL]: '体力工作',
+      [WorkType.CREATIVE]: '创意工作',
+      [WorkType.NIGHT_SHIFT]: '夜班工作',
+    };
+    return descriptions[workType] || workType;
+  };
+
+  // 辅助函数 - 获取饮食限制描述
+  const getDietaryRestrictionDescription = (restriction: DietaryRestriction): string => {
+    const descriptions = {
+      [DietaryRestriction.NONE]: '无限制',
+      [DietaryRestriction.VEGETARIAN]: '素食',
+      [DietaryRestriction.VEGAN]: '纯素',
+      [DietaryRestriction.GLUTEN_FREE]: '无麸质',
+      [DietaryRestriction.DIABETIC]: '糖尿病友好',
+      [DietaryRestriction.LOW_SODIUM]: '低钠',
+      [DietaryRestriction.LOW_FAT]: '低脂',
+      [DietaryRestriction.KETO]: '生酮饮食',
+      [DietaryRestriction.PALEO]: '原始人饮食',
+      [DietaryRestriction.MEDITERRANEAN]: '地中海饮食',
+    };
+    return descriptions[restriction] || restriction;
   };
 
   // 计算属性

@@ -1,5 +1,14 @@
 import type { Food } from '@/types';
-import { WeatherType, TimeOfDay, MoodType, Season, CuisineType } from '@/types';
+import {
+  WeatherType,
+  TimeOfDay,
+  MoodType,
+  Season,
+  CuisineType,
+  PhysicalState,
+  ActivityLevel,
+  DietaryRestriction,
+} from '@/types';
 
 export const enhancedDishList: Food[] = [
   {
@@ -23,6 +32,25 @@ export const enhancedDishList: Food[] = [
     origin: '江浙菜',
     description: '经典红烧肉，肥而不腻，入口即化',
     backgroundColor: '#8B4513',
+
+    // 新增：身体状态相关
+    suitablePhysicalState: [PhysicalState.NORMAL, PhysicalState.RECOVERING, PhysicalState.PMS],
+    benefitsForPhysicalState: {
+      [PhysicalState.RECOVERING]: '温补营养，有助于体力恢复',
+      [PhysicalState.PMS]: '安慰食物，缓解情绪波动',
+    },
+
+    // 新增：活动水平相关
+    suitableActivityLevel: [ActivityLevel.SEDENTARY, ActivityLevel.LIGHT],
+
+    // 新增：特殊需求
+    dietaryRestrictions: [DietaryRestriction.NONE],
+    allergens: [],
+    isRecoveryFood: true,
+    isEnergyBooster: false,
+    isAntiInflammatory: false,
+    isSleepFriendly: false,
+    isDetoxifying: false,
   },
   {
     id: '2',
@@ -45,6 +73,24 @@ export const enhancedDishList: Food[] = [
     origin: '四川',
     description: '麻辣鲜香的经典川菜',
     backgroundColor: '#DC143C',
+
+    // 新增：身体状态相关
+    suitablePhysicalState: [PhysicalState.NORMAL, PhysicalState.EXERCISED],
+    benefitsForPhysicalState: {
+      [PhysicalState.EXERCISED]: '辛辣刺激，提升新陈代谢',
+    },
+
+    // 新增：活动水平相关
+    suitableActivityLevel: [ActivityLevel.MODERATE, ActivityLevel.INTENSIVE],
+
+    // 新增：特殊需求
+    dietaryRestrictions: [DietaryRestriction.VEGETARIAN], // 豆腐为主，可素食
+    allergens: ['大豆'],
+    isRecoveryFood: false,
+    isEnergyBooster: true,
+    isAntiInflammatory: false,
+    isSleepFriendly: false,
+    isDetoxifying: false,
   },
   {
     id: '3',
@@ -445,6 +491,31 @@ export const enhancedDishList: Food[] = [
     origin: '家常菜',
     description: '家常经典，简单美味',
     backgroundColor: '#FFD700',
+
+    // 新增：身体状态相关
+    suitablePhysicalState: [
+      PhysicalState.NORMAL,
+      PhysicalState.SICK,
+      PhysicalState.HANGOVER,
+      PhysicalState.INSOMNIA,
+    ],
+    benefitsForPhysicalState: {
+      [PhysicalState.SICK]: '清淡易消化，适合生病时食用',
+      [PhysicalState.HANGOVER]: '简单清爽，有助缓解宿醉',
+      [PhysicalState.INSOMNIA]: '不会过于刺激，睡前也能食用',
+    },
+
+    // 新增：活动水平相关
+    suitableActivityLevel: [ActivityLevel.SEDENTARY, ActivityLevel.LIGHT],
+
+    // 新增：特殊需求
+    dietaryRestrictions: [DietaryRestriction.NONE],
+    allergens: ['鸡蛋'],
+    isRecoveryFood: true,
+    isEnergyBooster: false,
+    isAntiInflammatory: false,
+    isSleepFriendly: true,
+    isDetoxifying: false,
   },
   {
     id: '20',

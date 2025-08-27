@@ -1,18 +1,41 @@
-import type { Food, WeatherType, TimeOfDay, MoodType, Season } from './food';
+import type {
+  Food,
+  WeatherType,
+  TimeOfDay,
+  MoodType,
+  Season,
+  PhysicalState,
+  ActivityLevel,
+  WorkType,
+  DietaryRestriction,
+} from './food';
 
 // 推荐上下文接口
 export interface RecommendationContext {
+  // 环境因素
   currentWeather?: WeatherType; // 当前天气
   currentTime?: TimeOfDay; // 当前时间段
-  userMood?: MoodType; // 用户心情
   currentSeason?: Season; // 当前季节
   location?: string; // 用户位置
   temperature?: number; // 当前温度
   humidity?: number; // 当前湿度
+
+  // 用户状态
+  userMood?: MoodType; // 用户心情
+
+  // 新增：身体状态相关
+  physicalState?: PhysicalState; // 当前身体状态
+  activityLevel?: ActivityLevel; // 今日活动水平
+  workType?: WorkType; // 当前工作类型
+
+  // 新增：特殊需求
+  dietaryRestrictions?: DietaryRestriction[]; // 特殊饮食需求
+  allergens?: string[]; // 过敏原
 }
 
 // 推荐配置接口
 export interface RecommendationConfig {
+  // 基础维度权重
   weatherWeight?: number; // 天气权重 0-1
   timeWeight?: number; // 时间权重 0-1
   moodWeight?: number; // 心情权重 0-1
@@ -20,6 +43,13 @@ export interface RecommendationConfig {
   preferenceWeight?: number; // 用户偏好权重 0-1
   popularityWeight?: number; // 热门程度权重 0-1
   diversityFactor?: number; // 多样性因子 0-1
+
+  // 新增维度权重
+  physicalStateWeight?: number; // 身体状态权重 0-1
+  activityLevelWeight?: number; // 活动水平权重 0-1
+  workTypeWeight?: number; // 工作类型权重 0-1
+  dietaryRestrictionsWeight?: number; // 饮食限制权重 0-1
+
   maxRecommendations?: number; // 最大推荐数量
 }
 
@@ -42,6 +72,7 @@ export interface RecommendationReason {
 
 // 推荐原因类型枚举
 export enum RecommendationReasonType {
+  // 基础维度
   WEATHER = 'weather', // 基于天气
   TIME = 'time', // 基于时间
   MOOD = 'mood', // 基于心情
@@ -51,11 +82,19 @@ export enum RecommendationReasonType {
   HEALTH = 'health', // 基于健康考虑
   VARIETY = 'variety', // 基于多样性
   AI = 'ai', // 基于 AI 推荐
+
+  // 新增维度
+  PHYSICAL_STATE = 'physical_state', // 基于身体状态
+  ACTIVITY_LEVEL = 'activity_level', // 基于活动水平
+  WORK_TYPE = 'work_type', // 基于工作类型
+  DIETARY_RESTRICTION = 'dietary_restriction', // 基于饮食限制
 }
 
 // 用户偏好数据接口
 export interface UserPreference {
   userId?: string; // 用户ID
+
+  // 基础偏好
   favoriteCategories: string[]; // 喜爱的菜品分类
   favoriteCuisines: string[]; // 喜爱的菜系
   favoriteTags: string[]; // 喜爱的标签
@@ -64,6 +103,17 @@ export interface UserPreference {
   sweetTolerance: number; // 甜度承受度 0-5
   healthPriority: number; // 健康优先级 0-1
   adventurousness: number; // 冒险程度 0-1 (愿意尝试新菜品的程度)
+
+  // 新增：身体状态相关偏好
+  preferredPhysicalStates?: PhysicalState[]; // 偏好的身体状态食物
+  defaultActivityLevel?: ActivityLevel; // 默认活动水平
+  workType?: WorkType; // 工作类型
+
+  // 新增：特殊需求
+  dietaryRestrictions?: DietaryRestriction[]; // 饮食限制
+  allergens?: string[]; // 过敏原列表
+  avoidIngredients?: string[]; // 需要避免的食材
+
   lastUpdated: Date; // 最后更新时间
 }
 
@@ -89,11 +139,19 @@ export interface WeatherData {
 
 // 推荐算法配置
 export interface RecommendationAlgorithmConfig {
+  // 基础推荐开关
   enableWeatherRecommendation: boolean; // 是否启用天气推荐
   enableTimeRecommendation: boolean; // 是否启用时间推荐
   enableMoodRecommendation: boolean; // 是否启用心情推荐
   enableSeasonRecommendation: boolean; // 是否启用季节推荐
   enablePreferenceRecommendation: boolean; // 是否启用偏好推荐
+
+  // 新增推荐开关
+  enablePhysicalStateRecommendation?: boolean; // 是否启用身体状态推荐
+  enableActivityLevelRecommendation?: boolean; // 是否启用活动水平推荐
+  enableWorkTypeRecommendation?: boolean; // 是否启用工作类型推荐
+  enableDietaryRestrictionRecommendation?: boolean; // 是否启用饮食限制推荐
+
   learningRate: number; // 学习率 0-1
   decayFactor: number; // 衰减因子 0-1 (历史数据的权重衰减)
 }

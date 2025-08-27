@@ -71,6 +71,57 @@
           </div>
         </div>
 
+        <!-- 身体状态选择 -->
+        <div class="physical-state-selector">
+          <label class="input-label">身体状态：</label>
+          <div class="physical-state-options">
+            <button
+              v-for="state in physicalStateOptions"
+              :key="state.value"
+              :class="['state-btn', { active: currentPhysicalState === state.value }]"
+              @click="selectPhysicalState(state.value)"
+            >
+              <span class="state-emoji">{{ state.emoji }}</span>
+              <span class="state-text">{{ state.label }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 活动水平选择 -->
+        <div class="activity-level-selector">
+          <label class="input-label">今日活动水平：</label>
+          <div class="activity-level-options">
+            <button
+              v-for="level in activityLevelOptions"
+              :key="level.value"
+              :class="['level-btn', { active: currentActivityLevel === level.value }]"
+              @click="selectActivityLevel(level.value)"
+            >
+              <span class="level-emoji">{{ level.emoji }}</span>
+              <span class="level-text">{{ level.label }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 特殊需求选择 -->
+        <div class="dietary-restrictions-selector" v-if="showDietaryRestrictions">
+          <label class="input-label">特殊饮食需求：</label>
+          <div class="dietary-restrictions-options">
+            <button
+              v-for="restriction in dietaryRestrictionOptions"
+              :key="restriction.value"
+              :class="[
+                'restriction-btn',
+                { active: currentDietaryRestrictions.includes(restriction.value) },
+              ]"
+              @click="toggleDietaryRestriction(restriction.value)"
+            >
+              <span class="restriction-emoji">{{ restriction.emoji }}</span>
+              <span class="restriction-text">{{ restriction.label }}</span>
+            </button>
+          </div>
+        </div>
+
         <!-- 推荐按钮 -->
         <button
           class="recommend-btn glow-button"
@@ -114,8 +165,23 @@
   import { getCurrentWeather } from '@/utils/weatherService';
   import { hybridRecommendationService } from '@/utils/hybridRecommendationService';
   import { showFailToast } from 'vant';
-  import type { RecommendationResult, WeatherData, MoodType, NetworkStatus } from '@/types';
-  import { MoodType as MoodEnum, TimeOfDay, NetworkStatus as NetStatus } from '@/types';
+  import type {
+    RecommendationResult,
+    WeatherData,
+    MoodType,
+    PhysicalState,
+    ActivityLevel,
+    DietaryRestriction,
+    NetworkStatus,
+  } from '@/types';
+  import {
+    MoodType as MoodEnum,
+    PhysicalState as PhysicalStateEnum,
+    ActivityLevel as ActivityLevelEnum,
+    DietaryRestriction as DietaryRestrictionEnum,
+    TimeOfDay,
+    NetworkStatus as NetStatus,
+  } from '@/types';
   import '@/assets/css/glow-animation.css';
 
   // Props
@@ -148,6 +214,10 @@
   const weatherData = ref<WeatherData | null>(null);
   const locationError = ref<string | null>(null);
   const currentMood = ref<MoodType | null>(null);
+  const currentPhysicalState = ref<PhysicalState | null>(null);
+  const currentActivityLevel = ref<ActivityLevel | null>(null);
+  const currentDietaryRestrictions = ref<DietaryRestriction[]>([]);
+  const showDietaryRestrictions = ref(true); // 控制是否显示特殊需求选择器
   const recommendations = ref<RecommendationResult[]>([]);
   const showSuccessEffect = ref(false);
   const networkStatus = ref<NetworkStatus>(hybridRecommendationService.getNetworkStatus());
@@ -167,6 +237,37 @@
     { value: MoodEnum.SAD, emoji: '😢', label: '难过' },
     { value: MoodEnum.COMFORT, emoji: '🤗', label: '需要安慰' },
     { value: MoodEnum.ADVENTUROUS, emoji: '🚀', label: '想尝试新事物' },
+  ];
+
+  // 身体状态选项
+  const physicalStateOptions = [
+    { value: PhysicalStateEnum.NORMAL, emoji: '🆗', label: '正常' },
+    { value: PhysicalStateEnum.SICK, emoji: '🤒', label: '感冒生病' },
+    { value: PhysicalStateEnum.RECOVERING, emoji: '🌱', label: '病后恢复' },
+    { value: PhysicalStateEnum.EXERCISED, emoji: '💪', label: '刚运动完' },
+    { value: PhysicalStateEnum.HANGOVER, emoji: '🥴', label: '宿醉' },
+    { value: PhysicalStateEnum.INSOMNIA, emoji: '🌙', label: '失眠' },
+    { value: PhysicalStateEnum.PREGNANT, emoji: '🤱', label: '孕期' },
+    { value: PhysicalStateEnum.MENSTRUAL, emoji: '🩸', label: '生理期' },
+    { value: PhysicalStateEnum.PMS, emoji: '🌪️', label: '经前综合征' },
+  ];
+
+  // 活动水平选项
+  const activityLevelOptions = [
+    { value: ActivityLevelEnum.SEDENTARY, emoji: '🪑', label: '久坐' },
+    { value: ActivityLevelEnum.LIGHT, emoji: '🚶', label: '轻度活动' },
+    { value: ActivityLevelEnum.MODERATE, emoji: '🏃', label: '中度活动' },
+    { value: ActivityLevelEnum.INTENSIVE, emoji: '🏋️', label: '高强度' },
+  ];
+
+  // 特殊饮食需求选项（只显示常用的）
+  const dietaryRestrictionOptions = [
+    { value: DietaryRestrictionEnum.VEGETARIAN, emoji: '🥬', label: '素食' },
+    { value: DietaryRestrictionEnum.VEGAN, emoji: '🌱', label: '纯素' },
+    { value: DietaryRestrictionEnum.GLUTEN_FREE, emoji: '🚫', label: '无麸质' },
+    { value: DietaryRestrictionEnum.DIABETIC, emoji: '🩺', label: '糖尿病友好' },
+    { value: DietaryRestrictionEnum.LOW_SODIUM, emoji: '🧂', label: '低钠' },
+    { value: DietaryRestrictionEnum.KETO, emoji: '🥓', label: '生酮' },
   ];
 
   // 计算属性
@@ -250,6 +351,29 @@
   const selectMood = (mood: MoodType) => {
     currentMood.value = mood;
     recommendationStore.updateContext({ userMood: mood });
+  };
+
+  const selectPhysicalState = (state: PhysicalState) => {
+    currentPhysicalState.value = state;
+    recommendationStore.updateContext({ physicalState: state });
+  };
+
+  const selectActivityLevel = (level: ActivityLevel) => {
+    currentActivityLevel.value = level;
+    recommendationStore.updateContext({ activityLevel: level });
+  };
+
+  const toggleDietaryRestriction = (restriction: DietaryRestriction) => {
+    const index = currentDietaryRestrictions.value.indexOf(restriction);
+    if (index > -1) {
+      currentDietaryRestrictions.value.splice(index, 1);
+    } else {
+      currentDietaryRestrictions.value.push(restriction);
+    }
+    recommendationStore.updateContext({
+      dietaryRestrictions:
+        currentDietaryRestrictions.value.length > 0 ? currentDietaryRestrictions.value : undefined,
+    });
   };
 
   // 创建波纹效果
@@ -350,13 +474,26 @@
 
       // 构建推荐上下文
       const context = {
+        // 环境因素
         currentWeather: weatherData.value?.weatherType,
         currentTime: recommendationStore.getCurrentTimeOfDay(),
-        userMood: currentMood.value || undefined,
         currentSeason: recommendationStore.getCurrentSeason(),
         location: weatherData.value?.location,
         temperature: weatherData.value?.temperature,
         humidity: weatherData.value?.humidity,
+
+        // 用户状态
+        userMood: currentMood.value || undefined,
+
+        // 新增：身体状态相关
+        physicalState: currentPhysicalState.value || undefined,
+        activityLevel: currentActivityLevel.value || undefined,
+
+        // 新增：特殊需求
+        dietaryRestrictions:
+          currentDietaryRestrictions.value.length > 0
+            ? currentDietaryRestrictions.value
+            : undefined,
       };
 
       // 使用混合推荐服务获取推荐
@@ -603,6 +740,72 @@
   }
 
   .mood-text {
+    font-size: 10px;
+    text-align: center;
+  }
+
+  /* 新增：身体状态选择器样式 */
+  .physical-state-selector,
+  .activity-level-selector,
+  .dietary-restrictions-selector {
+    margin-bottom: 20px;
+  }
+
+  .physical-state-options,
+  .activity-level-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 8px;
+  }
+
+  .dietary-restrictions-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+  }
+
+  .state-btn,
+  .level-btn,
+  .restriction-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .state-btn:hover,
+  .level-btn:hover,
+  .restriction-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .state-btn.active,
+  .level-btn.active,
+  .restriction-btn.active {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.6);
+    color: white;
+    transform: scale(1.05);
+  }
+
+  .state-emoji,
+  .level-emoji,
+  .restriction-emoji {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .state-text,
+  .level-text,
+  .restriction-text {
     font-size: 10px;
     text-align: center;
   }

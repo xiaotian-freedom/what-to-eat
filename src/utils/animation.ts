@@ -1,6 +1,4 @@
-import type { DishAnimation } from '@/types';
-
-import type { Dish } from '@/types';
+import type { DishAnimation, Food, Dish } from '@/types';
 
 // 缓动函数库
 export const easingFunctions = {
@@ -58,9 +56,24 @@ export function clearRafTimeout(rafId: number): void {
 }
 
 // 创建单个菜品动画对象
-export function createDish(dish: Dish, canvasWidth: number, canvasHeight: number): DishAnimation {
+export function createDish(
+  dishOrFood: Food | Dish,
+  canvasWidth: number,
+  canvasHeight: number
+): DishAnimation {
+  // 如果输入是 Dish，需要转换回 Food；如果已经是 Food，保持不变
+  const foodDish =
+    'id' in dishOrFood
+      ? dishOrFood
+      : ({
+          id: `dish_${Date.now()}_${Math.random()}`,
+          name: dishOrFood.name,
+          image: dishOrFood.image,
+          description: dishOrFood.desc,
+          backgroundColor: dishOrFood.backgroundColor,
+        } as Food);
   return {
-    dish: dish,
+    dish: foodDish,
     x: canvasWidth / 2,
     y: canvasHeight / 2,
     scale: 0,
