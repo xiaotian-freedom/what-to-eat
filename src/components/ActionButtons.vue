@@ -17,7 +17,7 @@
           :disabled="disabled"
           @click="$emit('randomFood')"
           :style="{
-            backgroundImage: `linear-gradient(to right, var(--color-primary), var(--color-accent))`,
+            backgroundImage: `linear-gradient(to right, var(--color-secondary), var(--color-accent))`,
           }"
         >
           <img :src="shuffle" class="w-8 h-8" />

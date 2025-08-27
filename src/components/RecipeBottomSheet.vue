@@ -1,38 +1,38 @@
 <template>
   <BottomSheet
     :visible="visible"
-    :maxHeight="'85vh'"
-    :customClass="'bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50'"
+    maxHeight="85vh"
+    backgroundStyle="linear-gradient(135deg, var(--color-background), var(--color-surface))"
     @close="$emit('close')"
   >
     <div class="space-y-4">
       <!-- 标题区域 -->
-      <div class="text-center border-b border-orange-200 pb-4">
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ dishName }} 做法</h2>
-        <div class="flex items-center justify-center space-x-2 text-sm text-gray-600">
-          <span class="px-2 py-1 bg-orange-100 rounded-full">🍳 详细步骤</span>
-          <span class="px-2 py-1 bg-yellow-100 rounded-full">⏱️ {{ estimatedTime }}</span>
-          <span class="px-2 py-1 bg-red-100 rounded-full">👨‍🍳 {{ difficulty }}</span>
+      <div class="text-center">
+        <h2 class="text-2xl font-bold mb-2 recipe-title">{{ dishName }} 做法</h2>
+        <div class="flex items-center justify-center space-x-2 text-sm recipe-subtitle">
+          <span class="px-2 py-1 rounded-full recipe-tag-primary">🍳 详细步骤</span>
+          <span class="px-2 py-1 rounded-full recipe-tag-secondary">⏱️ {{ estimatedTime }}</span>
+          <span class="px-2 py-1 rounded-full recipe-tag-accent">👨‍🍳 {{ difficulty }}</span>
         </div>
       </div>
 
       <!-- 流式加载状态 -->
-      <div v-if="streamingLoading" class="flex flex-col items-center justify-center py-8 space-y-4">
+      <div v-if="streamingLoading" class="flex flex-col items-center justify-center py-5 space-y-4">
         <div class="flex items-center space-x-2">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
-          <span class="text-gray-600">🤖 AI 正在为您生成详细做法...</span>
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 recipe-loading-spinner"></div>
+          <span class="recipe-loading-text">🤖 AI 正在为您生成详细做法...</span>
         </div>
 
         <!-- 生成状态指示 - 移到顶部 -->
-        <div class="w-full max-w-md">
-          <div class="bg-white rounded-lg p-4 shadow-sm border border-orange-100">
+        <div class="w-full">
+          <div class="rounded-lg p-4 shadow-sm recipe-status-card">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-sm text-gray-600">生成状态</span>
-              <span class="text-xs text-orange-600">{{ getGenerationStatus() }}</span>
+              <span class="text-sm recipe-status-label">生成状态</span>
+              <span class="text-xs recipe-status-text">{{ getGenerationStatus() }}</span>
             </div>
-            <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="w-full recipe-progress-bg rounded-full h-2">
               <div
-                class="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full transition-all duration-500"
+                class="h-2 rounded-full transition-all duration-500 recipe-progress-bar"
                 :style="{ width: getProgressWidth() }"
               ></div>
             </div>
@@ -40,25 +40,25 @@
         </div>
 
         <!-- 分块内容展示 -->
-        <div class="w-full space-y-4">
+        <div class="w-full space-y-6">
           <!-- 菜品介绍 -->
-          <div class="bg-white rounded-xl p-4 shadow-sm border border-orange-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+          <div class="rounded-xl p-4 shadow-sm recipe-content-card">
+            <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
               <span class="mr-2">📖</span> 菜品介绍
             </h3>
-            <div v-if="partialRecipe?.introduction" class="text-gray-600 leading-relaxed">
+            <div v-if="partialRecipe?.introduction" class="recipe-content-text leading-relaxed">
               {{ partialRecipe.introduction }}
             </div>
             <div v-else class="space-y-2">
-              <div class="h-4 bg-gray-200 rounded animate-pulse"></div>
-              <div class="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
-              <div class="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+              <div class="h-4 recipe-skeleton-bg rounded animate-pulse"></div>
+              <div class="h-4 recipe-skeleton-bg rounded animate-pulse w-3/4"></div>
+              <div class="h-4 recipe-skeleton-bg rounded animate-pulse w-1/2"></div>
             </div>
           </div>
 
           <!-- 食材清单 -->
-          <div class="bg-white rounded-xl p-4 shadow-sm border border-orange-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+          <div class="rounded-xl p-4 shadow-sm recipe-content-card">
+            <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
               <span class="mr-2">🥬</span> 食材清单
             </h3>
             <div
@@ -68,49 +68,54 @@
               <div
                 v-for="(ingredient, index) in partialRecipe.ingredients"
                 :key="index"
-                class="flex items-center justify-between py-2 px-3 bg-orange-50 rounded-lg"
+                class="flex items-center justify-between py-2 px-3 rounded-lg recipe-ingredient-item"
               >
-                <span class="text-gray-700">{{ ingredient.name }}</span>
-                <span class="text-sm text-orange-600 font-medium">{{ ingredient.amount }}</span>
+                <span class="recipe-ingredient-name">{{ ingredient.name }}</span>
+                <span class="text-sm recipe-ingredient-amount font-medium">{{
+                  ingredient.amount
+                }}</span>
               </div>
             </div>
             <div v-else class="space-y-2">
-              <div class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-20"></div>
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
+              <div
+                class="flex items-center justify-between py-2 px-3 recipe-skeleton-item rounded-lg"
+              >
+                <div class="h-4 recipe-skeleton-bg rounded animate-pulse w-20"></div>
+                <div class="h-4 recipe-skeleton-bg rounded animate-pulse w-16"></div>
               </div>
-              <div class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-12"></div>
+              <div
+                class="flex items-center justify-between py-2 px-3 recipe-skeleton-item rounded-lg"
+              >
+                <div class="h-4 recipe-skeleton-bg rounded animate-pulse w-24"></div>
+                <div class="h-4 recipe-skeleton-bg rounded animate-pulse w-12"></div>
               </div>
-              <div class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-20"></div>
+              <div
+                class="flex items-center justify-between py-2 px-3 recipe-skeleton-item rounded-lg"
+              >
+                <div class="h-4 recipe-skeleton-bg rounded animate-pulse w-16"></div>
+                <div class="h-4 recipe-skeleton-bg rounded animate-pulse w-20"></div>
               </div>
             </div>
           </div>
 
           <!-- 制作步骤 -->
-          <div class="bg-white rounded-xl p-4 shadow-sm border border-orange-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+          <div class="rounded-xl p-4 shadow-sm recipe-content-card">
+            <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
               <span class="mr-2">👨‍🍳</span> 制作步骤
             </h3>
             <div v-if="partialRecipe?.steps && partialRecipe.steps.length > 0" class="space-y-4">
               <div v-for="(step, index) in partialRecipe.steps" :key="index" class="flex space-x-3">
                 <div
-                  class="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full flex items-center justify-center text-sm font-bold"
+                  class="flex-shrink-0 w-8 h-8 text-white rounded-full flex items-center justify-center text-sm font-bold recipe-step-number"
                 >
                   {{ index + 1 }}
                 </div>
                 <div class="flex-1">
-                  <p class="text-gray-700 leading-relaxed">{{ step.description }}</p>
-                  <div
-                    v-if="step.tips"
-                    class="mt-2 p-2 bg-yellow-50 rounded-lg border-l-4 border-yellow-400"
-                  >
-                    <p class="text-sm text-yellow-700">💡 小贴士：{{ step.tips }}</p>
+                  <p class="recipe-step-description leading-relaxed">{{ step.description }}</p>
+                  <div v-if="step.tips" class="mt-2 p-2 rounded-lg recipe-step-tips">
+                    <p class="text-sm recipe-step-tips-text">💡 小贴士：{{ step.tips }}</p>
                   </div>
-                  <div v-if="step.time" class="mt-1 text-xs text-gray-500">
+                  <div v-if="step.time" class="mt-1 text-xs recipe-step-time">
                     ⏱️ 预计时间：{{ step.time }}
                   </div>
                 </div>
@@ -118,61 +123,68 @@
             </div>
             <div v-else class="space-y-4">
               <div class="flex space-x-3">
-                <div class="flex-shrink-0 w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+                <div
+                  class="flex-shrink-0 w-8 h-8 recipe-skeleton-bg rounded-full animate-pulse"
+                ></div>
                 <div class="flex-1 space-y-2">
-                  <div class="h-4 bg-gray-200 rounded animate-pulse"></div>
-                  <div class="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                  <div class="h-4 recipe-skeleton-bg rounded animate-pulse"></div>
+                  <div class="h-4 recipe-skeleton-bg rounded animate-pulse w-3/4"></div>
                 </div>
               </div>
               <div class="flex space-x-3">
-                <div class="flex-shrink-0 w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+                <div
+                  class="flex-shrink-0 w-8 h-8 recipe-skeleton-bg rounded-full animate-pulse"
+                ></div>
                 <div class="flex-1 space-y-2">
-                  <div class="h-4 bg-gray-200 rounded animate-pulse"></div>
-                  <div class="h-4 bg-gray-200 rounded animate-pulse w-2/3"></div>
+                  <div class="h-4 recipe-skeleton-bg rounded animate-pulse"></div>
+                  <div class="h-4 recipe-skeleton-bg rounded animate-pulse w-2/3"></div>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- 烹饪小贴士 -->
-          <div class="bg-white rounded-xl p-4 shadow-sm border border-orange-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+          <div class="rounded-xl p-4 shadow-sm recipe-content-card">
+            <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
               <span class="mr-2">💡</span> 烹饪小贴士
             </h3>
             <div v-if="partialRecipe?.tips && partialRecipe.tips.length > 0" class="space-y-2">
               <div
                 v-for="(tip, index) in partialRecipe.tips"
                 :key="index"
-                class="flex items-start space-x-2 p-2 bg-yellow-50 rounded-lg"
+                class="flex items-center space-x-2 p-2 rounded-lg recipe-tip-item"
               >
-                <span class="text-yellow-600 mt-0.5">•</span>
-                <span class="text-gray-700 text-sm">{{ tip }}</span>
+                <span class="recipe-tip-bullet">•</span>
+                <span class="text-sm recipe-tip-text">{{ tip }}</span>
               </div>
             </div>
             <div v-else class="space-y-2">
-              <div class="flex items-start space-x-2 p-2 bg-gray-50 rounded-lg">
-                <div class="w-2 h-2 bg-gray-300 rounded-full mt-1"></div>
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+              <div class="flex items-center space-x-2 p-2 recipe-skeleton-item rounded-lg">
+                <div class="w-2 h-2 recipe-skeleton-dot rounded-full"></div>
+                <div class="h-4 recipe-skeleton-bg rounded animate-pulse w-full"></div>
               </div>
-              <div class="flex items-start space-x-2 p-2 bg-gray-50 rounded-lg">
-                <div class="w-2 h-2 bg-gray-300 rounded-full mt-1"></div>
-                <div class="h-4 bg-gray-200 rounded animate-pulse w-4/5"></div>
+              <div class="flex items-center space-x-2 p-2 recipe-skeleton-item rounded-lg">
+                <div class="w-2 h-2 recipe-skeleton-dot rounded-full"></div>
+                <div class="h-4 recipe-skeleton-bg rounded animate-pulse w-4/5"></div>
               </div>
             </div>
           </div>
 
           <!-- 营养价值 -->
-          <div class="bg-white rounded-xl p-4 shadow-sm border border-orange-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+          <div class="rounded-xl p-4 shadow-sm recipe-content-card">
+            <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
               <span class="mr-2">🥗</span> 营养价值
             </h3>
-            <div v-if="partialRecipe?.nutrition" class="text-gray-600 text-sm leading-relaxed">
+            <div
+              v-if="partialRecipe?.nutrition"
+              class="recipe-content-text text-sm leading-relaxed"
+            >
               {{ partialRecipe.nutrition }}
             </div>
             <div v-else class="space-y-2">
-              <div class="h-4 bg-gray-200 rounded animate-pulse"></div>
-              <div class="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
-              <div class="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+              <div class="h-4 recipe-skeleton-bg rounded animate-pulse"></div>
+              <div class="h-4 recipe-skeleton-bg rounded animate-pulse w-3/4"></div>
+              <div class="h-4 recipe-skeleton-bg rounded animate-pulse w-1/2"></div>
             </div>
           </div>
         </div>
@@ -180,17 +192,17 @@
 
       <!-- 传统加载状态 -->
       <div v-else-if="loading" class="flex flex-col items-center justify-center py-12 space-y-4">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-        <p class="text-gray-600">🤖 AI 正在为您生成详细做法...</p>
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 recipe-loading-spinner"></div>
+        <p class="recipe-loading-text">🤖 AI 正在为您生成详细做法...</p>
       </div>
 
       <!-- 错误状态 -->
       <div v-else-if="error" class="flex flex-col items-center justify-center py-12 space-y-4">
         <div class="text-6xl">😔</div>
-        <p class="text-gray-600 text-center">{{ error }}</p>
+        <p class="recipe-error-text text-center">{{ error }}</p>
         <button
           @click="$emit('retry')"
-          class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+          class="px-4 py-2 text-white rounded-lg transition-colors recipe-retry-button"
         >
           重新获取
         </button>
@@ -199,32 +211,31 @@
       <!-- 做法内容 -->
       <div v-else-if="recipe" class="space-y-6">
         <!-- 菜品介绍 -->
-        <div
-          v-if="recipe.introduction"
-          class="bg-white rounded-xl p-4 shadow-sm border border-orange-100"
-        >
-          <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+        <div v-if="recipe.introduction" class="rounded-xl p-4 shadow-sm recipe-content-card">
+          <h3 class="text-lg font-semibold mb-2 flex items-center recipe-content-title">
             <span class="mr-2">📖</span> 菜品介绍
           </h3>
-          <p class="text-gray-600 leading-relaxed">{{ recipe.introduction }}</p>
+          <p class="recipe-content-text leading-relaxed">{{ recipe.introduction }}</p>
         </div>
 
         <!-- 食材清单 -->
         <div
           v-if="recipe.ingredients && recipe.ingredients.length > 0"
-          class="bg-white rounded-xl p-4 shadow-sm border border-orange-100"
+          class="rounded-xl p-4 shadow-sm recipe-content-card"
         >
-          <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+          <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
             <span class="mr-2">🥬</span> 食材清单
           </h3>
           <div class="grid grid-cols-1 gap-2">
             <div
               v-for="(ingredient, index) in recipe.ingredients"
               :key="index"
-              class="flex items-center justify-between py-2 px-3 bg-orange-50 rounded-lg"
+              class="flex items-center justify-between py-2 px-3 rounded-lg recipe-ingredient-item"
             >
-              <span class="text-gray-700">{{ ingredient.name }}</span>
-              <span class="text-sm text-orange-600 font-medium">{{ ingredient.amount }}</span>
+              <span class="recipe-ingredient-name">{{ ingredient.name }}</span>
+              <span class="text-sm recipe-ingredient-amount font-medium">{{
+                ingredient.amount
+              }}</span>
             </div>
           </div>
         </div>
@@ -232,27 +243,24 @@
         <!-- 制作步骤 -->
         <div
           v-if="recipe.steps && recipe.steps.length > 0"
-          class="bg-white rounded-xl p-4 shadow-sm border border-orange-100"
+          class="rounded-xl p-4 shadow-sm recipe-content-card"
         >
-          <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+          <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
             <span class="mr-2">👨‍🍳</span> 制作步骤
           </h3>
           <div class="space-y-4">
             <div v-for="(step, index) in recipe.steps" :key="index" class="flex space-x-3">
               <div
-                class="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full flex items-center justify-center text-sm font-bold"
+                class="flex-shrink-0 w-8 h-8 text-white rounded-full flex items-center justify-center text-sm font-bold recipe-step-number"
               >
                 {{ index + 1 }}
               </div>
               <div class="flex-1">
-                <p class="text-gray-700 leading-relaxed">{{ step.description }}</p>
-                <div
-                  v-if="step.tips"
-                  class="mt-2 p-2 bg-yellow-50 rounded-lg border-l-4 border-yellow-400"
-                >
-                  <p class="text-sm text-yellow-700">💡 小贴士：{{ step.tips }}</p>
+                <p class="recipe-step-description leading-relaxed">{{ step.description }}</p>
+                <div v-if="step.tips" class="mt-2 p-2 rounded-lg recipe-step-tips">
+                  <p class="text-sm recipe-step-tips-text">💡 小贴士：{{ step.tips }}</p>
                 </div>
-                <div v-if="step.time" class="mt-1 text-xs text-gray-500">
+                <div v-if="step.time" class="mt-1 text-xs recipe-step-time">
                   ⏱️ 预计时间：{{ step.time }}
                 </div>
               </div>
@@ -263,47 +271,44 @@
         <!-- 烹饪小贴士 -->
         <div
           v-if="recipe.tips && recipe.tips.length > 0"
-          class="bg-white rounded-xl p-4 shadow-sm border border-orange-100"
+          class="rounded-xl p-4 shadow-sm recipe-content-card"
         >
-          <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+          <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
             <span class="mr-2">💡</span> 烹饪小贴士
           </h3>
           <div class="space-y-2">
             <div
               v-for="(tip, index) in recipe.tips"
               :key="index"
-              class="flex items-start space-x-2 p-2 bg-yellow-50 rounded-lg"
+              class="flex items-center space-x-2 p-2 rounded-lg recipe-tip-item"
             >
-              <span class="text-yellow-600 mt-0.5">•</span>
-              <span class="text-gray-700 text-sm">{{ tip }}</span>
+              <span class="recipe-tip-bullet">•</span>
+              <span class="text-sm recipe-tip-text">{{ tip }}</span>
             </div>
           </div>
         </div>
 
         <!-- 营养价值 -->
-        <div
-          v-if="recipe.nutrition"
-          class="bg-white rounded-xl p-4 shadow-sm border border-orange-100"
-        >
-          <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+        <div v-if="recipe.nutrition" class="rounded-xl p-4 shadow-sm recipe-content-card">
+          <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
             <span class="mr-2">🥗</span> 营养价值
           </h3>
-          <p class="text-gray-600 text-sm leading-relaxed">{{ recipe.nutrition }}</p>
+          <p class="text-sm leading-relaxed recipe-content-text">{{ recipe.nutrition }}</p>
         </div>
       </div>
 
       <!-- 底部操作按钮 -->
-      <div v-if="recipe" class="flex space-x-3 pt-4 border-t border-orange-200">
+      <div v-if="recipe" class="flex space-x-3 pt-4">
         <button
           @click="shareRecipe"
-          class="flex-1 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-medium hover:from-orange-600 hover:to-red-600 transition-all duration-200 flex items-center justify-center space-x-2"
+          class="flex-1 py-3 text-white rounded-xl font-medium transition-all duration-200 flex items-center justify-center space-x-2 recipe-share-button"
         >
           <span>📤</span>
           <span>分享做法</span>
         </button>
         <button
           @click="saveRecipe"
-          class="flex-1 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl font-medium hover:from-yellow-600 hover:to-orange-600 transition-all duration-200 flex items-center justify-center space-x-2"
+          class="flex-1 py-3 text-white rounded-xl font-medium transition-all duration-200 flex items-center justify-center space-x-2 recipe-save-button"
         >
           <span>⭐</span>
           <span>收藏做法</span>
@@ -481,3 +486,274 @@
     return '10%';
   };
 </script>
+
+<style scoped>
+  /* 标签样式 */
+  .recipe-tag-primary {
+    background-color: var(--color-primary);
+    opacity: 0.9;
+    color: white;
+    transition: all 0.2s ease;
+  }
+
+  .recipe-tag-secondary {
+    background-color: var(--color-secondary);
+    opacity: 0.9;
+    color: white;
+    transition: all 0.2s ease;
+  }
+
+  .recipe-tag-accent {
+    background-color: var(--color-accent);
+    opacity: 0.9;
+    color: white;
+    transition: all 0.2s ease;
+  }
+
+  /* 加载状态样式 */
+  .recipe-loading-spinner {
+    border-color: var(--color-primary);
+  }
+
+  .recipe-loading-text {
+    color: var(--color-textSecondary);
+  }
+
+  /* 状态卡片样式 */
+  .recipe-status-card {
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    box-shadow: 0 2px 8px var(--color-shadow);
+  }
+
+  .recipe-status-label {
+    color: var(--color-textSecondary);
+  }
+
+  .recipe-status-text {
+    color: var(--color-primary);
+    font-weight: 500;
+  }
+
+  .recipe-progress-bg {
+    background-color: var(--color-border);
+  }
+
+  .recipe-progress-bar {
+    background: linear-gradient(to right, var(--color-primary), var(--color-accent));
+  }
+
+  /* 内容卡片样式 */
+  .recipe-content-card {
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    box-shadow: 0 4px 12px var(--color-shadow);
+    transition: all 0.3s ease;
+  }
+
+  .recipe-content-card:hover {
+    box-shadow: 0 6px 20px var(--color-shadow);
+    transform: translateY(-1px);
+  }
+
+  /* 骨架屏样式 */
+  .recipe-skeleton-bg {
+    background-color: var(--color-border);
+  }
+
+  .recipe-skeleton-item {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+  }
+
+  .recipe-skeleton-dot {
+    background-color: var(--color-textSecondary);
+  }
+
+  /* 食材样式 */
+  .recipe-ingredient-item {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    transition: all 0.2s ease;
+  }
+
+  .recipe-ingredient-item:hover {
+    background-color: var(--color-background);
+    border-color: var(--color-primary);
+  }
+
+  .recipe-ingredient-amount {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .recipe-ingredient-name {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  /* 步骤样式 */
+  .recipe-step-description {
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  .recipe-step-time {
+    color: var(--color-textSecondary);
+    font-style: italic;
+  }
+
+  .recipe-step-number {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .recipe-step-tips {
+    background-color: var(--color-surface);
+    border-left: 4px solid var(--color-accent);
+    border-radius: 8px;
+  }
+
+  .recipe-step-tips-text {
+    color: var(--color-accent);
+    font-weight: 500;
+  }
+
+  /* 小贴士样式 */
+  .recipe-tip-text {
+    color: var(--color-text);
+    line-height: 1.5;
+  }
+
+  .recipe-tip-item {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    transition: all 0.2s ease;
+  }
+
+  .recipe-tip-item:hover {
+    background-color: var(--color-background);
+    border-color: var(--color-accent);
+  }
+
+  .recipe-tip-bullet {
+    color: var(--color-accent);
+    font-weight: bold;
+  }
+
+  /* 文本样式 */
+  .recipe-title {
+    color: var(--color-text);
+    text-shadow: 0 1px 2px var(--color-shadow);
+  }
+
+  .recipe-subtitle {
+    color: var(--color-textSecondary);
+  }
+
+  .recipe-content-title {
+    color: var(--color-text);
+    border-bottom: 2px solid var(--color-primary);
+    padding-bottom: 0.5rem;
+  }
+
+  .recipe-content-text {
+    color: var(--color-textSecondary);
+    line-height: 1.6;
+  }
+
+  /* 错误状态样式 */
+  .recipe-error-text {
+    color: var(--color-textSecondary);
+    font-size: 0.95rem;
+  }
+
+  /* 按钮样式 */
+  .recipe-retry-button {
+    background: var(--color-primary);
+    box-shadow: 0 4px 12px var(--color-shadow);
+    transition: all 0.2s ease;
+  }
+
+  .recipe-retry-button:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px var(--color-shadow);
+  }
+
+  .recipe-share-button {
+    background: var(--color-primary);
+    box-shadow: 0 4px 12px var(--color-shadow);
+    transition: all 0.2s ease;
+  }
+
+  .recipe-share-button:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px var(--color-shadow);
+  }
+
+  .recipe-save-button {
+    background: var(--color-accent);
+    box-shadow: 0 4px 12px var(--color-shadow);
+    transition: all 0.2s ease;
+  }
+
+  .recipe-save-button:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px var(--color-shadow);
+  }
+
+  /* 响应式优化 */
+  @media (max-width: 640px) {
+    .recipe-content-card,
+    .recipe-status-card {
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+    }
+
+    .recipe-title {
+      font-size: 1.5rem;
+    }
+
+    .recipe-content-title {
+      font-size: 1.1rem;
+    }
+  }
+
+  /* 深色主题特殊处理 */
+  body.theme-dark .recipe-content-card {
+    border-color: var(--color-border);
+  }
+
+  body.theme-dark .recipe-ingredient-item,
+  body.theme-dark .recipe-tip-item {
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+  }
+
+  body.theme-dark .recipe-skeleton-bg {
+    background-color: var(--color-border);
+  }
+
+  /* 主题过渡动画 */
+  .recipe-content-card,
+  .recipe-ingredient-item,
+  .recipe-tip-item,
+  .recipe-retry-button,
+  .recipe-share-button,
+  .recipe-save-button {
+    transition: all 0.3s ease;
+  }
+
+  /* 确保间距正常工作 */
+  .space-y-6 > * + * {
+    margin-top: 1.5rem;
+  }
+
+  .space-y-4 > * + * {
+    margin-top: 1rem;
+  }
+
+  .space-y-2 > * + * {
+    margin-top: 0.5rem;
+  }
+</style>

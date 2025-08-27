@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#818CF8" />
+    <meta name="theme-color" content="#6366f1" id="theme-color-meta" />
     <meta name="description" content="帮你决定今天吃什么的美食选择应用" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -21,6 +21,66 @@
 <body>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
+
+    <!-- 动态主题色脚本 -->
+    <script>
+        // 主题色映射 - 使用主题系统中的 primary 颜色
+        const themeColors = {
+            'default': '#6366f1',    // 默认主题 - 蓝紫色
+            'dark': '#3b82f6',       // 深色主题 - 蓝色
+            'sunset': '#f97316',     // 日落主题 - 橙色
+            'ocean': '#06b6d4',      // 海洋主题 - 青色
+            'forest': '#059669',     // 森林主题 - 绿色
+            'vintage': '#a855f7'     // 复古主题 - 紫色
+        };
+
+        // 更新主题色的函数
+        function updateThemeColor(themeId) {
+            const metaElement = document.getElementById('theme-color-meta');
+            const color = themeColors[themeId] || themeColors['default'];
+            if (metaElement) {
+                metaElement.setAttribute('content', color);
+            }
+        }
+
+        // 监听主题变化
+        function watchThemeChanges() {
+            // 监听 body 的 class 变化
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        const bodyClass = document.body.className;
+                        // 提取主题ID
+                        const themeMatch = bodyClass.match(/theme-(\w+)/);
+                        if (themeMatch) {
+                            const themeId = themeMatch[1];
+                            updateThemeColor(themeId);
+                        }
+                    }
+                });
+            });
+
+            observer.observe(document.body, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+
+            // 初始化主题色
+            const currentTheme = document.body.className.match(/theme-(\w+)/);
+            if (currentTheme) {
+                updateThemeColor(currentTheme[1]);
+            } else {
+                updateThemeColor('default');
+            }
+        }
+
+        // 页面加载完成后启动主题监听
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', watchThemeChanges);
+        } else {
+            watchThemeChanges();
+        }
+    </script>
 </body>
 
 </html>
