@@ -1,6 +1,7 @@
 <template>
   <div
-    class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 font-sans h-screen flex justify-center items-center"
+    class="font-sans h-screen flex justify-center items-center"
+    :class="`theme-gradient-${themeStore.currentTheme}`"
   >
     <!-- 步骤1: 介绍主功能 -->
     <GuideStepOne
@@ -30,10 +31,12 @@
   import GuideStepThree from '../components/guide/GuideStepThree.vue';
   import { wheelAnimation } from '../utils/wheel-animation';
   import { useRouter } from 'vue-router';
+  import { useThemeStore } from '@/stores/theme';
   import gsap from 'gsap'; // 导入GSAP
 
   // 使用路由
   const router = useRouter();
+  const themeStore = useThemeStore();
 
   // 响应式状态
   const currentStep = ref(1);

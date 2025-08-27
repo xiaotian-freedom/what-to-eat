@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import './assets/css/style.css';
+import './assets/css/themes.css';
 // import './assets/css/card-flip.css';
 import './assets/css/ripple.css';
 import './assets/css/glow-animation.css';

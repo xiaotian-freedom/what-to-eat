@@ -1,0 +1,134 @@
+/* 主题系统 CSS 变量 */
+
+/* 默认主题 */
+:root {
+    --color-primary: #6366f1;
+    --color-secondary: #8b5cf6;
+    --color-accent: #ec4899;
+    --color-background: #f8fafc;
+    --color-surface: #ffffff;
+    --color-text: #1f2937;
+    --color-textSecondary: #6b7280;
+    --color-border: #e5e7eb;
+    --color-shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* 深色主题 */
+body.theme-dark {
+    --color-primary: #3b82f6;
+    --color-secondary: #8b5cf6;
+    --color-accent: #ec4899;
+    --color-background: #0f172a;
+    --color-surface: #1e293b;
+    --color-text: #f1f5f9;
+    --color-textSecondary: #94a3b8;
+    --color-border: #334155;
+    --color-shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* 日落主题 */
+body.theme-sunset {
+    --color-primary: #f97316;
+    --color-secondary: #ec4899;
+    --color-accent: #fbbf24;
+    --color-background: #fef3c7;
+    --color-surface: #ffffff;
+    --color-text: #92400e;
+    --color-textSecondary: #d97706;
+    --color-border: #fde68a;
+    --color-shadow: rgba(251, 191, 36, 0.2);
+}
+
+/* 海洋主题 */
+body.theme-ocean {
+    --color-primary: #06b6d4;
+    --color-secondary: #0891b2;
+    --color-accent: #0ea5e9;
+    --color-background: #f0f9ff;
+    --color-surface: #ffffff;
+    --color-text: #0c4a6e;
+    --color-textSecondary: #0369a1;
+    --color-border: #bae6fd;
+    --color-shadow: rgba(6, 182, 212, 0.2);
+}
+
+/* 森林主题 */
+body.theme-forest {
+    --color-primary: #059669;
+    --color-secondary: #047857;
+    --color-accent: #10b981;
+    --color-background: #f0fdf4;
+    --color-surface: #ffffff;
+    --color-text: #064e3b;
+    --color-textSecondary: #065f46;
+    --color-border: #bbf7d0;
+    --color-shadow: rgba(5, 150, 105, 0.2);
+}
+
+/* 复古主题 */
+body.theme-vintage {
+    --color-primary: #a855f7;
+    --color-secondary: #7c3aed;
+    --color-accent: #f59e0b;
+    --color-background: #fdf4ff;
+    --color-surface: #ffffff;
+    --color-text: #581c87;
+    --color-textSecondary: #7c3aed;
+    --color-border: #e9d5ff;
+    --color-shadow: rgba(168, 85, 247, 0.2);
+}
+
+/* 主题过渡动画 */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 主题相关的通用样式类 */
+.theme-text {
+    color: var(--color-text);
+}
+
+.theme-text-secondary {
+    color: var(--color-textSecondary);
+}
+
+.theme-bg {
+    background-color: var(--color-background);
+}
+
+.theme-surface {
+    background-color: var(--color-surface);
+}
+
+.theme-border {
+    border-color: var(--color-border);
+}
+
+.theme-shadow {
+    box-shadow: 0 4px 6px -1px var(--color-shadow);
+}
+
+/* 主题渐变背景 */
+.theme-gradient-default {
+    background: linear-gradient(135deg, #e0e7ff, #ddd6fe, #fce7f3);
+}
+
+.theme-gradient-dark {
+    background: linear-gradient(135deg, #0f172a, #581c87, #0f172a);
+}
+
+.theme-gradient-sunset {
+    background: linear-gradient(135deg, #fed7aa, #fce7f3, #fef3c7);
+}
+
+.theme-gradient-ocean {
+    background: linear-gradient(135deg, #cffafe, #dbeafe, #e0f2fe);
+}
+
+.theme-gradient-forest {
+    background: linear-gradient(135deg, #dcfce7, #d1fae5, #ccfbf1);
+}
+
+.theme-gradient-vintage {
+    background: linear-gradient(135deg, #f3e8ff, #ede9fe, #fdf4ff);
+}

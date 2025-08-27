@@ -156,6 +156,9 @@
           <!-- 额外推荐按钮的波纹效果容器 -->
           <div class="ripple-container" ref="extraRippleContainer"></div>
 
+          <!-- 额外推荐按钮的粒子效果容器 -->
+          <div class="sparkles-container" ref="extraSparklesContainer"></div>
+
           <span class="button-text"> {{ extraRecommendationButtonText }} </span>
         </button>
       </div>
@@ -236,6 +239,7 @@
 
     // 清理粒子效果
     clearSparkleEffect();
+    clearSparkleEffect(extraSparklesContainer.value);
 
     // 重置推荐系统的上下文
     recommendationStore.updateContext({
@@ -281,6 +285,7 @@
   const rippleContainer = ref<HTMLDivElement | null>(null);
   const extraRippleContainer = ref<HTMLDivElement | null>(null);
   const sparklesContainer = ref<HTMLDivElement | null>(null);
+  const extraSparklesContainer = ref<HTMLDivElement | null>(null);
 
   // 心情选项
   const moodOptions = [
@@ -491,23 +496,23 @@
   };
 
   // 清理粒子效果
-  const clearSparkleEffect = () => {
-    const container = sparklesContainer.value;
-    if (!container) return;
+  const clearSparkleEffect = (container?: HTMLDivElement | null) => {
+    const targetContainer = container || sparklesContainer.value;
+    if (!targetContainer) return;
 
     // 清除所有粒子
-    while (container.firstChild) {
-      container.removeChild(container.firstChild);
+    while (targetContainer.firstChild) {
+      targetContainer.removeChild(targetContainer.firstChild);
     }
   };
 
   // 创建粒子效果
-  const createSparkleEffect = () => {
-    const container = sparklesContainer.value;
-    if (!container) return;
+  const createSparkleEffect = (container?: HTMLDivElement | null) => {
+    const targetContainer = container || sparklesContainer.value;
+    if (!targetContainer) return;
 
     // 先清理之前的粒子
-    clearSparkleEffect();
+    clearSparkleEffect(targetContainer);
 
     const sparkleCount = 8;
 
@@ -522,7 +527,7 @@
       // 随机延迟
       sparkle.style.animationDelay = Math.random() * 2 + 's';
 
-      container.appendChild(sparkle);
+      targetContainer.appendChild(sparkle);
     }
   };
 
@@ -672,7 +677,7 @@
     usingAI.value = true; // 额外推荐强制使用AI
 
     // 延迟启动粒子效果
-    createSparkleEffect();
+    createSparkleEffect(extraSparklesContainer.value);
 
     try {
       // 确保有天气数据
@@ -764,7 +769,7 @@
       usingAI.value = false;
 
       // 清理粒子效果
-      clearSparkleEffect();
+      clearSparkleEffect(extraSparklesContainer.value);
 
       // 重置成功状态
       setTimeout(() => {
@@ -1081,8 +1086,7 @@
   .extra-recommend-btn {
     width: 100%;
     padding: 12px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
     border-radius: 12px;
     color: white;
     font-size: 14px;
@@ -1098,8 +1102,7 @@
   .extra-recommend-btn:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1));
-    border-color: rgba(255, 255, 255, 0.4);
+    background: linear-gradient(135deg, #ff5722, #ff9800);
   }
 
   .extra-recommend-btn:disabled {
@@ -1145,9 +1148,47 @@
 
   /* 额外推荐按钮加载状态 */
   .extra-recommend-btn.loading {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-    border-color: rgba(255, 255, 255, 0.4);
+    background: linear-gradient(135deg, #e64a19, #f57c00);
     animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  /* 额外推荐按钮的粒子效果容器 */
+  .extra-recommend-btn .sparkles-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    border-radius: 12px;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  /* 额外推荐按钮的粒子样式 */
+  .extra-recommend-btn .sparkle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: white;
+    border-radius: 50%;
+    animation: sparkle 2s ease-in-out infinite;
+    pointer-events: none;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+  }
+
+  /* 额外推荐按钮的粒子动画 */
+  @keyframes sparkle {
+    0%,
+    100% {
+      opacity: 0;
+      transform: scale(0);
+    }
+
+    50% {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 
   .recommendation-action {

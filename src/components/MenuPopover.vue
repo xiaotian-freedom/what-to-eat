@@ -48,7 +48,7 @@
       <!-- 系统设置 -->
       <button
         @click.stop="handleMenuClick('settings')"
-        class="w-full flex items-center px-4 py-3 text-left hover:bg-gray-50 active:bg-blue-500/20 transition-all duration-150 ease-out focus:outline-none"
+        class="w-full flex items-center px-4 py-3 text-left hover:bg-gray-50 transition-all duration-150 ease-out focus:outline-none"
       >
         <span class="text-lg mr-3">⚙️</span>
         <span class="text-sm font-medium text-gray-700">{{ $t('menu.settings') }}</span>

@@ -1,6 +1,7 @@
 <template>
   <div
-    class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 font-sans flex justify-center items-center px-5 w-full h-screen"
+    class="font-sans flex justify-center items-center px-5 w-full h-screen"
+    :class="`theme-gradient-${themeStore.currentTheme}`"
   >
     <!-- 卡片容器 -->
     <div class="card-container" :class="{ flipped: showResult }">
@@ -37,11 +38,13 @@
   import { showFailToast, showSuccessToast } from 'vant';
   import { useChallengeStore } from '@/stores/challenge';
   import { useDevModeStore } from '@/stores/devMode';
+  import { useThemeStore } from '@/stores/theme';
 
   const { t } = useI18n();
   const router = useRouter();
   const challengeStore = useChallengeStore();
   const devModeStore = useDevModeStore();
+  const themeStore = useThemeStore();
 
   const selectedDish = ref<Food | null>(null);
   const showResult = ref(false);

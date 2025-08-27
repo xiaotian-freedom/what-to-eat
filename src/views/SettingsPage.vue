@@ -1,6 +1,7 @@
 <template>
   <div
-    class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 font-sans flex justify-center items-center px-5 w-full h-screen"
+    class="font-sans flex justify-center items-center px-5 w-full h-screen"
+    :class="`theme-gradient-${themeStore.currentTheme}`"
   >
     <!-- 卡片容器 -->
     <div class="card-container w-full h-[70vh] max-w-md">
@@ -35,6 +36,23 @@
                       :class="devModeStore.isDevModeEnabled ? 'translate-x-6' : 'translate-x-0.5'"
                     ></div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 主题设置 -->
+            <div
+              @click="showThemeSelector = true"
+              class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 border border-purple-100 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-95"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <h3 class="text-lg font-semibold text-gray-800">{{ $t('settings.theme') }}</h3>
+                  <p class="text-sm text-gray-600 mt-1">{{ $t('settings.themeDesc') }}</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-2xl">{{ themeStore.currentThemeData.icon }}</span>
+                  <span class="text-purple-400 text-xl">›</span>
                 </div>
               </div>
             </div>
@@ -93,6 +111,11 @@
         </div>
       </div>
     </div>
+
+    <!-- 主题选择器 BottomSheet -->
+    <BottomSheet :visible="showThemeSelector" @close="showThemeSelector = false" maxHeight="80vh">
+      <ThemeSelector />
+    </BottomSheet>
 
     <!-- 语言选择器 BottomSheet -->
     <BottomSheet
@@ -209,11 +232,14 @@
 
   import HeaderBar from '@/components/HeaderBar.vue';
   import BottomSheet from '@/components/BottomSheet.vue';
+  import ThemeSelector from '@/components/ThemeSelector.vue';
   import { APP_CONFIG } from '@/config/app';
   import { useDevModeStore } from '@/stores/devMode';
+  import { useThemeStore } from '@/stores/theme';
 
   const { locale } = useI18n();
   const devModeStore = useDevModeStore();
+  const themeStore = useThemeStore();
 
   // 页面加载时加载开发模式状态
   onMounted(() => {
@@ -222,6 +248,7 @@
 
   // 响应式数据
   const showLanguageSelector = ref(false);
+  const showThemeSelector = ref(false);
   const showAboutModal = ref(false);
 
   // 计算属性

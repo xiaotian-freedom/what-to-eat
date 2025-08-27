@@ -1,6 +1,7 @@
 <template>
   <div
-    class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 font-sans w-full h-screen device-container px-5 flex justify-center items-center"
+    class="font-sans w-full h-screen device-container px-5 flex justify-center items-center"
+    :class="`theme-gradient-${themeStore.currentTheme}`"
   >
     <div
       id="addFoodPage"
@@ -152,6 +153,7 @@
   import HeaderBar from '@/components/HeaderBar.vue';
   import { dishList } from '@/data/dishList';
   import { useFoodStore } from '@/stores';
+  import { useThemeStore } from '@/stores/theme';
   import type { Food } from '@/types/food';
   import { ColorManager } from '@/utils/ColorManager';
   import { upload } from '@/utils/qiniu';
@@ -166,6 +168,7 @@
   const router = useRouter();
   // 菜品store
   const foodStore = useFoodStore();
+  const themeStore = useThemeStore();
   // 文件输入框
   const fileInput = ref<HTMLInputElement | null>(null);
   // 菜品名称

@@ -4,12 +4,14 @@
   import { useRouter } from 'vue-router';
   import HeaderBar from '@/components/HeaderBar.vue';
   import { useFoodStore } from '@/stores';
+  import { useThemeStore } from '@/stores/theme';
   import { showConfirmDialog } from 'vant';
   import IconEmpty from '@/assets/icons/empty.svg';
 
   const { t } = useI18n();
   const router = useRouter();
   const foodStore = useFoodStore();
+  const themeStore = useThemeStore();
 
   // 存储图片加载失败的菜品ID
   const failedImages = ref<Set<string>>(new Set());
@@ -60,7 +62,8 @@
 
 <template>
   <div
-    class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 w-screen h-screen font-sans flex justify-center items-center px-5"
+    class="w-screen h-screen font-sans flex justify-center items-center px-5"
+    :class="`theme-gradient-${themeStore.currentTheme}`"
   >
     <!-- 菜品管理页面模拟设备 -->
     <div

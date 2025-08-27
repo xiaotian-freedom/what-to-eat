@@ -128,6 +128,8 @@ export default {
 
   // Settings page
   'settings.title': 'Settings',
+  'settings.theme': 'Theme',
+  'settings.themeDesc': 'Choose your favorite theme style',
   'settings.language': 'Language',
   'settings.languageDesc': 'Choose app language',
   'settings.version': 'Version',

@@ -136,6 +136,8 @@ export default {
 
   // 设置页面
   'settings.title': '设置',
+  'settings.theme': '主题',
+  'settings.themeDesc': '选择你喜欢的主题风格',
   'settings.language': '语言',
   'settings.languageDesc': '选择应用语言',
   'settings.version': '版本号',
