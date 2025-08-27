@@ -1,5 +1,5 @@
 export const APP_CONFIG = {
-  version: '1.1.0',
+  version: '1.2.0',
   developer: {
     name: '小田',
     email: 'phantomps.free@gmail.com',

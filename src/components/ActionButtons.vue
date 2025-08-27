@@ -4,24 +4,29 @@
       <div class="flex justify-between items-center mt-4">
         <button
           @click="$emit('addFood')"
-          class="w-16 h-16 rounded-full bg-purple-500 backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn"
+          class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn"
+          :style="{ backgroundColor: 'var(--color-primary)' }"
         >
           <img :src="plus" class="w-7 h-7" />
         </button>
 
         <!-- 主随机按钮 -->
         <button
-          class="w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg transform transition flex items-center justify-center ripple-btn"
+          class="w-20 h-20 rounded-full text-white font-bold text-lg shadow-lg transform transition flex items-center justify-center ripple-btn"
           :class="{ 'opacity-50': disabled }"
           :disabled="disabled"
           @click="$emit('randomFood')"
+          :style="{
+            backgroundImage: `linear-gradient(to right, var(--color-primary), var(--color-accent))`,
+          }"
         >
           <img :src="shuffle" class="w-8 h-8" />
         </button>
 
         <button
           @click="$emit('showFoodList')"
-          class="w-16 h-16 rounded-full bg-pink-500 backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn"
+          class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn"
+          :style="{ backgroundColor: 'var(--color-accent)' }"
         >
           <img :src="list" class="w-7 h-7" />
         </button>
@@ -32,7 +37,8 @@
       <div class="flex justify-between items-center w-full">
         <button
           @click="$emit('chooseAgain')"
-          class="w-16 h-16 rounded-full bg-purple-500 backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn"
+          class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn"
+          :style="{ backgroundColor: 'var(--color-primary)' }"
         >
           <img :src="shuffle" class="w-7 h-7" />
         </button>
@@ -41,8 +47,11 @@
         <button
           @click="$emit('viewRecipe')"
           :disabled="recipeLoading"
-          class="w-20 h-20 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold shadow-lg transform transition flex items-center justify-center ripple-btn relative"
+          class="w-20 h-20 rounded-full text-white font-bold shadow-lg transform transition flex items-center justify-center ripple-btn relative"
           :class="{ 'opacity-75': recipeLoading }"
+          :style="{
+            backgroundImage: `linear-gradient(to right, var(--color-secondary), var(--color-accent))`,
+          }"
         >
           <div v-if="recipeLoading" class="absolute inset-0 flex items-center justify-center">
             <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
@@ -55,7 +64,8 @@
 
         <button
           @click="$emit('shareResult')"
-          class="w-16 h-16 rounded-full bg-pink-500 backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn"
+          class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn"
+          :style="{ backgroundColor: 'var(--color-accent)' }"
         >
           <img :src="share" class="w-6 h-6" />
         </button>

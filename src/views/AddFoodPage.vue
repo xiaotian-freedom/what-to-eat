@@ -124,7 +124,10 @@
                 <van-field
                   v-model="foodName"
                   :placeholder="t('form.dishNamePlaceholder')"
-                  class="rounded-xl !py-3 !px-4 !text-base !border-1 !border-purple-500"
+                  class="rounded-xl !py-3 !px-4 !text-base"
+                  :style="{
+                    border: '1px solid var(--color-primary)',
+                  }"
                   :border="false"
                   input-align="center"
                   clearable
@@ -135,7 +138,10 @@
             <!-- 底部按钮区域 -->
             <button
               @click="submitForm"
-              class="w-full py-4 my-5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg transform transition flex items-center justify-center focus:outline-none focus:ring-0"
+              class="w-full py-4 my-5 rounded-xl text-white font-bold text-lg shadow-lg transform transition flex items-center justify-center focus:outline-none focus:ring-0"
+              :style="{
+                backgroundImage: `linear-gradient(to right, var(--color-primary), var(--color-accent))`,
+              }"
             >
               <img :src="IconConfirm" class="w-5 h-5 mr-2" />
               {{ isEdit ? $t('common.save') : $t('common.add') }}

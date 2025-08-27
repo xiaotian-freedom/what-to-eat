@@ -56,7 +56,7 @@
       </div>
 
       <!-- 菜品介绍区域 -->
-      <div v-if="selectedDish" class="w-full max-w-sm mt-6 px-4">
+      <div v-if="selectedDish && selectedDish.description" class="w-full max-w-sm mt-6 px-4">
         <div
           class="bg-white/80 backdrop-filter backdrop-blur-lg rounded-2xl p-4 shadow-lg max-h-36 overflow-y-auto overscroll-contain"
           style="-webkit-overflow-scrolling: touch; scrollbar-width: thin"

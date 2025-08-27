@@ -9,7 +9,13 @@
       <template #rightContent>
         <button
           @click.stop="toggleMenu"
-          class="text-gray-600 hover:bg-gray-100 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
+          class="p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
+          :style="{
+            color: 'var(--color-textSecondary)',
+            backgroundColor: 'transparent',
+          }"
+          @mouseenter="handleMenuMouseEnter"
+          @mouseleave="handleMenuMouseLeave"
         >
           <img src="@/assets/icons/menu.svg" class="w-5 h-5" />
         </button>
@@ -243,6 +249,21 @@
         // 系统设置：跳转到设置页面
         router.push('/settings');
         break;
+    }
+  };
+
+  // 处理菜单按钮鼠标悬停事件
+  const handleMenuMouseEnter = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (target) {
+      target.style.backgroundColor = 'var(--color-border)';
+    }
+  };
+
+  const handleMenuMouseLeave = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (target) {
+      target.style.backgroundColor = 'transparent';
     }
   };
 

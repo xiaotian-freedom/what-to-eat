@@ -8,7 +8,13 @@
         v-if="showBackButton"
         href="#"
         @click.prevent="handleBack"
-        class="text-gray-600 mr-2 hover:bg-gray-100 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
+        class="mr-2 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
+        :style="{
+          color: 'var(--color-textSecondary)',
+          backgroundColor: 'transparent',
+        }"
+        @mouseenter="handleBackMouseEnter"
+        @mouseleave="handleBackMouseLeave"
       >
         <img src="@/assets/icons/left.svg" class="w-5 h-5" />
       </a>
@@ -20,7 +26,10 @@
       class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-0"
     >
       <div
-        class="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 text-center"
+        class="text-lg font-bold text-transparent bg-clip-text text-center"
+        :style="{
+          backgroundImage: `linear-gradient(to right, var(--color-primary), var(--color-accent))`,
+        }"
       >
         {{ title }}
       </div>
@@ -29,7 +38,10 @@
     <!-- 非居中时的标题 -->
     <div
       v-else
-      class="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500"
+      class="text-lg font-bold text-transparent bg-clip-text"
+      :style="{
+        backgroundImage: `linear-gradient(to right, var(--color-primary), var(--color-accent))`,
+      }"
     >
       {{ title }}
     </div>
@@ -45,9 +57,15 @@
             :key="index"
             @click="button.onClick"
             :class="[
-              'text-gray-600 hover:bg-gray-100 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0',
+              'p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0',
               button.className || '',
             ]"
+            :style="{
+              color: 'var(--color-textSecondary)',
+              backgroundColor: 'transparent',
+            }"
+            @mouseenter="handleRightButtonMouseEnter"
+            @mouseleave="handleRightButtonMouseLeave"
           >
             <span class="text-lg">{{ button.icon }}</span>
           </button>
@@ -55,7 +73,13 @@
             v-if="rightIcon"
             href="#"
             @click.prevent="handleRightIconClick"
-            class="text-gray-600 hover:bg-gray-100 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
+            class="p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
+            :style="{
+              color: 'var(--color-textSecondary)',
+              backgroundColor: 'transparent',
+            }"
+            @mouseenter="handleRightIconMouseEnter"
+            @mouseleave="handleRightIconMouseLeave"
           >
             <img :src="rightIcon" class="w-5 h-5" />
           </a>
@@ -107,6 +131,51 @@
   const handleRightIconClick = () => {
     if (props.onRightIconClick) {
       props.onRightIconClick();
+    }
+  };
+
+  // 处理返回按钮鼠标悬停事件
+  const handleBackMouseEnter = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (target) {
+      target.style.backgroundColor = 'var(--color-border)';
+    }
+  };
+
+  const handleBackMouseLeave = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (target) {
+      target.style.backgroundColor = 'transparent';
+    }
+  };
+
+  // 处理右侧按钮鼠标悬停事件
+  const handleRightButtonMouseEnter = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (target) {
+      target.style.backgroundColor = 'var(--color-border)';
+    }
+  };
+
+  const handleRightButtonMouseLeave = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (target) {
+      target.style.backgroundColor = 'transparent';
+    }
+  };
+
+  // 处理右侧图标鼠标悬停事件
+  const handleRightIconMouseEnter = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (target) {
+      target.style.backgroundColor = 'var(--color-border)';
+    }
+  };
+
+  const handleRightIconMouseLeave = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (target) {
+      target.style.backgroundColor = 'transparent';
     }
   };
 </script>
