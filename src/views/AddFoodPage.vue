@@ -5,7 +5,7 @@
   >
     <div
       id="addFoodPage"
-      class="card-face bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative w-full"
+      class="card-face rounded-3xl shadow-xl overflow-hidden border-8 relative w-full theme-surface theme-border"
     >
       <!-- 使用封装的顶部状态栏组件 -->
       <HeaderBar
@@ -14,9 +14,18 @@
         :onBack="goBack"
       />
 
-      <!-- 标签页切换 -->
-      <van-tabs v-model:active="activeTab" class="custom-tabs">
-        <van-tab :title="$t('tabs.presetDishes')" name="preset">
+      <!-- 自定义标签页切换 -->
+      <CustomTabs
+        v-model="activeTab"
+        :tabs="tabItems"
+        type="pill"
+        size="medium"
+        :animated="true"
+        :shadow="true"
+        :centered="true"
+        class="custom-tabs"
+      >
+        <template #preset>
           <!-- 预设菜品区域 -->
           <div class="preset-dishes-container">
             <!-- 搜索框 -->
@@ -29,7 +38,7 @@
                 clearable
               >
                 <template #left-icon>
-                  <van-icon name="search" class="text-gray-400" />
+                  <van-icon name="search" class="search-icon" />
                 </template>
               </van-field>
             </div>
@@ -62,8 +71,8 @@
                   </div>
                 </div>
                 <div class="dish-info">
-                  <h3 class="dish-name">{{ dish.name }}</h3>
-                  <p class="dish-desc">{{ dish.desc }}</p>
+                  <h3 class="dish-name theme-text">{{ dish.name }}</h3>
+                  <p class="dish-desc theme-text-secondary">{{ dish.desc }}</p>
                 </div>
               </div>
             </div>
@@ -71,18 +80,18 @@
             <!-- 空状态 -->
             <div v-if="filteredDishes.length === 0" class="empty-state">
               <van-icon name="search" class="empty-icon" />
-              <p class="empty-text">{{ $t('search.noResults') }}</p>
+              <p class="empty-text theme-text-secondary">{{ $t('search.noResults') }}</p>
             </div>
           </div>
-        </van-tab>
+        </template>
 
-        <van-tab :title="$t('tabs.customAdd')" name="custom">
+        <template #custom>
           <!-- 自定义添加区域 -->
           <div class="custom-add-container">
             <!-- 上传图片区域 -->
             <div class="mb-8 flex justify-center pt-8">
               <div
-                class="w-44 h-44 rounded-full bg-white/50 backdrop-filter backdrop-blur-sm border-2 border-white border-opacity-60 flex flex-col items-center justify-center shadow-lg relative image-upload-area cursor-pointer focus:outline-none focus:ring-0"
+                class="w-44 h-44 rounded-full backdrop-filter backdrop-blur-sm border-2 flex flex-col items-center justify-center shadow-lg relative image-upload-area cursor-pointer focus:outline-none focus:ring-0 theme-surface theme-border"
                 @click="triggerFileInput"
               >
                 <div
@@ -96,14 +105,15 @@
                   />
                 </div>
                 <div
-                  class="absolute inset-0 rounded-full flex items-center justify-center bg-black/30 backdrop-filter backdrop-blur-sm hover:bg-opacity-20 transition-all duration-300 focus:outline-none image-overlay"
+                  class="absolute inset-0 rounded-full flex items-center justify-center backdrop-filter backdrop-blur-sm hover:bg-opacity-20 transition-all duration-300 focus:outline-none image-overlay"
                   :style="{
                     opacity: imageSelected ? '0' : '1',
                     pointerEvents: imageSelected ? 'none' : 'auto',
+                    backgroundColor: 'var(--color-shadow)',
                   }"
                 >
                   <div
-                    class="p-3 rounded-full bg-white bg-opacity-80 shadow-lg upload-icon-pulse focus:outline-none"
+                    class="p-3 rounded-full shadow-lg upload-icon-pulse focus:outline-none theme-surface"
                   >
                     <img :src="IconCamera" class="w-6 h-6" />
                   </div>
@@ -124,9 +134,10 @@
                 <van-field
                   v-model="foodName"
                   :placeholder="t('form.dishNamePlaceholder')"
-                  class="rounded-xl !py-3 !px-4 !text-base"
+                  class="custom-input-field"
                   :style="{
                     border: '1px solid var(--color-primary)',
+                    backgroundColor: 'var(--color-surface)',
                   }"
                   :border="false"
                   input-align="center"
@@ -147,16 +158,18 @@
               {{ isEdit ? $t('common.save') : $t('common.add') }}
             </button>
           </div>
-        </van-tab>
-      </van-tabs>
+        </template>
+      </CustomTabs>
     </div>
   </div>
 </template>
 <script setup lang="ts">
   import IconCamera from '@/assets/icons/camera.svg';
   import IconConfirm from '@/assets/icons/confirm.svg';
+  import IconList from '@/assets/icons/list.svg';
   import ImgTofu from '@/assets/images/tofu.jpg';
   import HeaderBar from '@/components/HeaderBar.vue';
+  import CustomTabs from '@/components/CustomTabs.vue';
   import { dishList } from '@/data/dishList';
   import { useFoodStore } from '@/stores';
   import { useThemeStore } from '@/stores/theme';
@@ -199,6 +212,20 @@
 
   // 预设菜品数据 - 使用导入的dishList
   const presetDishes = ref(dishList);
+
+  // 标签页配置
+  const tabItems = computed(() => [
+    {
+      name: 'preset',
+      title: t('tabs.presetDishes'),
+      icon: IconList,
+    },
+    {
+      name: 'custom',
+      title: t('tabs.customAdd'),
+      icon: 'plus',
+    },
+  ]);
 
   // 过滤预设菜品 - 使用computed实现响应式搜索
   const filteredDishes = computed(() => {
@@ -385,8 +412,12 @@
       showSuccessToast(t('messages.addSuccess'));
     }
 
-    // 操作完成后返回
-    router.back();
+    // 操作完成后清除表单
+    foodName.value = '';
+    previewSrc.value = ImgTofu;
+    imageSelected.value = false;
+    imageLoadFailed.value = false;
+    // activeTab.value = 'preset';
   };
 
   // 处理菜品点击
@@ -485,8 +516,25 @@
     transition: all 0.3s ease;
   }
 
+  .image-upload-area:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 8px 25px var(--color-shadow);
+  }
+
   .upload-icon-pulse {
     animation: pulse 2s infinite;
+    background: var(--color-surface);
+    opacity: 0.9;
+  }
+
+  /* 按钮hover效果 */
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--color-shadow);
+  }
+
+  button:active {
+    transform: translateY(0);
   }
 
   @keyframes pulse {
@@ -515,20 +563,33 @@
     overflow: hidden;
   }
 
-  .custom-tabs :deep(.van-tabs__content) {
-    height: calc(100% - 44px);
-    overflow-y: auto;
+  /* 自定义标签组件样式适配 */
+  .custom-tabs :deep(.custom-tabs-container) {
+    height: 100%;
   }
 
-  .custom-tabs :deep(.van-tab__panel) {
+  .custom-tabs :deep(.tabs-content) {
+    height: calc(100% - 60px);
+  }
+
+  .custom-tabs :deep(.tab-panel) {
     height: 100%;
     padding: 0;
+  }
+
+  /* 自定义van-field样式以适配主题 */
+  .custom-tabs :deep(.van-field__control) {
+    color: var(--color-text);
+  }
+
+  .custom-tabs :deep(.van-field__control::placeholder) {
+    color: var(--color-textSecondary);
   }
 
   .preset-dishes-container {
     padding: 16px;
     height: 100%;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, var(--color-background) 0%, var(--color-surface) 100%);
   }
 
   .search-container {
@@ -536,9 +597,33 @@
   }
 
   .search-field {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--color-surface);
     border-radius: 25px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px var(--color-shadow);
+    transition: all 0.3s ease;
+  }
+
+  .search-field:focus-within {
+    box-shadow: 0 4px 20px var(--color-shadow);
+    transform: translateY(-1px);
+  }
+
+  /* 确保搜索框内部输入框的文字颜色正确 */
+  .search-field :deep(.van-field__control) {
+    color: var(--color-text) !important;
+    background-color: transparent !important;
+  }
+
+  .search-field :deep(.van-field__control::placeholder) {
+    color: var(--color-textSecondary) !important;
+  }
+
+  .search-field :deep(.van-field__clear) {
+    color: var(--color-textSecondary) !important;
+  }
+
+  .search-icon {
+    color: var(--color-textSecondary);
   }
 
   .dishes-grid {
@@ -549,15 +634,20 @@
   }
 
   .dish-card {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--color-surface);
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px var(--color-shadow);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid transparent;
+    border: 2px solid var(--color-border);
     position: relative;
     user-select: none;
+  }
+
+  .dish-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--color-shadow);
   }
 
   .dish-card:active {
@@ -574,7 +664,8 @@
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(139, 92, 246, 0.3);
+    background: var(--color-primary);
+    opacity: 0.3;
     transform: translate(-50%, -50%);
     transition: width 0.3s ease, height 0.3s ease;
     pointer-events: none;
@@ -588,9 +679,9 @@
 
   /* 已添加菜品的样式 */
   .dish-card.already-added {
-    opacity: 0.9;
+    opacity: 0.8;
     filter: grayscale(0.1);
-    border-color: rgba(34, 197, 94, 0.8);
+    border-color: var(--color-accent);
     position: relative;
   }
 
@@ -601,7 +692,7 @@
     right: 8px;
     width: 20px;
     height: 20px;
-    background: rgba(34, 197, 94, 0.9);
+    background: var(--color-accent);
     color: white;
     border-radius: 50%;
     display: flex;
@@ -613,7 +704,7 @@
   }
 
   .dish-card.already-added .dish-overlay {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(220, 38, 38, 0.8));
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
     opacity: 0;
     transition: opacity 0.3s ease;
   }
@@ -629,20 +720,20 @@
   .dish-card.already-added:active {
     transform: translateY(-2px) scale(0.98);
     opacity: 1;
-    border-color: rgba(239, 68, 68, 0.8);
+    border-color: var(--color-primary);
   }
 
   .dish-card.already-added:active .dish-overlay {
     opacity: 1;
   }
 
-  .dish-card.already-added:active .add-icon {
-    opacity: 1;
+  .dish-card.already-added:active::after {
+    background: var(--color-primary);
+    content: '−';
   }
 
-  .dish-card.already-added:active::after {
-    background: rgba(239, 68, 68, 0.9);
-    content: '−';
+  .dish-card.already-added:active .add-icon {
+    opacity: 1;
   }
 
   /* 移除按钮样式 */
@@ -652,7 +743,7 @@
     right: 8px;
     width: 24px;
     height: 24px;
-    background: rgba(239, 68, 68, 0.9);
+    background: var(--color-primary);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -664,7 +755,7 @@
 
   .remove-button:active {
     transform: scale(0.9);
-    background: rgba(220, 38, 38, 0.9);
+    background: var(--color-accent);
   }
 
   .remove-icon {
@@ -674,7 +765,7 @@
 
   /* 显示移除按钮时的菜品样式 */
   .dish-card.show-remove {
-    border-color: rgba(239, 68, 68, 0.8);
+    border-color: var(--color-primary);
   }
 
   .dish-card.show-remove::after {
@@ -701,7 +792,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(236, 72, 153, 0.8));
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
     display: flex;
     justify-content: center;
     align-items: center;
@@ -711,7 +802,7 @@
 
   .dish-card.clicked .dish-overlay {
     opacity: 1;
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.9), rgba(16, 185, 129, 0.9));
+    background: linear-gradient(135deg, var(--color-accent), var(--color-primary));
   }
 
   .add-icon {
@@ -747,13 +838,11 @@
     font-size: 14px;
     font-weight: 600;
     margin-bottom: 4px;
-    color: #374151;
     line-height: 1.2;
   }
 
   .dish-desc {
     font-size: 11px;
-    color: #6b7280;
     line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -765,13 +854,13 @@
   .empty-state {
     text-align: center;
     padding: 60px 20px;
-    color: #9ca3af;
   }
 
   .empty-icon {
     font-size: 48px;
     margin-bottom: 16px;
     opacity: 0.6;
+    color: var(--color-textSecondary);
   }
 
   .empty-text {
@@ -781,8 +870,42 @@
 
   .custom-add-container {
     padding: 20px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, var(--color-background) 0%, var(--color-surface) 100%);
     height: 100%;
     overflow-y: auto;
+  }
+
+  /* 自定义输入框样式 */
+  .custom-input-field {
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    font-size: 16px !important;
+    background-color: var(--color-surface) !important;
+    border: 1px solid var(--color-primary) !important;
+    color: var(--color-text) !important;
+    transition: all 0.3s ease;
+  }
+
+  .custom-input-field:focus {
+    border-color: var(--color-accent) !important;
+    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2) !important;
+  }
+
+  .custom-input-field::placeholder {
+    color: var(--color-textSecondary) !important;
+  }
+
+  /* 确保 van-field 内部输入框的文字颜色正确 */
+  .custom-input-field :deep(.van-field__control) {
+    color: var(--color-text) !important;
+    background-color: transparent !important;
+  }
+
+  .custom-input-field :deep(.van-field__control::placeholder) {
+    color: var(--color-textSecondary) !important;
+  }
+
+  .custom-input-field :deep(.van-field__clear) {
+    color: var(--color-textSecondary) !important;
   }
 </style>

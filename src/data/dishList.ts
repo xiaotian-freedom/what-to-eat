@@ -32,12 +32,6 @@ export const dishList: Dish[] = [
     desc: '鲜香嫩滑，营养价值高',
   },
   {
-    name: '糖醋排骨',
-    image:
-      'http://t1dfw88cb.hn-bkt.clouddn.com/690x390_5e7a9d5aa05131b40e15cf863962ecec.jpg?e=1755827549&token=iCVLMYDrwQ8fpd9yENAOSbfv4SboFmActyCEYXDd:i45by-Xv1TSzEd1ftmhyEOoxctg=',
-    desc: '酸甜可口，色泽诱人',
-  },
-  {
     name: '蚝油生菜',
     image:
       'http://t1dfw88cb.hn-bkt.clouddn.com/690x390_a0eb4b43a7efa50efc0a422f36522a54.jpg?e=1755827719&token=iCVLMYDrwQ8fpd9yENAOSbfv4SboFmActyCEYXDd:J5E-ReHq9phXxAWmh44dXalhNEk=',

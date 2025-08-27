@@ -1,6 +1,11 @@
 <template>
   <div
-    class="bg-white/70 backdrop-filter backdrop-blur-lg p-4 relative flex justify-between items-center border-b border-gray-100"
+    class="backdrop-filter backdrop-blur-lg p-4 relative flex justify-between items-center theme-transition"
+    :style="{
+      backgroundColor: 'var(--color-surface)',
+      borderBottom: '1px solid var(--color-border)',
+      opacity: 0.9,
+    }"
   >
     <!-- 左侧区域 -->
     <div class="flex items-center z-10">
@@ -8,13 +13,11 @@
         v-if="showBackButton"
         href="#"
         @click.prevent="handleBack"
-        class="mr-2 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
+        class="mr-2 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0 back-btn"
         :style="{
           color: 'var(--color-textSecondary)',
           backgroundColor: 'transparent',
         }"
-        @mouseenter="handleBackMouseEnter"
-        @mouseleave="handleBackMouseLeave"
       >
         <img src="@/assets/icons/left.svg" class="w-5 h-5" />
       </a>
@@ -57,15 +60,13 @@
             :key="index"
             @click="button.onClick"
             :class="[
-              'p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0',
+              'p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0 right-btn',
               button.className || '',
             ]"
             :style="{
               color: 'var(--color-textSecondary)',
               backgroundColor: 'transparent',
             }"
-            @mouseenter="handleRightButtonMouseEnter"
-            @mouseleave="handleRightButtonMouseLeave"
           >
             <span class="text-lg">{{ button.icon }}</span>
           </button>
@@ -73,13 +74,11 @@
             v-if="rightIcon"
             href="#"
             @click.prevent="handleRightIconClick"
-            class="p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
+            class="p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0 right-icon-btn"
             :style="{
               color: 'var(--color-textSecondary)',
               backgroundColor: 'transparent',
             }"
-            @mouseenter="handleRightIconMouseEnter"
-            @mouseleave="handleRightIconMouseLeave"
           >
             <img :src="rightIcon" class="w-5 h-5" />
           </a>
@@ -133,55 +132,40 @@
       props.onRightIconClick();
     }
   };
-
-  // 处理返回按钮鼠标悬停事件
-  const handleBackMouseEnter = (event: MouseEvent) => {
-    const target = event.target as HTMLElement;
-    if (target) {
-      target.style.backgroundColor = 'var(--color-border)';
-    }
-  };
-
-  const handleBackMouseLeave = (event: MouseEvent) => {
-    const target = event.target as HTMLElement;
-    if (target) {
-      target.style.backgroundColor = 'transparent';
-    }
-  };
-
-  // 处理右侧按钮鼠标悬停事件
-  const handleRightButtonMouseEnter = (event: MouseEvent) => {
-    const target = event.target as HTMLElement;
-    if (target) {
-      target.style.backgroundColor = 'var(--color-border)';
-    }
-  };
-
-  const handleRightButtonMouseLeave = (event: MouseEvent) => {
-    const target = event.target as HTMLElement;
-    if (target) {
-      target.style.backgroundColor = 'transparent';
-    }
-  };
-
-  // 处理右侧图标鼠标悬停事件
-  const handleRightIconMouseEnter = (event: MouseEvent) => {
-    const target = event.target as HTMLElement;
-    if (target) {
-      target.style.backgroundColor = 'var(--color-border)';
-    }
-  };
-
-  const handleRightIconMouseLeave = (event: MouseEvent) => {
-    const target = event.target as HTMLElement;
-    if (target) {
-      target.style.backgroundColor = 'transparent';
-    }
-  };
 </script>
 
 <style scoped>
+  /* 主题过渡动画 */
+  .theme-transition {
+    transition: all 0.3s ease;
+  }
+
+  /* 返回按钮悬停效果 */
+  .back-btn:hover {
+    background-color: var(--color-border) !important;
+    transform: scale(1.05);
+  }
+
+  /* 右侧按钮悬停效果 */
+  .right-btn:hover {
+    background-color: var(--color-border) !important;
+    transform: scale(1.05);
+  }
+
+  /* 右侧图标悬停效果 */
+  .right-icon-btn:hover {
+    background-color: var(--color-border) !important;
+    transform: scale(1.05);
+  }
+
+  /* 链接样式 */
   a {
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+  }
+
+  /* 按钮样式 */
+  button {
     -webkit-tap-highlight-color: transparent;
     outline: none;
   }

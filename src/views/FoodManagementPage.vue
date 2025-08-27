@@ -38,7 +38,7 @@
       message: t('messages.deleteConfirm'),
       confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
-      confirmButtonColor: '#ee0a24',
+      confirmButtonColor: 'var(--color-accent)',
     })
       .then(() => {
         // 用户点击确认按钮
@@ -62,12 +62,16 @@
 
 <template>
   <div
-    class="w-screen h-screen font-sans flex justify-center items-center px-5"
+    class="w-screen h-screen font-sans flex justify-center items-center px-5 theme-transition"
     :class="`theme-gradient-${themeStore.currentTheme}`"
   >
     <!-- 菜品管理页面模拟设备 -->
     <div
-      class="w-full bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative mx-auto flex flex-col device-container"
+      class="w-full rounded-3xl shadow-xl overflow-hidden border-8 relative mx-auto flex flex-col device-container theme-surface theme-border"
+      :style="{
+        borderColor: 'var(--color-border)',
+        boxShadow: `0 20px 25px -5px var(--color-shadow), 0 10px 10px -5px var(--color-shadow)`,
+      }"
     >
       <!-- 顶部状态栏 -->
       <HeaderBar
@@ -78,7 +82,10 @@
 
       <!-- 内容区域 - 菜品列表 -->
       <div
-        class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex flex-col overflow-hidden h-[500px]"
+        class="flex flex-col overflow-hidden h-[500px] theme-bg"
+        :style="{
+          background: `linear-gradient(135deg, var(--color-background), var(--color-surface))`,
+        }"
       >
         <!-- 可滚动的菜品列表 -->
         <div class="overflow-y-auto p-3">
@@ -92,7 +99,12 @@
             >
               <template #default>
                 <div
-                  class="bg-white/60 backdrop-filter backdrop-blur-lg rounded-xl p-3 flex items-center shadow-sm"
+                  class="backdrop-filter backdrop-blur-lg rounded-xl p-3 flex items-center shadow-sm theme-surface theme-border"
+                  :style="{
+                    backgroundColor: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    boxShadow: `0 2px 4px var(--color-shadow)`,
+                  }"
                 >
                   <!-- 图片区域 - 支持加载失败时的替代显示 -->
                   <template v-if="item.image && !isImageFailed(item.id)">
@@ -112,8 +124,13 @@
                   </div>
 
                   <div class="flex-1">
-                    <h3 class="font-medium text-gray-800">{{ item.name }}</h3>
-                    <p class="text-xs text-gray-500 flex items-center">
+                    <h3 class="font-medium theme-text" :style="{ color: 'var(--color-text)' }">
+                      {{ item.name }}
+                    </h3>
+                    <p
+                      class="text-xs flex items-center theme-text-secondary"
+                      :style="{ color: 'var(--color-textSecondary)' }"
+                    >
                       <span
                         class="inline-block w-2 h-2 rounded-full mr-1"
                         :style="{ backgroundColor: item.categoryColor }"
@@ -127,13 +144,21 @@
                 <div class="flex h-full">
                   <button
                     @click="editFood(item.id)"
-                    class="h-full flex items-center justify-center px-4 bg-blue-500 text-white"
+                    class="h-full flex items-center justify-center px-4 text-white theme-transition edit-btn"
+                    :style="{
+                      backgroundColor: 'var(--color-primary)',
+                      transition: 'all 0.2s ease',
+                    }"
                   >
                     {{ $t('common.edit') }}
                   </button>
                   <button
                     @click="deleteFood(item.id)"
-                    class="h-full flex items-center justify-center px-4 bg-red-500 text-white"
+                    class="h-full flex items-center justify-center px-4 text-white theme-transition delete-btn"
+                    :style="{
+                      backgroundColor: 'var(--color-accent)',
+                      transition: 'all 0.2s ease',
+                    }"
                   >
                     {{ $t('common.delete') }}
                   </button>
@@ -146,8 +171,13 @@
               v-if="foodStore.foodItems.length === 0"
               class="flex flex-col items-center justify-center"
             >
-              <img :src="IconEmpty" alt="空状态" class="w-32 h-32 mx-auto mt-16" />
-              <p class="text-center text-gray-500 mt-6">{{ $t('messages.noDishes') }}</p>
+              <img :src="IconEmpty" alt="空状态" class="w-32 h-32 mx-auto mt-16 opacity-60" />
+              <p
+                class="text-center mt-6 theme-text-secondary"
+                :style="{ color: 'var(--color-textSecondary)' }"
+              >
+                {{ $t('messages.noDishes') }}
+              </p>
             </div>
           </div>
         </div>
@@ -157,14 +187,29 @@
 </template>
 
 <style scoped>
+  /* 主题过渡动画 */
+  .theme-transition {
+    transition: all 0.3s ease;
+  }
+
+  /* 编辑按钮效果 */
+  .edit-btn {
+    transition: all 0.2s ease;
+  }
+
+  .edit-btn:hover {
+    background-color: var(--color-secondary) !important;
+    transform: scale(1.05);
+  }
+
   /* 删除按钮效果 */
   .delete-btn {
     transition: all 0.2s ease;
   }
 
   .delete-btn:hover {
-    background-color: rgba(254, 202, 202, 0.8);
-    transform: scale(1.1);
+    background-color: #dc2626 !important;
+    transform: scale(1.05);
   }
 
   /* 分类标签动画 */
@@ -174,7 +219,7 @@
 
   .category-tag:hover:not(.active-tag) {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px var(--color-shadow);
   }
 
   .active-tag {
@@ -188,7 +233,7 @@
     left: 50%;
     width: 20px;
     height: 3px;
-    background: linear-gradient(to right, #a855f7, #ec4899);
+    background: linear-gradient(to right, var(--color-primary), var(--color-accent));
     transform: translateX(-50%);
     border-radius: 3px;
   }
@@ -232,7 +277,7 @@
 
   .add-btn:hover {
     transform: rotate(90deg);
-    background: linear-gradient(to right, #a855f7, #ec4899);
+    background: linear-gradient(to right, var(--color-primary), var(--color-accent));
   }
 
   /* 空状态样式 */
@@ -243,7 +288,7 @@
   .custom-empty-description {
     text-align: center;
     font-size: 14px;
-    color: #969799;
+    color: var(--color-textSecondary);
     line-height: 1.6;
   }
 
@@ -255,5 +300,22 @@
   .van-swipe-cell {
     border-radius: 0.75rem;
     overflow: hidden;
+  }
+
+  /* 设备容器主题样式 */
+  .device-container {
+    transition: all 0.3s ease;
+  }
+
+  /* 菜品卡片悬停效果 */
+  .van-swipe-cell:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px var(--color-shadow);
+  }
+
+  /* 图片悬停效果 */
+  img:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
   }
 </style>
