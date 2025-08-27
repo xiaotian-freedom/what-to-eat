@@ -17,7 +17,7 @@
     >
       <!-- 选中结果展示 -->
       <div
-        class="w-64 h-64 rounded-full bg-white backdrop-filter backdrop-blur-lg shadow-xl flex flex-col items-center justify-center mt-5"
+        class="w-64 h-64 rounded-full bg-white backdrop-filter backdrop-blur-lg shadow-xl flex flex-col items-center justify-center"
       >
         <div class="w-full h-full rounded-full overflow-hidden shadow-lg relative">
           <!-- 有图片时显示图片 -->
@@ -55,25 +55,105 @@
         </div>
       </div>
 
+      <!-- 菜品介绍区域 -->
+      <div v-if="selectedDish" class="w-full max-w-sm mt-6 px-4">
+        <div
+          class="bg-white/80 backdrop-filter backdrop-blur-lg rounded-2xl p-4 shadow-lg border border-gray-200"
+        >
+          <!-- 菜品详细信息 -->
+          <div class="space-y-3">
+            <!-- 描述信息 -->
+            <div v-if="selectedDish.description" class="text-center">
+              <p class="text-gray-600 text-sm leading-relaxed">{{ selectedDish.description }}</p>
+            </div>
+
+            <!-- 标签展示 -->
+            <div
+              v-if="selectedDish.tags && selectedDish.tags.length > 0"
+              class="flex flex-wrap justify-center gap-2"
+            >
+              <span
+                v-for="tag in selectedDish.tags"
+                :key="tag"
+                class="px-2 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-600 text-xs rounded-full"
+              >
+                {{ tag }}
+              </span>
+            </div>
+
+            <!-- 基础信息 -->
+            <div class="flex justify-center space-x-4 text-xs text-gray-500">
+              <span v-if="selectedDish.cuisine" class="flex items-center">
+                🍽️ {{ selectedDish.cuisine }}
+              </span>
+              <span v-if="selectedDish.difficulty" class="flex items-center">
+                👨‍🍳 {{ getDifficultyText(selectedDish.difficulty) }}
+              </span>
+              <span v-if="selectedDish.prepTime" class="flex items-center">
+                ⏱️ {{ selectedDish.prepTime }}分钟
+              </span>
+            </div>
+
+            <!-- 特色标识 -->
+            <div class="flex justify-center space-x-2">
+              <span
+                v-if="selectedDish.isComfortFood"
+                class="text-xs px-2 py-1 bg-yellow-100 text-yellow-600 rounded-full"
+              >
+                🫂 安慰食物
+              </span>
+              <span
+                v-if="selectedDish.isPopular"
+                class="text-xs px-2 py-1 bg-red-100 text-red-600 rounded-full"
+              >
+                🔥 热门菜品
+              </span>
+              <span
+                v-if="selectedDish.nutrition?.isHealthy"
+                class="text-xs px-2 py-1 bg-green-100 text-green-600 rounded-full"
+              >
+                🥗 健康推荐
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- 底部按钮区域 -->
       <div class="mt-auto pt-6 w-full">
         <ActionButtons
           :disabled="false"
           :showMainButtons="false"
+          :recipeLoading="recipeLoading"
           @chooseAgain="$emit('choose-again')"
           @shareResult="$emit('share-result')"
+          @viewRecipe="handleViewRecipe"
         />
       </div>
     </div>
+
+    <!-- 做法展示底部抽屉 -->
+    <RecipeBottomSheet
+      :visible="showRecipeSheet"
+      :dishName="selectedDish?.name || ''"
+      :recipe="recipeData"
+      :loading="recipeLoading"
+      :error="recipeError"
+      @close="closeRecipeSheet"
+      @retry="retryGetRecipe"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
   import { ref, computed } from 'vue';
+  import { showFailToast, closeToast } from 'vant';
 
   import type { Food } from '@/types';
   import ActionButtons from './ActionButtons.vue';
   import HeaderBar from '@/components/HeaderBar.vue';
+  import RecipeBottomSheet from './RecipeBottomSheet.vue';
+  import { deepseekService } from '@/utils/deepseekService';
 
   const props = defineProps<{
     selectedDish: Food | null;
@@ -81,6 +161,12 @@
 
   // 存储图片加载失败的状态
   const imageLoadFailed = ref(false);
+
+  // 做法相关状态
+  const showRecipeSheet = ref(false);
+  const recipeLoading = ref(false);
+  const recipeData = ref<any>(null);
+  const recipeError = ref<string | null>(null);
 
   // 处理图片加载失败
   const handleImageError = (): void => {
@@ -98,6 +184,56 @@
       props.selectedDish?.category === '智能推荐' && props.selectedDish?.tags?.includes('AI推荐')
     );
   });
+
+  // 获取难度文本
+  const getDifficultyText = (difficulty: number): string => {
+    const levels = ['非常简单', '简单', '一般', '困难', '非常困难'];
+    return levels[difficulty - 1] || '未知';
+  };
+
+  // 处理查看做法
+  const handleViewRecipe = async () => {
+    if (!props.selectedDish) {
+      showFailToast('请先选择一道菜');
+      return;
+    }
+
+    // 如果已经有缓存的做法数据，直接显示
+    if (recipeData.value) {
+      showRecipeSheet.value = true;
+      return;
+    }
+
+    recipeLoading.value = true;
+    recipeError.value = null;
+
+    try {
+      const recipe = await deepseekService.getRecipe(props.selectedDish.name);
+      recipeData.value = recipe;
+      showRecipeSheet.value = true;
+    } catch (error) {
+      console.error('获取做法失败:', error);
+      recipeError.value = error instanceof Error ? error.message : '获取做法失败，请稍后重试';
+
+      // 显示错误提示
+      showFailToast(recipeError.value);
+    } finally {
+      recipeLoading.value = false;
+      closeToast();
+    }
+  };
+
+  // 重新获取做法
+  const retryGetRecipe = () => {
+    recipeData.value = null;
+    recipeError.value = null;
+    handleViewRecipe();
+  };
+
+  // 关闭做法抽屉
+  const closeRecipeSheet = () => {
+    showRecipeSheet.value = false;
+  };
 
   defineEmits<{
     (e: 'choose-again'): void;

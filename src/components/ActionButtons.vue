@@ -29,13 +29,30 @@
     </template>
 
     <template v-else>
-      <div class="flex justify-between w-full">
+      <div class="flex justify-between items-center w-full">
         <button
           @click="$emit('chooseAgain')"
           class="w-16 h-16 rounded-full bg-purple-500 backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn"
         >
           <img :src="shuffle" class="w-7 h-7" />
         </button>
+
+        <!-- 查看做法按钮 - 中间位置，比两边按钮略大 -->
+        <button
+          @click="$emit('viewRecipe')"
+          :disabled="recipeLoading"
+          class="w-20 h-20 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold shadow-lg transform transition flex items-center justify-center ripple-btn relative"
+          :class="{ 'opacity-75': recipeLoading }"
+        >
+          <div v-if="recipeLoading" class="absolute inset-0 flex items-center justify-center">
+            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+          </div>
+          <div v-else class="flex flex-col items-center">
+            <img :src="utensils" class="w-6 h-6 mb-1" />
+            <span class="text-xs">做法</span>
+          </div>
+        </button>
+
         <button
           @click="$emit('shareResult')"
           class="w-16 h-16 rounded-full bg-pink-500 backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn"
@@ -52,10 +69,12 @@
   import plus from '@/assets/icons/plus.svg';
   import list from '@/assets/icons/list.svg';
   import share from '@/assets/icons/share.svg';
+  import utensils from '@/assets/icons/utensils.svg';
 
   defineProps<{
     disabled: boolean;
     showMainButtons: boolean;
+    recipeLoading?: boolean;
   }>();
 
   defineEmits<{
@@ -64,5 +83,6 @@
     (e: 'showFoodList'): void;
     (e: 'chooseAgain'): void;
     (e: 'shareResult'): void;
+    (e: 'viewRecipe'): void;
   }>();
 </script>

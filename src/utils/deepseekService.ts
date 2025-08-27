@@ -417,6 +417,110 @@ ${foodListStr}
     };
     return descriptions[mood] || mood;
   }
+
+  /**
+   * 获取菜品做法
+   */
+  public async getRecipe(dishName: string): Promise<any> {
+    if (!this.canUseAPI()) {
+      throw new Error('DeepSeek API 不可用');
+    }
+
+    const messages: DeepSeekMessage[] = [
+      {
+        role: 'system',
+        content: `你是一个专业的烹饪专家，精通各种中式菜品的制作方法。用户会询问某道菜的做法，请提供详细、准确、实用的烹饪指导。
+
+请严格按照以下 JSON 格式返回菜谱信息：
+{
+  "introduction": "菜品的简介和特色",
+  "ingredients": [
+    {"name": "食材名称", "amount": "用量"},
+    {"name": "调料名称", "amount": "用量"}
+  ],
+  "steps": [
+    {
+      "description": "详细的制作步骤描述",
+      "time": "预计时间（可选）",
+      "tips": "小贴士（可选）"
+    }
+  ],
+  "tips": ["烹饪小贴士1", "烹饪小贴士2"],
+  "nutrition": "营养价值简介",
+  "estimatedTime": "总制作时间",
+  "difficulty": "难度等级（简单/中等/困难）"
+}
+
+要求：
+1. 食材用量要具体明确（如：猪肉500g、生抽2勺等）
+2. 制作步骤要详细清晰，便于操作
+3. 提供实用的烹饪技巧和注意事项
+4. 必须返回标准的 JSON 格式，不要添加任何其他文字
+5. 所有文本内容使用中文`,
+      },
+      {
+        role: 'user',
+        content: `请告诉我"${dishName}"的详细做法，包括食材清单、制作步骤、烹饪技巧等。`,
+      },
+    ];
+
+    const requestBody: DeepSeekRequest = {
+      model: this.config.model,
+      messages,
+      max_tokens: 2000, // 做法内容需要更多token
+      temperature: 0.3, // 降低温度确保回答更准确
+      top_p: 0.9,
+      stream: false,
+    };
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20秒超时，给更多时间生成内容
+
+    try {
+      const response = await fetch(this.config.apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.config.apiKey}`,
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`API 请求失败: ${response.status} ${response.statusText}`);
+      }
+
+      const data: DeepSeekResponse = await response.json();
+
+      if (!data.choices || data.choices.length === 0) {
+        throw new Error('API 返回数据格式错误');
+      }
+
+      const content = data.choices[0].message.content;
+
+      // 尝试解析 JSON 响应
+      try {
+        const recipe = JSON.parse(content);
+        return recipe;
+      } catch (parseError) {
+        console.error('解析菜谱响应失败:', parseError);
+        console.error('AI 响应内容:', content);
+        throw new Error('AI 响应格式错误');
+      }
+    } catch (error) {
+      clearTimeout(timeoutId);
+
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('API 请求超时，请检查网络连接');
+      }
+
+      console.error('DeepSeek API 调用失败:', error);
+      throw error;
+    }
+  }
 }
 
 // 导出单例实例
