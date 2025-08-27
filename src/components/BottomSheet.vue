@@ -13,17 +13,22 @@
     <Transition name="slide-up">
       <div
         v-if="visible"
-        class="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl shadow-2xl"
+        class="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl theme-transition"
         :class="[customClass]"
         :style="{
           maxHeight: maxHeight,
           background: backgroundStyle.background,
-          backgroundColor: backgroundStyle.backgroundColor,
+          backgroundColor: backgroundStyle.backgroundColor || 'var(--color-surface)',
+          boxShadow: '0 -10px 25px -3px var(--color-shadow)',
+          borderTop: '1px solid var(--color-border)',
         }"
       >
         <!-- 拖拽指示器 -->
         <div class="flex justify-center pt-3 pb-2">
-          <div class="w-12 h-1 rounded-full" :style="{ backgroundColor: indicatorColor }"></div>
+          <div
+            class="w-12 h-1 rounded-full"
+            :style="{ backgroundColor: indicatorColor || 'var(--color-border)' }"
+          ></div>
         </div>
 
         <!-- 内容区域 -->
@@ -58,10 +63,10 @@
   const props = withDefaults(defineProps<Props>(), {
     maxHeight: '80vh',
     closeOnBackdrop: true,
-    backgroundColor: '#ffffff',
+    backgroundColor: 'var(--color-surface)',
     backgroundStyle: undefined,
     customClass: '',
-    indicatorColor: '#d1d5db',
+    indicatorColor: 'var(--color-border)',
   });
 
   // 计算背景样式

@@ -1,10 +1,13 @@
 <template>
   <div
-    class="challenge-status bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg transition-all duration-300 cursor-pointer hover:shadow-xl hover:bg-white/95 relative overflow-hidden"
+    class="challenge-status backdrop-blur-sm rounded-2xl shadow-lg transition-all duration-300 cursor-pointer hover:shadow-xl relative overflow-hidden theme-transition"
     :style="{
       width: isExpanded ? '200px' : '48px',
       height: isExpanded ? (contentVisible ? 'auto' : getExpandedHeight()) : '48px',
       minHeight: isExpanded ? getExpandedHeight() : '48px',
+      backgroundColor: 'var(--color-surface)',
+      opacity: 0.9,
+      boxShadow: '0 10px 15px -3px var(--color-shadow)',
     }"
     @click="toggleExpand"
   >
@@ -16,13 +19,14 @@
       <div class="text-lg">🎯</div>
       <div
         class="text-xs font-bold"
-        :class="
-          remainingUses === 0
-            ? 'text-red-600'
-            : devModeStore.isUnlimitedUsesEnabled
-            ? 'text-orange-600'
-            : 'text-gray-700'
-        "
+        :style="{
+          color:
+            remainingUses === 0
+              ? '#dc2626'
+              : devModeStore.isUnlimitedUsesEnabled
+              ? '#ea580c'
+              : 'var(--color-textSecondary)',
+        }"
       >
         {{ devModeStore.isUnlimitedUsesEnabled ? '∞' : remainingUses }}
       </div>
@@ -39,9 +43,11 @@
       <div class="flex items-center justify-between mb-2">
         <div class="flex items-center space-x-1">
           <span class="text-sm">🎯</span>
-          <span class="font-semibold text-gray-800 text-sm">{{ $t('challenge.title') }}</span>
+          <span class="font-semibold text-sm" :style="{ color: 'var(--color-text)' }">
+            {{ $t('challenge.title') }}
+          </span>
         </div>
-        <div class="text-xs text-gray-600 font-medium">
+        <div class="text-xs font-medium" :style="{ color: 'var(--color-textSecondary)' }">
           {{ devModeStore.isUnlimitedUsesEnabled ? '∞' : remainingUses }}/{{
             challengeStore.challengeData.maxDailyUses
           }}
@@ -49,10 +55,16 @@
       </div>
 
       <!-- 进度条 -->
-      <div class="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+      <div
+        class="w-full rounded-full h-1.5 mb-2"
+        :style="{ backgroundColor: 'var(--color-border)' }"
+      >
         <div
-          class="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full transition-all duration-300"
-          :style="{ width: `${progressPercentage}%` }"
+          class="h-1.5 rounded-full transition-all duration-300"
+          :style="{
+            width: `${progressPercentage}%`,
+            background: 'linear-gradient(to right, var(--color-primary), var(--color-secondary))',
+          }"
         ></div>
       </div>
 
@@ -60,11 +72,13 @@
       <div class="flex justify-between text-xs">
         <div class="flex items-center space-x-1">
           <span>🍀</span>
-          <span class="text-gray-700">{{ challengeStore.challengeData.luckyValue }}</span>
+          <span :style="{ color: 'var(--color-textSecondary)' }">
+            {{ challengeStore.challengeData.luckyValue }}
+          </span>
         </div>
         <div class="flex items-center space-x-1">
           <span>🔥</span>
-          <span class="text-gray-700"
+          <span :style="{ color: 'var(--color-textSecondary)' }"
             >{{ challengeStore.challengeData.consecutiveDays }}{{ $t('challenge.times') }}</span
           >
         </div>
@@ -73,19 +87,34 @@
       <!-- 使用限制提示 -->
       <div
         v-if="!canUseToday && !devModeStore.isUnlimitedUsesEnabled"
-        class="mt-2 p-1.5 bg-orange-100 rounded-lg"
+        class="mt-2 p-1.5 rounded-lg theme-transition"
+        :style="{
+          backgroundColor: 'var(--color-accent)',
+          opacity: 0.15,
+        }"
       >
-        <div class="flex items-center space-x-1 text-orange-700">
+        <div class="flex items-center space-x-1">
           <span class="text-xs">⏰</span>
-          <span class="text-xs">{{ $t('challenge.todayLimitReached') }}</span>
+          <span class="text-xs" :style="{ color: 'var(--color-accent)' }">
+            {{ $t('challenge.todayLimitReached') }}
+          </span>
         </div>
       </div>
 
       <!-- 开发模式提示 -->
-      <div v-if="devModeStore.isUnlimitedUsesEnabled" class="mt-2 p-1.5 bg-orange-100 rounded-lg">
-        <div class="flex items-center space-x-1 text-orange-700">
+      <div
+        v-if="devModeStore.isUnlimitedUsesEnabled"
+        class="mt-2 p-1.5 rounded-lg theme-transition"
+        :style="{
+          backgroundColor: 'var(--color-secondary)',
+          opacity: 0.15,
+        }"
+      >
+        <div class="flex items-center space-x-1">
           <span class="text-xs">🔧</span>
-          <span class="text-xs">开发模式：无限使用</span>
+          <span class="text-xs" :style="{ color: 'var(--color-secondary)' }">
+            开发模式：无限使用
+          </span>
         </div>
       </div>
     </div>

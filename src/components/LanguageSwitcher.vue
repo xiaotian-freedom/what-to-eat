@@ -1,42 +1,57 @@
 <template>
-  <div class="language-switcher">
+  <div class="relative">
     <button
-      @click="toggleLanguage"
-      class="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30 text-sm font-medium transition-all duration-200 hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+      @click="isOpen = !isOpen"
+      class="flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors theme-transition"
+      :style="{
+        backgroundColor: 'var(--color-surface)',
+        color: 'var(--color-text)',
+        border: '1px solid var(--color-border)',
+      }"
     >
-      <span class="text-lg">{{ currentLanguageFlag }}</span>
-      <span class="text-gray-700">{{ currentLanguageName }}</span>
+      <span :style="{ color: 'var(--color-textSecondary)' }">{{ currentLanguageName }}</span>
       <svg
-        class="w-4 h-4 text-gray-600 transition-transform duration-200"
-        :class="{ 'rotate-180': showDropdown }"
+        class="w-4 h-4 transition-transform duration-200"
+        :class="{ 'rotate-180': isOpen }"
+        :style="{ color: 'var(--color-textSecondary)' }"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
       >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M19 9l-7 7-7-7"
+        ></path>
       </svg>
     </button>
 
-    <!-- 下拉菜单 -->
     <div
-      v-if="showDropdown"
-      class="absolute top-full right-0 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
+      v-if="isOpen"
+      class="absolute top-full left-0 right-0 mt-1 rounded-lg shadow-lg z-50 theme-transition"
+      :style="{
+        backgroundColor: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
+        boxShadow: '0 10px 15px -3px var(--color-shadow)',
+      }"
     >
       <button
-        @click="switchLanguage('zh-CN')"
-        class="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center space-x-2 transition-colors duration-150"
-        :class="{ 'bg-purple-50 text-purple-600': currentLocale === 'zh-CN' }"
+        v-for="locale in availableLocales"
+        :key="locale.value"
+        @click="selectLanguage(locale.value)"
+        class="w-full px-3 py-2 text-left flex items-center space-x-2 transition-colors duration-150 theme-transition"
+        :style="{
+          color: 'var(--color-text)',
+          backgroundColor: currentLocale === locale.value ? 'var(--color-border)' : 'transparent',
+        }"
+        @mouseenter="handleHover"
+        @mouseleave="handleLeave"
       >
-        <span class="text-lg">🇨🇳</span>
-        <span>中文</span>
-      </button>
-      <button
-        @click="switchLanguage('en-US')"
-        class="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center space-x-2 transition-colors duration-150"
-        :class="{ 'bg-purple-50 text-purple-600': currentLocale === 'en-US' }"
-      >
-        <span class="text-lg">🇺🇸</span>
-        <span>English</span>
+        <span class="font-medium">{{ locale.label }}</span>
+        <span v-if="currentLocale === locale.value" :style="{ color: 'var(--color-primary)' }"
+          >✓</span
+        >
       </button>
     </div>
   </div>
@@ -48,7 +63,7 @@
 
   const { locale } = useI18n();
 
-  const showDropdown = ref(false);
+  const isOpen = ref(false);
   const currentLocale = computed(() => locale.value);
 
   const currentLanguageFlag = computed(() => {
@@ -59,21 +74,37 @@
     return currentLocale.value === 'zh-CN' ? '中文' : 'English';
   });
 
+  const availableLocales = computed(() => {
+    return [
+      { value: 'zh-CN', label: '🇨🇳 中文' },
+      { value: 'en-US', label: '🇺🇸 English' },
+    ];
+  });
+
   const toggleLanguage = () => {
-    showDropdown.value = !showDropdown.value;
+    isOpen.value = !isOpen.value;
   };
 
-  const switchLanguage = (lang: string) => {
+  const selectLanguage = (lang: string) => {
     locale.value = lang;
     localStorage.setItem('locale', lang);
-    showDropdown.value = false;
+    isOpen.value = false;
+  };
+
+  const handleHover = () => {
+    // No specific hover effect needed here as the button handles its own hover state
+  };
+
+  const handleLeave = () => {
+    // No specific hover effect needed here as the button handles its own hover state
   };
 
   // 点击外部关闭下拉菜单
   const handleClickOutside = (event: Event) => {
     const target = event.target as Element;
-    if (!target.closest('.language-switcher')) {
-      showDropdown.value = false;
+    if (!target.closest('.relative')) {
+      // Changed to .relative to match new template structure
+      isOpen.value = false;
     }
   };
 

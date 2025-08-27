@@ -142,11 +142,11 @@
       }
     } else {
       // 无图片时，绘制背景颜色和文字
-      cacheCtx.fillStyle = dish.backgroundColor || '#4A5568';
+      cacheCtx.fillStyle = dish.backgroundColor || 'var(--color-primary)';
       cacheCtx.fillRect(0, 0, size, size);
 
       // 添加文字（菜品名称首字母）
-      cacheCtx.fillStyle = '#FFFFFF';
+      cacheCtx.fillStyle = 'var(--color-surface)';
       cacheCtx.font = 'bold 60px sans-serif';
       cacheCtx.textAlign = 'center';
       cacheCtx.textBaseline = 'middle';
@@ -154,7 +154,7 @@
     }
 
     // 添加圆形边框
-    cacheCtx.strokeStyle = 'rgba(255,255,255,0.8)';
+    cacheCtx.strokeStyle = 'var(--color-border)';
     cacheCtx.lineWidth = 2;
     cacheCtx.beginPath();
     cacheCtx.arc(size / 2, size / 2, size / 2 - 1, 0, Math.PI * 2);
@@ -324,13 +324,13 @@
       // 没有缓存图像时绘制备用图像
       const size = 60;
       // 使用菜品背景颜色或默认颜色
-      ctx.fillStyle = dish.dish.backgroundColor || '#f0f0f0';
+      ctx.fillStyle = dish.dish.backgroundColor || 'var(--color-primary)';
       ctx.beginPath();
       ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
       ctx.fill();
 
       // 添加首字母文本
-      ctx.fillStyle = '#FFFFFF';
+      ctx.fillStyle = 'var(--color-surface)';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.font = 'bold 30px sans-serif';

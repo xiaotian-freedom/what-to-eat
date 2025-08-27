@@ -2,29 +2,65 @@
   <BottomSheet :visible="visible" @close="$emit('close')" maxHeight="70vh">
     <!-- 标题 -->
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-bold text-gray-800">{{ $t('achievements.system') }}</h2>
+      <h2 class="text-xl font-bold" :style="{ color: 'var(--color-text)' }">
+        {{ $t('achievements.system') }}
+      </h2>
       <button
         @click="$emit('close')"
-        class="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors"
+        class="p-1 rounded-full transition-colors"
+        :style="{
+          color: 'var(--color-textSecondary)',
+        }"
       >
         <span class="text-lg">✕</span>
       </button>
     </div>
 
     <!-- 成就统计 -->
-    <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 mb-6">
+    <div
+      class="rounded-2xl p-4 mb-6 theme-transition"
+      :style="{
+        backgroundColor: 'var(--color-surface)',
+        boxShadow: '0 2px 4px 1px var(--color-shadow)',
+      }"
+    >
       <div class="flex justify-between items-center">
         <div class="text-center">
-          <div class="text-2xl font-bold text-blue-600">{{ unlockedCount }}</div>
-          <div class="text-sm text-gray-600">{{ $t('achievements.unlocked') }}</div>
+          <div class="text-2xl font-bold" :style="{ color: 'var(--color-primary)' }">
+            {{ unlockedCount }}
+          </div>
+          <div class="text-sm" :style="{ color: 'var(--color-textSecondary)' }">
+            {{ $t('achievements.unlocked') }}
+          </div>
         </div>
         <div class="text-center">
-          <div class="text-2xl font-bold text-purple-600">{{ totalCount }}</div>
-          <div class="text-sm text-gray-600">{{ $t('achievements.total') }}</div>
+          <div class="text-2xl font-bold" :style="{ color: 'var(--color-secondary)' }">
+            {{ totalCount }}
+          </div>
+          <div class="text-sm" :style="{ color: 'var(--color-textSecondary)' }">
+            {{ $t('achievements.total') }}
+          </div>
         </div>
         <div class="text-center">
-          <div class="text-2xl font-bold text-green-600">{{ progressPercentage }}%</div>
-          <div class="text-sm text-gray-600">{{ $t('achievements.completion') }}</div>
+          <div class="text-2xl font-bold" :style="{ color: 'var(--color-accent)' }">
+            {{ progressPercentage }}%
+          </div>
+          <div class="text-sm" :style="{ color: 'var(--color-textSecondary)' }">
+            {{ $t('achievements.completion') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- 进度条 -->
+      <div class="mt-4">
+        <div class="w-full rounded-full h-2" :style="{ backgroundColor: 'var(--color-border)' }">
+          <div
+            class="h-2 rounded-full transition-all duration-300"
+            :style="{
+              width: `${progressPercentage}%`,
+              background: 'linear-gradient(to right, var(--color-primary), var(--color-secondary))',
+            }"
+          ></div>
         </div>
       </div>
     </div>
@@ -34,15 +70,31 @@
       <div
         v-for="achievement in challengeStore.challengeData.achievements"
         :key="achievement.id"
-        class="bg-white border border-gray-200 rounded-2xl p-4 transition-all duration-200"
-        :class="achievement.isUnlocked ? 'border-green-200 bg-green-50' : 'hover:bg-gray-50'"
+        class="border rounded-2xl p-4 transition-all duration-200 theme-transition"
+        :style="{
+          backgroundColor: 'var(--color-surface)',
+          borderColor: achievement.isUnlocked ? 'var(--color-accent)' : 'var(--color-border)',
+        }"
       >
         <div class="flex items-start space-x-4">
           <!-- 成就图标 -->
           <div class="flex-shrink-0">
             <div
-              class="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
-              :class="achievement.isUnlocked ? 'bg-green-100' : 'bg-gray-100'"
+              class="w-12 h-12 rounded-full flex items-center justify-center text-2xl theme-transition"
+              :style="{
+                backgroundColor: achievement.isUnlocked
+                  ? 'var(--color-accent)'
+                  : 'var(--color-border)',
+                border: achievement.isUnlocked
+                  ? '2px solid var(--color-accent)'
+                  : '2px solid var(--color-border)',
+                color: achievement.isUnlocked
+                  ? 'var(--color-accent)'
+                  : 'var(--color-textSecondary)',
+                boxShadow: achievement.isUnlocked
+                  ? '0 2px 8px rgba(0, 0, 0, 0.15)'
+                  : '0 1px 4px rgba(0, 0, 0, 0.1)',
+              }"
             >
               {{ achievement.icon }}
             </div>
@@ -52,35 +104,52 @@
           <div class="flex-1 min-w-0">
             <div class="flex items-center space-x-2 mb-1">
               <h3
-                class="font-semibold text-gray-800 truncate"
-                :class="achievement.isUnlocked ? 'text-green-700' : ''"
+                class="font-semibold truncate"
+                :style="{
+                  color: achievement.isUnlocked ? 'var(--color-accent)' : 'var(--color-text)',
+                }"
               >
                 {{ $t(achievement.name) }}
               </h3>
-              <span v-if="achievement.isUnlocked" class="text-green-500 text-sm flex-shrink-0">
+              <span
+                v-if="achievement.isUnlocked"
+                class="text-sm flex-shrink-0"
+                :style="{ color: 'var(--color-accent)' }"
+              >
                 ✓
               </span>
             </div>
 
-            <p class="text-sm text-gray-600 mb-2">{{ $t(achievement.description) }}</p>
+            <p class="text-sm mb-2" :style="{ color: 'var(--color-textSecondary)' }">
+              {{ $t(achievement.description) }}
+            </p>
 
             <!-- 进度条 - 只在未解锁时显示 -->
             <div v-if="!achievement.isUnlocked" class="space-y-1">
-              <div class="flex justify-between text-xs text-gray-500">
+              <div
+                class="flex justify-between text-xs"
+                :style="{ color: 'var(--color-textSecondary)' }"
+              >
                 <span>{{ $t('achievements.progress') }}</span>
                 <span>{{ achievement.progress }}/{{ achievement.maxProgress }}</span>
               </div>
-              <div class="w-full bg-gray-200 rounded-full h-2">
+              <div
+                class="w-full rounded-full h-2"
+                :style="{ backgroundColor: 'var(--color-border)' }"
+              >
                 <div
-                  class="h-2 rounded-full transition-all duration-300 bg-blue-500"
-                  :style="{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }"
+                  class="h-2 rounded-full transition-all duration-300"
+                  :style="{
+                    width: `${(achievement.progress / achievement.maxProgress) * 100}%`,
+                    backgroundColor: 'var(--color-primary)',
+                  }"
                 ></div>
               </div>
             </div>
 
             <!-- 解锁时间 -->
             <div v-if="achievement.isUnlocked && achievement.unlockDate" class="mt-2">
-              <p class="text-xs text-green-600">
+              <p class="text-xs" :style="{ color: 'var(--color-accent)' }">
                 {{ $t('achievements.unlockTime') }}: {{ formatDate(achievement.unlockDate) }}
               </p>
             </div>

@@ -4,20 +4,25 @@
       <div class="flex justify-between items-center mt-4">
         <button
           @click="$emit('addFood')"
-          class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn"
-          :style="{ backgroundColor: 'var(--color-primary)' }"
+          class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center transform transition ripple-btn theme-transition"
+          :style="{
+            backgroundColor: 'var(--color-primary)',
+            color: 'var(--color-text)',
+            boxShadow: '0 10px 15px -3px var(--color-shadow)',
+          }"
         >
           <img :src="plus" class="w-7 h-7" />
         </button>
 
         <!-- 主随机按钮 -->
         <button
-          class="w-20 h-20 rounded-full text-white font-bold text-lg shadow-lg transform transition flex items-center justify-center ripple-btn"
+          class="w-20 h-20 rounded-full text-white font-bold text-lg shadow-lg transform transition flex items-center justify-center ripple-btn theme-transition"
           :class="{ 'opacity-50': disabled }"
           :disabled="disabled"
           @click="$emit('randomFood')"
           :style="{
             backgroundImage: `linear-gradient(to right, var(--color-secondary), var(--color-accent))`,
+            boxShadow: '0 10px 15px -3px var(--color-shadow)',
           }"
         >
           <img :src="shuffle" class="w-8 h-8" />
@@ -25,8 +30,12 @@
 
         <button
           @click="$emit('showFoodList')"
-          class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn"
-          :style="{ backgroundColor: 'var(--color-accent)' }"
+          class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center transform transition ripple-btn theme-transition"
+          :style="{
+            backgroundColor: 'var(--color-accent)',
+            color: 'var(--color-text)',
+            boxShadow: '0 10px 15px -3px var(--color-shadow)',
+          }"
         >
           <img :src="list" class="w-7 h-7" />
         </button>
@@ -37,8 +46,12 @@
       <div class="flex justify-between items-center w-full">
         <button
           @click="$emit('chooseAgain')"
-          class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn"
-          :style="{ backgroundColor: 'var(--color-primary)' }"
+          class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center transform transition ripple-btn theme-transition"
+          :style="{
+            backgroundColor: 'var(--color-primary)',
+            color: 'var(--color-text)',
+            boxShadow: '0 10px 15px -3px var(--color-shadow)',
+          }"
         >
           <img :src="shuffle" class="w-7 h-7" />
         </button>
@@ -47,10 +60,11 @@
         <button
           @click="$emit('viewRecipe')"
           :disabled="recipeLoading"
-          class="w-20 h-20 rounded-full text-white font-bold shadow-lg transform transition flex items-center justify-center ripple-btn relative"
+          class="w-20 h-20 rounded-full text-white font-bold shadow-lg transform transition flex items-center justify-center ripple-btn relative theme-transition"
           :class="{ 'opacity-75': recipeLoading }"
           :style="{
             backgroundImage: `linear-gradient(to right, var(--color-secondary), var(--color-accent))`,
+            boxShadow: '0 10px 15px -3px var(--color-shadow)',
           }"
         >
           <div v-if="recipeLoading" class="absolute inset-0 flex items-center justify-center">
@@ -64,8 +78,12 @@
 
         <button
           @click="$emit('shareResult')"
-          class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center text-gray-700 transform transition ripple-btn"
-          :style="{ backgroundColor: 'var(--color-accent)' }"
+          class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center transform transition ripple-btn theme-transition"
+          :style="{
+            backgroundColor: 'var(--color-accent)',
+            color: 'var(--color-text)',
+            boxShadow: '0 10px 15px -3px var(--color-shadow)',
+          }"
         >
           <img :src="share" class="w-6 h-6" />
         </button>

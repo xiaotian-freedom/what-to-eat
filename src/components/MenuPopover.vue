@@ -12,46 +12,71 @@
     <div
       v-if="visible"
       ref="menuRef"
-      class="fixed top-16 right-4 z-50 bg-white rounded-xl shadow-lg border border-gray-100 py-2 min-w-[160px] overflow-hidden"
-      style="transform-origin: top right"
+      class="fixed top-16 right-4 z-50 rounded-xl shadow-lg py-2 min-w-[160px] overflow-hidden theme-transition"
+      :style="{
+        backgroundColor: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
+        transformOrigin: 'top right',
+        boxShadow: '0 10px 25px -3px var(--color-shadow)',
+      }"
     >
       <!-- 智能推荐 -->
       <button
         @click.stop="handleMenuClick('recommendation')"
-        class="w-full flex items-center px-4 py-3 text-left hover:bg-gray-50 transition-all duration-150 ease-out focus:outline-none"
+        class="w-full flex items-center px-4 py-3 text-left transition-all duration-150 ease-out focus:outline-none"
+        :style="{
+          color: 'var(--color-text)',
+        }"
+        @mouseenter="handleButtonHover"
+        @mouseleave="handleButtonLeave"
       >
         <span class="text-lg mr-3">🎯</span>
-        <span class="text-sm font-medium text-gray-700">{{ $t('menu.smartRecommendation') }}</span>
+        <span class="text-sm font-medium">{{ $t('menu.smartRecommendation') }}</span>
       </button>
 
       <!-- 每日挑战 -->
       <button
         @click.stop="handleMenuClick('challenge')"
-        class="w-full flex items-center px-4 py-3 text-left hover:bg-gray-50 transition-all duration-150 ease-out focus:outline-none"
+        class="w-full flex items-center px-4 py-3 text-left transition-all duration-150 ease-out focus:outline-none"
+        :style="{
+          color: 'var(--color-text)',
+        }"
+        @mouseenter="handleButtonHover"
+        @mouseleave="handleButtonLeave"
       >
         <span class="text-lg mr-3">🔥</span>
-        <span class="text-sm font-medium text-gray-700">{{ $t('menu.dailyChallenge') }}</span>
+        <span class="text-sm font-medium">{{ $t('menu.dailyChallenge') }}</span>
       </button>
 
       <!-- 成就系统 -->
       <button
         @click.stop="handleMenuClick('achievements')"
-        class="w-full flex items-center px-4 py-3 text-left hover:bg-gray-50 transition-all duration-150 ease-out focus:outline-none"
+        class="w-full flex items-center px-4 py-3 text-left transition-all duration-150 ease-out focus:outline-none"
+        :style="{
+          color: 'var(--color-text)',
+        }"
+        @mouseenter="handleButtonHover"
+        @mouseleave="handleButtonLeave"
       >
         <span class="text-lg mr-3">🏆</span>
-        <span class="text-sm font-medium text-gray-700">{{ $t('menu.achievements') }}</span>
+        <span class="text-sm font-medium">{{ $t('menu.achievements') }}</span>
       </button>
 
       <!-- 分割线 -->
-      <div class="h-px bg-gray-100 mx-2 my-1"></div>
+      <div class="h-px mx-2 my-1" :style="{ backgroundColor: 'var(--color-border)' }"></div>
 
       <!-- 系统设置 -->
       <button
         @click.stop="handleMenuClick('settings')"
-        class="w-full flex items-center px-4 py-3 text-left hover:bg-gray-50 transition-all duration-150 ease-out focus:outline-none"
+        class="w-full flex items-center px-4 py-3 text-left transition-all duration-150 ease-out focus:outline-none"
+        :style="{
+          color: 'var(--color-text)',
+        }"
+        @mouseenter="handleButtonHover"
+        @mouseleave="handleButtonLeave"
       >
         <span class="text-lg mr-3">⚙️</span>
-        <span class="text-sm font-medium text-gray-700">{{ $t('menu.settings') }}</span>
+        <span class="text-sm font-medium">{{ $t('menu.settings') }}</span>
       </button>
     </div>
   </transition>
@@ -77,6 +102,21 @@
   const handleMenuClick = (action: string) => {
     emit('menu-click', action);
     emit('close');
+  };
+
+  // 处理按钮悬停效果
+  const handleButtonHover = (event: MouseEvent) => {
+    const target = event.currentTarget as HTMLElement;
+    if (target) {
+      target.style.backgroundColor = 'var(--color-border)';
+    }
+  };
+
+  const handleButtonLeave = (event: MouseEvent) => {
+    const target = event.currentTarget as HTMLElement;
+    if (target) {
+      target.style.backgroundColor = 'transparent';
+    }
   };
 
   // 处理点击外部区域关闭菜单

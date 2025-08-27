@@ -1,7 +1,12 @@
 <template>
   <div
     id="homePage"
-    class="card-face bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative flex flex-col w-full h-full"
+    class="card-face rounded-3xl shadow-xl overflow-hidden border-8 relative flex flex-col w-full h-full theme-transition"
+    :style="{
+      backgroundColor: 'var(--color-surface)',
+      borderColor: 'var(--color-border)',
+      boxShadow: '0 10px 25px -3px var(--color-shadow)',
+    }"
   >
     <!-- 顶部状态栏 -->
     <HeaderBar :title="$t('今天吃什么')" :showBackButton="false" :centerTitle="true">
@@ -26,7 +31,12 @@
     <MenuPopover :visible="showMenu" @close="showMenu = false" @menu-click="handleMenuClick" />
 
     <!-- 内容区域 -->
-    <div class="flex-1 flex flex-col items-center p-6 overflow-hidden relative">
+    <div
+      class="flex-1 flex flex-col items-center p-6 overflow-hidden relative"
+      :style="{
+        backgroundColor: 'var(--color-background)',
+      }"
+    >
       <!-- 成就BottomSheet -->
       <AchievementBottomSheet :visible="showAchievements" @close="showAchievements = false" />
 

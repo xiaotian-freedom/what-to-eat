@@ -58,14 +58,21 @@
       <!-- 菜品介绍区域 -->
       <div v-if="selectedDish && selectedDish.description" class="w-full max-w-sm mt-6 px-4">
         <div
-          class="bg-white/80 backdrop-filter backdrop-blur-lg rounded-2xl p-4 shadow-lg max-h-36 overflow-y-auto overscroll-contain"
+          class="backdrop-filter backdrop-blur-lg rounded-2xl p-4 shadow-lg max-h-36 overflow-y-auto overscroll-contain theme-transition"
+          :style="{
+            backgroundColor: 'var(--color-surface)',
+            opacity: 0.8,
+            boxShadow: '0 10px 15px -3px var(--color-shadow)',
+          }"
           style="-webkit-overflow-scrolling: touch; scrollbar-width: thin"
         >
           <!-- 菜品详细信息 -->
           <div class="space-y-3">
             <!-- 描述信息 -->
             <div v-if="selectedDish.description" class="text-center">
-              <p class="text-gray-600 text-sm leading-relaxed">{{ selectedDish.description }}</p>
+              <p class="text-sm leading-relaxed" :style="{ color: 'var(--color-textSecondary)' }">
+                {{ selectedDish.description }}
+              </p>
             </div>
 
             <!-- 标签展示 -->
@@ -76,7 +83,13 @@
               <span
                 v-for="tag in selectedDish.tags"
                 :key="tag"
-                class="px-2 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-600 text-xs rounded-full"
+                class="px-2 py-1 text-xs rounded-full theme-transition"
+                :style="{
+                  background:
+                    'linear-gradient(to right, var(--color-primary), var(--color-secondary))',
+                  opacity: 0.2,
+                  color: 'var(--color-primary)',
+                }"
               >
                 {{ tag }}
               </span>
@@ -86,19 +99,34 @@
             <div class="flex justify-center space-x-2">
               <span
                 v-if="selectedDish.isComfortFood"
-                class="text-xs px-2 py-1 bg-yellow-100 text-yellow-600 rounded-full"
+                class="text-xs px-2 py-1 rounded-full theme-transition"
+                :style="{
+                  backgroundColor: 'var(--color-accent)',
+                  opacity: 0.15,
+                  color: 'var(--color-accent)',
+                }"
               >
                 🫂 安慰食物
               </span>
               <span
                 v-if="selectedDish.isPopular"
-                class="text-xs px-2 py-1 bg-red-100 text-red-600 rounded-full"
+                class="text-xs px-2 py-1 rounded-full theme-transition"
+                :style="{
+                  backgroundColor: '#dc2626',
+                  opacity: 0.15,
+                  color: '#dc2626',
+                }"
               >
                 🔥 热门菜品
               </span>
               <span
                 v-if="selectedDish.nutrition?.isHealthy"
-                class="text-xs px-2 py-1 bg-green-100 text-green-600 rounded-full"
+                class="text-xs px-2 py-1 rounded-full theme-transition"
+                :style="{
+                  backgroundColor: '#059669',
+                  opacity: 0.15,
+                  color: '#059669',
+                }"
               >
                 🥗 健康推荐
               </span>
