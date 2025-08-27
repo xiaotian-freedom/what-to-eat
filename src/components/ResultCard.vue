@@ -33,23 +33,30 @@
           <div
             v-else-if="selectedDish"
             class="w-full h-full rounded-full flex items-center justify-center"
-            :style="{ backgroundColor: selectedDish.backgroundColor || '#4A5568' }"
+            :style="{ backgroundColor: selectedDish.backgroundColor || 'var(--color-primary)' }"
           >
-            <span class="text-white text-6xl font-bold">{{ selectedDish.name.charAt(0) }}</span>
+            <span
+              class="text-6xl font-bold"
+              :style="{
+                textShadow: getTextShadow(
+                  getContrastTextColor(
+                    selectedDish.backgroundColor || getThemeColor('--color-primary')
+                  )
+                ),
+              }"
+            >
+              {{ selectedDish.name.charAt(0) }}
+            </span>
           </div>
 
           <!-- 底部名称显示 -->
           <div
-            class="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-filter backdrop-blur-sm p-2 text-center"
+            class="absolute bottom-0 left-0 right-0 bg-black/30 backdrop-filter backdrop-blur-sm p-2 text-center overflow-hidden"
           >
-            <p class="text-lg font-medium text-white">{{ selectedDish?.name }}</p>
-            <!-- AI 扩展推荐标识 -->
-            <div v-if="isAIExtendedRecommendation" class="flex items-center justify-center mt-1">
-              <span
-                class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full"
-              >
-                🤖 AI 推荐
-              </span>
+            <div class="marquee-container" :class="{ 'is-marquee': needsMarquee }">
+              <p class="text-lg font-medium text-white marquee-text" ref="dishNameRef">
+                {{ selectedDish?.name }}
+              </p>
             </div>
           </div>
         </div>
@@ -85,9 +92,7 @@
                 :key="tag"
                 class="px-2 py-1 text-xs rounded-full theme-transition"
                 :style="{
-                  background:
-                    'linear-gradient(to right, var(--color-primary), var(--color-secondary))',
-                  opacity: 0.2,
+                  background: getTransparentGradient(),
                   color: 'var(--color-primary)',
                 }"
               >
@@ -101,8 +106,7 @@
                 v-if="selectedDish.isComfortFood"
                 class="text-xs px-2 py-1 rounded-full theme-transition"
                 :style="{
-                  backgroundColor: 'var(--color-accent)',
-                  opacity: 0.15,
+                  background: getTransparentColor('accent', 0.15),
                   color: 'var(--color-accent)',
                 }"
               >
@@ -112,8 +116,7 @@
                 v-if="selectedDish.isPopular"
                 class="text-xs px-2 py-1 rounded-full theme-transition"
                 :style="{
-                  backgroundColor: '#dc2626',
-                  opacity: 0.15,
+                  background: getTransparentColor('primary', 0.15),
                   color: '#dc2626',
                 }"
               >
@@ -123,8 +126,7 @@
                 v-if="selectedDish.nutrition?.isHealthy"
                 class="text-xs px-2 py-1 rounded-full theme-transition"
                 :style="{
-                  backgroundColor: '#059669',
-                  opacity: 0.15,
+                  background: getTransparentColor('primary', 0.15),
                   color: '#059669',
                 }"
               >
@@ -165,7 +167,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed } from 'vue';
+  import { ref, watch, nextTick } from 'vue';
   import { showFailToast, closeToast } from 'vant';
 
   import type { Food } from '@/types';
@@ -173,6 +175,13 @@
   import HeaderBar from '@/components/HeaderBar.vue';
   import RecipeBottomSheet from './RecipeBottomSheet.vue';
   import { deepseekService } from '@/utils/deepseekService';
+  import {
+    getThemeColor,
+    getContrastTextColor,
+    getTextShadow,
+    getTransparentGradient,
+    getTransparentColor,
+  } from '@/utils/colorUtils';
 
   const props = defineProps<{
     selectedDish: Food | null;
@@ -180,6 +189,11 @@
 
   // 存储图片加载失败的状态
   const imageLoadFailed = ref(false);
+
+  // 菜品名称引用和跑马灯控制
+  const dishNameRef = ref<HTMLElement | null>(null);
+  const needsMarquee = ref(false);
+  const marqueeDistance = ref(159); // 默认值
 
   // 做法相关状态
   const showRecipeSheet = ref(false);
@@ -202,12 +216,55 @@
     return !!(props.selectedDish?.image && !imageLoadFailed.value);
   };
 
-  // 检查是否为 AI 扩展推荐
-  const isAIExtendedRecommendation = computed(() => {
-    return (
-      props.selectedDish?.category === '智能推荐' && props.selectedDish?.tags?.includes('AI推荐')
-    );
-  });
+  // 计算圆形容器底部的实际可用宽度
+  const calculateCircleBottomWidth = (radius: number, distanceFromBottom: number): number => {
+    // 使用勾股定理计算圆弧在指定高度处的宽度
+    // radius = 90px (180px/2), distanceFromBottom 是从圆底部的距离
+    const heightFromCenter = radius - distanceFromBottom;
+    const halfWidth = Math.sqrt(radius * radius - heightFromCenter * heightFromCenter);
+    return halfWidth * 2;
+  };
+
+  // 检查是否需要跑马灯效果
+  const checkTextOverflow = async () => {
+    await nextTick();
+    if (dishNameRef.value && props.selectedDish?.name) {
+      const container = dishNameRef.value.parentElement;
+      if (container) {
+        const textWidth = dishNameRef.value.scrollWidth;
+
+        // 圆形容器半径 90px，名称区域大约距离底部 16px（考虑padding和文字高度）
+        const radius = 90;
+        const distanceFromBottom = 16; // 调整为更合理的距离
+        const availableWidth = calculateCircleBottomWidth(radius, distanceFromBottom);
+
+        // 减去左右padding (约20px，考虑视觉效果)
+        const usableWidth = availableWidth - 20;
+
+        // 更新跑马灯距离 - 现在是文字从右侧进入的起始位置
+        marqueeDistance.value = Math.max(usableWidth, 120); // 最小120px
+
+        needsMarquee.value = textWidth > usableWidth;
+
+        // 设置CSS变量用于动画 - 文字从容器右侧外部开始
+        if (container.parentElement) {
+          container.parentElement.style.setProperty(
+            '--marquee-distance',
+            `${marqueeDistance.value}px`
+          );
+        }
+      }
+    }
+  };
+
+  // 监听菜品变化，重新检测文本溢出
+  watch(
+    () => props.selectedDish?.name,
+    () => {
+      checkTextOverflow();
+    },
+    { immediate: true }
+  );
 
   // 处理查看做法
   const handleViewRecipe = async () => {
@@ -336,5 +393,49 @@
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
     scrollbar-color: rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.1);
+  }
+
+  /* 跑马灯样式 */
+  .marquee-container {
+    position: relative;
+    width: 100%;
+    height: 1.5rem; /* 约等于text-lg的行高 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* 确保文字可以隐藏在容器外 */
+  }
+
+  .marquee-text {
+    white-space: nowrap;
+    transition: transform 0.3s ease;
+  }
+
+  /* 当需要跑马灯时的样式 */
+  .marquee-container.is-marquee {
+    justify-content: flex-start;
+  }
+
+  .marquee-container.is-marquee .marquee-text {
+    animation: marquee 6s linear infinite;
+    animation-delay: 1s; /* 延迟1秒开始动画，让用户能先看到开头 */
+  }
+
+  .marquee-container.is-marquee .marquee-text:hover {
+    animation-play-state: paused;
+  }
+
+  /* 圆形容器底部名称区域 */
+  .absolute.bottom-0 {
+    --marquee-distance: 159px; /* 默认值，会被JavaScript动态更新 */
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(var(--marquee-distance)); /* 从右侧容器外开始 */
+    }
+    100% {
+      transform: translateX(-100%); /* 向左移动直到文字完全消失 */
+    }
   }
 </style>

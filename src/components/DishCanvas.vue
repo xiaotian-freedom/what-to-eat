@@ -5,6 +5,7 @@
 <script setup lang="ts">
   import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
   import type { Food, Dish, DishAnimation, CachedDishImage } from '@/types';
+  import { getThemeColor, getContrastTextColor, getCanvasShadowConfig } from '@/utils/colorUtils';
 
   const props = defineProps<{
     dishList: Food[];
@@ -142,19 +143,36 @@
       }
     } else {
       // 无图片时，绘制背景颜色和文字
-      cacheCtx.fillStyle = dish.backgroundColor || 'var(--color-primary)';
+      const backgroundColor = dish.backgroundColor || getThemeColor('--color-primary');
+      cacheCtx.fillStyle = backgroundColor;
       cacheCtx.fillRect(0, 0, size, size);
 
-      // 添加文字（菜品名称首字母）
-      cacheCtx.fillStyle = 'var(--color-surface)';
+      // 添加文字（菜品名称首字母）- 根据背景色自动选择文字颜色
+      const textColor = getContrastTextColor(backgroundColor);
+
+      // 添加文字阴影以提高可读性
+      const shadowConfig = getCanvasShadowConfig(textColor);
+      cacheCtx.shadowColor = shadowConfig.shadowColor;
+      cacheCtx.shadowBlur = shadowConfig.shadowBlur;
+      cacheCtx.shadowOffsetX = shadowConfig.shadowOffsetX;
+      cacheCtx.shadowOffsetY = shadowConfig.shadowOffsetY;
+
+      cacheCtx.fillStyle = textColor;
       cacheCtx.font = 'bold 60px sans-serif';
       cacheCtx.textAlign = 'center';
       cacheCtx.textBaseline = 'middle';
       cacheCtx.fillText(dish.name.charAt(0), size / 2, size / 2);
+
+      // 重置阴影设置
+      cacheCtx.shadowColor = 'transparent';
+      cacheCtx.shadowBlur = 0;
+      cacheCtx.shadowOffsetX = 0;
+      cacheCtx.shadowOffsetY = 0;
     }
 
     // 添加圆形边框
-    cacheCtx.strokeStyle = 'var(--color-border)';
+    const borderColor = getThemeColor('--color-border');
+    cacheCtx.strokeStyle = borderColor;
     cacheCtx.lineWidth = 2;
     cacheCtx.beginPath();
     cacheCtx.arc(size / 2, size / 2, size / 2 - 1, 0, Math.PI * 2);
@@ -324,17 +342,33 @@
       // 没有缓存图像时绘制备用图像
       const size = 60;
       // 使用菜品背景颜色或默认颜色
-      ctx.fillStyle = dish.dish.backgroundColor || 'var(--color-primary)';
+      const backgroundColor = dish.dish.backgroundColor || getThemeColor('--color-primary');
+      ctx.fillStyle = backgroundColor;
       ctx.beginPath();
       ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
       ctx.fill();
 
-      // 添加首字母文本
-      ctx.fillStyle = 'var(--color-surface)';
+      // 添加首字母文本 - 根据背景色自动选择文字颜色
+      const textColor = getContrastTextColor(backgroundColor);
+
+      // 添加文字阴影以提高可读性
+      const shadowConfig = getCanvasShadowConfig(textColor);
+      ctx.shadowColor = shadowConfig.shadowColor;
+      ctx.shadowBlur = shadowConfig.shadowBlur / 2; // 小尺寸时使用较小的阴影
+      ctx.shadowOffsetX = shadowConfig.shadowOffsetX / 2;
+      ctx.shadowOffsetY = shadowConfig.shadowOffsetY / 2;
+
+      ctx.fillStyle = textColor;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.font = 'bold 30px sans-serif';
       ctx.fillText(dish.dish.name.charAt(0), 0, 0);
+
+      // 重置阴影设置
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
     }
 
     // 恢复上下文状态
