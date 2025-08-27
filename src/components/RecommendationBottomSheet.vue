@@ -1,7 +1,7 @@
 <template>
   <BottomSheet
     :visible="visible"
-    @close="$emit('close')"
+    @close="handleClose"
     maxHeight="85vh"
     backgroundStyle="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
     indicatorColor="rgba(255, 255, 255, 0.6)"
@@ -170,7 +170,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, onMounted, onUnmounted } from 'vue';
+  import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
   import BottomSheet from './BottomSheet.vue';
   import { useRecommendationStore } from '@/stores/recommendation';
   import { useUserPreferenceStore } from '@/stores/userPreference';
@@ -206,7 +206,7 @@
     maxRecommendations?: number;
   }
 
-  withDefaults(defineProps<Props>(), {
+  const props = withDefaults(defineProps<Props>(), {
     maxRecommendations: 5,
   });
 
@@ -216,6 +216,43 @@
     foodSelected: [recommendation: RecommendationResult];
     recommendationsUpdated: [recommendations: RecommendationResult[]];
   }>();
+
+  // 重置数据的方法
+  const resetData = () => {
+    // 重置用户选择的状态
+    currentMood.value = null;
+    currentPhysicalState.value = null;
+    currentActivityLevel.value = null;
+    currentDietaryRestrictions.value = [];
+
+    // 重置推荐结果
+    recommendations.value = [];
+
+    // 重置UI状态
+    showSuccessEffect.value = false;
+    isLoading.value = false;
+    isExtraRecommendationLoading.value = false;
+    usingAI.value = false;
+
+    // 清理粒子效果
+    clearSparkleEffect();
+
+    // 重置推荐系统的上下文
+    recommendationStore.updateContext({
+      userMood: undefined,
+      physicalState: undefined,
+      activityLevel: undefined,
+      dietaryRestrictions: undefined,
+    });
+  };
+
+  // 处理关闭事件
+  const handleClose = () => {
+    // 重置数据
+    resetData();
+    // 触发关闭事件
+    emit('close');
+  };
 
   // Stores
   const recommendationStore = useRecommendationStore();
@@ -582,7 +619,7 @@
 
         // 延迟关闭弹窗，给动画一些时间开始
         setTimeout(() => {
-          emit('close');
+          handleClose();
         }, 100);
       }
     } catch (error) {
@@ -704,7 +741,7 @@
 
         // 延迟关闭弹窗，给动画一些时间开始
         setTimeout(() => {
-          emit('close');
+          handleClose();
         }, 100);
       }
     } catch (error) {
@@ -738,6 +775,17 @@
 
   // 网络状态监听器清理函数
   let networkStatusInterval: number | null = null;
+
+  // 监听面板可见性变化，当面板显示时重置数据
+  watch(
+    () => props.visible,
+    (newVisible, oldVisible) => {
+      if (newVisible && !oldVisible) {
+        // 面板从隐藏变为显示时，重置数据
+        resetData();
+      }
+    }
+  );
 
   // 生命周期
   onMounted(async () => {
