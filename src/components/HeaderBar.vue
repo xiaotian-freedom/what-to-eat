@@ -15,11 +15,24 @@
         @click.prevent="handleBack"
         class="mr-2 p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0 back-btn"
         :style="{
-          color: 'var(--color-textSecondary)',
+          color: 'var(--color-primary)',
           backgroundColor: 'transparent',
         }"
       >
-        <img src="@/assets/icons/left.svg" class="w-5 h-5" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="w-5 h-5"
+        >
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
       </a>
     </div>
 
@@ -80,7 +93,7 @@
               backgroundColor: 'transparent',
             }"
           >
-            <img :src="rightIcon" class="w-5 h-5" />
+            <img :src="rightIcon" class="w-5 h-5" style="filter: opacity(1)" />
           </a>
         </template>
       </slot>
