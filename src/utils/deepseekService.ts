@@ -163,18 +163,55 @@ export class DeepSeekService {
   /**
    * 创建系统提示词
    */
-  private createSystemPrompt(): string {
-    return `你是一个专业的美食推荐助手。根据用户的当前情况（天气、时间、心情、季节等）和可选菜品列表，为用户推荐最合适的一道菜。
-
-**重要提示**：如果可选菜品列表中的选项较少或重复性高，你可以：
-1. 优先从现有列表中选择最合适的菜品
-2. 如果现有菜品都不太合适，可以推荐一道符合当前情况的经典中餐菜品，但需要在 explanation 中说明这是额外推荐
+  private createSystemPrompt(forceExtendedRecommendation: boolean = false): string {
+    const basePrompt = `你是一个专业的美食推荐助手。根据用户的当前情况（天气、时间、心情、季节等）和可选菜品列表，为用户推荐最合适的一道菜。
 
 **推荐策略**：
 - 优先考虑用户的心情、天气、时间等因素
 - 注重饮食营养搭配和季节性
 - 避免过于重复的推荐，增加多样性
 - 考虑菜品的制作难度和普及程度
+
+**重要推荐原则**：
+- 🎯 **绝对避免重复**：如果最近推荐过凉皮，这次绝对不能推荐凉皮
+- 🔄 **强制多样性**：每次推荐都要选择不同的菜品类型
+- 🍽️ **营养搭配**：避免连续推荐同类菜品
+- ⚡ **创新性**：优先推荐用户可能没尝试过的菜品
+- 🌟 **适配性**：确保推荐符合当前的时间、天气、心情等条件`;
+
+    if (forceExtendedRecommendation) {
+      return `${basePrompt}
+
+**额外推荐模式**：
+- 🚫 **禁止从现有列表选择**：绝对不能从用户提供的菜品列表中选择
+- 🆕 **必须推荐新菜品**：必须推荐一道全新的、符合当前情况的经典中餐菜品
+- 🎯 **精准匹配**：推荐的新菜品必须完美匹配当前的天气、时间、心情、季节等条件
+- 📝 **详细说明**：在explanation中详细说明为什么推荐这道新菜品，以及它的特色
+
+请严格按照以下 JSON 格式返回推荐结果：
+{
+  "recommendedFoodId": "新推荐菜品名称（如：宫保鸡丁、麻婆豆腐等）",
+  "confidence": 0.85,
+  "reasons": ["推荐原因1", "推荐原因2", "推荐原因3"],
+  "explanation": "详细的推荐解释，说明为什么推荐这道新菜品，以及它的特色和制作要点",
+  "score": 0.92,
+  "isExtendedRecommendation": true
+}
+
+要求：
+1. recommendedFoodId：必须是新菜品的名称，不能是现有列表中的ID
+2. confidence 表示推荐置信度，范围 0-1
+3. reasons 是推荐原因数组，每个原因要简洁明了
+4. explanation 是详细的推荐解释，说明为什么推荐这道新菜品
+5. score 是综合评分，范围 0-1
+6. isExtendedRecommendation：必须为true
+7. 必须返回标准的 JSON 格式，不要添加任何其他文字`;
+    } else {
+      return `${basePrompt}
+
+**重要提示**：如果可选菜品列表中的选项较少或重复性高，你可以：
+1. 优先从现有列表中选择最合适的菜品
+2. 如果现有菜品都不太合适，可以推荐一道符合当前情况的经典中餐菜品，但需要在 explanation 中说明这是额外推荐
 
 请严格按照以下 JSON 格式返回推荐结果：
 {
@@ -194,6 +231,7 @@ export class DeepSeekService {
 5. score 是综合评分，范围 0-1
 6. isExtendedRecommendation：true表示是额外推荐的菜品，false表示从现有列表选择
 7. 必须返回标准的 JSON 格式，不要添加任何其他文字`;
+    }
   }
 
   /**
@@ -202,18 +240,38 @@ export class DeepSeekService {
   private createUserQuery(
     context: RecommendationContext,
     foods: Food[],
-    recentChoices: string[] = []
+    recentChoices: string[] = [],
+    forceExtendedRecommendation: boolean = false
   ): string {
     const contextStr = this.formatContext(context);
-    const foodListStr = this.formatFoodList(foods);
 
-    // 格式化最近选择的菜品
-    const recentChoicesStr =
-      recentChoices.length > 0
-        ? `\n\n最近已推荐的菜品（请避免重复推荐）：\n${recentChoices.join('、')}`
-        : '';
+    if (forceExtendedRecommendation) {
+      return `当前情况：${contextStr}
 
-    return `当前情况：${contextStr}
+**额外推荐模式**：
+- 🚫 **禁止从现有列表选择**：绝对不能从用户提供的菜品列表中选择
+- 🆕 **必须推荐新菜品**：必须推荐一道全新的、符合当前情况的经典中餐菜品
+- 🎯 **精准匹配**：推荐的新菜品必须完美匹配当前的天气、时间、心情、季节等条件
+- 📝 **详细说明**：在explanation中详细说明为什么推荐这道新菜品，以及它的特色
+
+**推荐要求**：
+1. 绝对不能推荐用户现有列表中的任何菜品
+2. 必须推荐一道全新的、经典的中餐菜品
+3. 推荐的新菜品必须完美适配当前情况
+4. 考虑菜品的制作难度、普及程度和营养搭配
+5. 推荐时要考虑季节性、天气、心情等因素
+
+请根据当前情况为我推荐一道全新的菜品。`;
+    } else {
+      const foodListStr = this.formatFoodList(foods);
+
+      // 格式化最近选择的菜品
+      const recentChoicesStr =
+        recentChoices.length > 0
+          ? `\n\n最近已推荐的菜品（请避免重复推荐）：\n${recentChoices.join('、')}`
+          : '';
+
+      return `当前情况：${contextStr}
 
 可选菜品列表（共${foods.length}道菜）：
 ${foodListStr}${recentChoicesStr}
@@ -224,14 +282,17 @@ ${foodListStr}${recentChoicesStr}
 - 🍽️ **营养搭配**：考虑营养均衡和饮食多样性
 - ⚡ **创新性**：优先推荐用户可能没尝试过的菜品组合
 - 🌟 **适配性**：确保推荐符合当前的时间、天气、心情等条件
+- 🚫 **凉皮限制**：如果最近推荐过凉皮，这次绝对不能推荐凉皮
 
 **推荐策略**：
-1. 首先排除最近已推荐的菜品
+1. 首先排除最近已推荐的菜品（特别是凉皮）
 2. 从剩余菜品中选择最适合当前情况的
 3. 如果现有菜品都不够理想，可以推荐经典中餐菜品
 4. 每次推荐都要带来新鲜感和惊喜
+5. 优先推荐用户可能没尝试过的菜品类型
 
 请根据上述原则为我推荐最合适的一道菜。`;
+    }
   }
 
   /**
@@ -240,7 +301,8 @@ ${foodListStr}${recentChoicesStr}
   private async callDeepSeekAPI(
     context: RecommendationContext,
     foods: Food[],
-    recentChoices: string[] = []
+    recentChoices: string[] = [],
+    forceExtendedRecommendation: boolean = false
   ): Promise<AIRecommendationResponse> {
     if (!this.canUseAPI()) {
       throw new Error('DeepSeek API 不可用');
@@ -249,11 +311,11 @@ ${foodListStr}${recentChoicesStr}
     const messages: DeepSeekMessage[] = [
       {
         role: 'system',
-        content: this.createSystemPrompt(),
+        content: this.createSystemPrompt(forceExtendedRecommendation),
       },
       {
         role: 'user',
-        content: this.createUserQuery(context, foods, recentChoices),
+        content: this.createUserQuery(context, foods, recentChoices, forceExtendedRecommendation),
       },
     ];
 
@@ -302,6 +364,14 @@ ${foodListStr}${recentChoicesStr}
 
         // 如果是扩展推荐，不需要验证ID是否在现有列表中
         if (aiResponse.isExtendedRecommendation) {
+          // 在强制扩展推荐模式下，验证AI确实推荐了新菜品而不是现有列表中的菜品
+          if (forceExtendedRecommendation) {
+            const existingFood = foods.find(food => food.name === aiResponse.recommendedFoodId);
+            if (existingFood) {
+              console.warn('AI在强制扩展推荐模式下仍然推荐了现有菜品，重新标记为新菜品');
+              aiResponse.recommendedFoodId = `新推荐：${aiResponse.recommendedFoodId}`;
+            }
+          }
           this.addToRecentRecommendations(aiResponse.recommendedFoodId);
           return aiResponse;
         }
@@ -409,18 +479,31 @@ ${foodListStr}${recentChoicesStr}
   public async getAIRecommendation(
     context: RecommendationContext,
     foods: Food[],
-    userRecentChoices: string[] = []
+    userRecentChoices: string[] = [],
+    options?: { forceExtendedRecommendation?: boolean }
   ): Promise<RecommendationResult> {
     if (foods.length === 0) {
       throw new Error('菜品列表为空');
     }
 
     try {
+      // 如果强制扩展推荐，清空最近选择历史
+      let recentChoices = userRecentChoices;
+      if (options?.forceExtendedRecommendation) {
+        recentChoices = [];
+        console.log('强制扩展推荐模式，清空最近选择历史');
+      }
+
       // 合并AI自己的推荐历史和用户选择历史
-      const allRecentChoices = [...this.recentRecommendations, ...userRecentChoices];
+      const allRecentChoices = [...this.recentRecommendations, ...recentChoices];
       const uniqueRecentChoices = [...new Set(allRecentChoices)].slice(0, 15); // 限制为15个，避免prompt过长
 
-      const aiResponse = await this.callDeepSeekAPI(context, foods, uniqueRecentChoices);
+      const aiResponse = await this.callDeepSeekAPI(
+        context,
+        foods,
+        uniqueRecentChoices,
+        options?.forceExtendedRecommendation
+      );
       return this.convertToRecommendationResult(aiResponse, foods);
     } catch (error) {
       console.error('AI 推荐失败:', error);

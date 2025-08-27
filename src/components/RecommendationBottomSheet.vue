@@ -129,7 +129,7 @@
             'active loading': isLoading,
             success: showSuccessEffect,
           }"
-          :disabled="isLoading"
+          :disabled="isLoading || isExtraRecommendationLoading"
           @click="getRecommendations($event)"
         >
           <!-- 波纹效果容器 -->
@@ -142,6 +142,21 @@
           <span class="button-text">
             {{ recommendationButtonText }}
           </span>
+        </button>
+
+        <!-- 额外推荐按钮 -->
+        <button
+          class="extra-recommend-btn"
+          :class="{
+            'active loading': isExtraRecommendationLoading,
+          }"
+          :disabled="isLoading || isExtraRecommendationLoading"
+          @click="getExtraRecommendation($event)"
+        >
+          <!-- 额外推荐按钮的波纹效果容器 -->
+          <div class="ripple-container" ref="extraRippleContainer"></div>
+
+          <span class="button-text"> {{ extraRecommendationButtonText }} </span>
         </button>
       </div>
 
@@ -164,6 +179,7 @@
   import { useDevModeStore } from '@/stores/devMode';
   import { getCurrentWeather } from '@/utils/weatherService';
   import { hybridRecommendationService } from '@/utils/hybridRecommendationService';
+  import { deepseekService } from '@/utils/deepseekService';
   import { showFailToast } from 'vant';
   import type {
     RecommendationResult,
@@ -222,9 +238,11 @@
   const showSuccessEffect = ref(false);
   const networkStatus = ref<NetworkStatus>(hybridRecommendationService.getNetworkStatus());
   const usingAI = ref(false);
+  const isExtraRecommendationLoading = ref(false); // 额外推荐加载状态
 
   // DOM 引用
   const rippleContainer = ref<HTMLDivElement | null>(null);
+  const extraRippleContainer = ref<HTMLDivElement | null>(null);
   const sparklesContainer = ref<HTMLDivElement | null>(null);
 
   // 心情选项
@@ -305,6 +323,13 @@
     return canUseAI.value ? '🤖 AI 智能推荐' : '🔮 智能推荐';
   });
 
+  const extraRecommendationButtonText = computed(() => {
+    if (isExtraRecommendationLoading.value) {
+      return '🎲 AI 扩展分析中...';
+    }
+    return '🎲 推荐新菜品';
+  });
+
   const networkStatusText = computed(() => {
     switch (networkStatus.value) {
       case NetStatus.ONLINE:
@@ -379,6 +404,32 @@
   // 创建波纹效果
   const createRippleEffect = (event: MouseEvent) => {
     const container = rippleContainer.value;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = event.clientX - rect.left - size / 2;
+    const y = event.clientY - rect.top - size / 2;
+
+    const ripple = document.createElement('div');
+    ripple.className = 'ripple';
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+
+    container.appendChild(ripple);
+
+    // 动画结束后移除元素
+    setTimeout(() => {
+      if (container.contains(ripple)) {
+        container.removeChild(ripple);
+      }
+    }, 1500);
+  };
+
+  // 创建额外推荐按钮的波纹效果
+  const createExtraRippleEffect = (event: MouseEvent) => {
+    const container = extraRippleContainer.value;
     if (!container) return;
 
     const rect = container.getBoundingClientRect();
@@ -551,6 +602,128 @@
       }
     } finally {
       isLoading.value = false;
+      usingAI.value = false;
+
+      // 清理粒子效果
+      clearSparkleEffect();
+
+      // 重置成功状态
+      setTimeout(() => {
+        showSuccessEffect.value = false;
+      }, 1000);
+    }
+  };
+
+  // 获取额外推荐（强制AI推荐全新的菜品，不从本地列表选择）
+  const getExtraRecommendation = async (event?: MouseEvent) => {
+    // 检查今日使用次数限制
+    if (!canUseToday.value) {
+      if (devModeStore.isUnlimitedUsesEnabled) {
+        showFailToast('开发模式下应该可以无限使用，请检查配置');
+      } else {
+        showFailToast('今日使用次数已用完，请明天再试');
+      }
+      return;
+    }
+
+    // 创建额外推荐按钮的点击波纹效果
+    if (event) {
+      createExtraRippleEffect(event);
+    }
+
+    isExtraRecommendationLoading.value = true;
+    usingAI.value = true; // 额外推荐强制使用AI
+
+    // 延迟启动粒子效果
+    createSparkleEffect();
+
+    try {
+      // 确保有天气数据
+      if (!weatherData.value) {
+        await loadWeatherData();
+      }
+
+      // 构建推荐上下文
+      const context = {
+        // 环境因素
+        currentWeather: weatherData.value?.weatherType,
+        currentTime: recommendationStore.getCurrentTimeOfDay(),
+        currentSeason: recommendationStore.getCurrentSeason(),
+        location: weatherData.value?.location,
+        temperature: weatherData.value?.temperature,
+        humidity: weatherData.value?.humidity,
+
+        // 用户状态
+        userMood: currentMood.value || undefined,
+
+        // 新增：身体状态相关
+        physicalState: currentPhysicalState.value || undefined,
+        activityLevel: currentActivityLevel.value || undefined,
+
+        // 新增：特殊需求
+        dietaryRestrictions:
+          currentDietaryRestrictions.value.length > 0
+            ? currentDietaryRestrictions.value
+            : undefined,
+      };
+
+      // 强制AI进行扩展推荐，推荐全新的菜品（不从本地列表选择）
+      const selectedRec = await deepseekService.getAIRecommendation(
+        context,
+        foodStore.foodItems,
+        [], // 清空最近选择历史，强制AI推荐新菜品
+        { forceExtendedRecommendation: true } // 强制扩展推荐，禁止从本地列表选择
+      );
+
+      recommendations.value = [selectedRec];
+
+      // 记录用户选择到偏好系统（用于学习）
+      userPreferenceStore.recordChoice(selectedRec.food, context);
+
+      // 记录智能推荐使用次数（开发模式下不增加使用次数）
+      if (!devModeStore.isUnlimitedUsesEnabled) {
+        challengeStore.useRandomFood(selectedRec.food.name);
+      }
+
+      emit('recommendationsUpdated', recommendations.value);
+
+      if (recommendations.value.length === 0) {
+        showFailToast('暂无合适的推荐');
+      } else {
+        // 显示成功效果
+        showSuccessEffect.value = true;
+
+        // 等待一小段时间让用户看到成功动画
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        // 直接使用选中的推荐结果
+        const topRecommendation = recommendations.value[0];
+
+        // 先触发选择事件
+        emit('foodSelected', topRecommendation);
+
+        // 延迟关闭弹窗，给动画一些时间开始
+        setTimeout(() => {
+          emit('close');
+        }, 100);
+      }
+    } catch (error) {
+      console.error('获取额外推荐失败:', error);
+
+      // 根据错误类型显示不同的提示
+      if (error instanceof Error) {
+        if (error.message.includes('网络') || error.message.includes('超时')) {
+          showFailToast('网络连接问题，无法获取额外推荐');
+        } else if (error.message.includes('API')) {
+          showFailToast('AI 服务暂不可用，无法获取额外推荐');
+        } else {
+          showFailToast('额外推荐失败，请重试');
+        }
+      } else {
+        showFailToast('额外推荐失败，请重试');
+      }
+    } finally {
+      isExtraRecommendationLoading.value = false;
       usingAI.value = false;
 
       // 清理粒子效果
@@ -854,6 +1027,79 @@
     overflow: hidden;
     pointer-events: none;
     z-index: 1;
+  }
+
+  /* 额外推荐按钮样式 */
+  .extra-recommend-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 10px 0;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+
+  .extra-recommend-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1));
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+
+  .extra-recommend-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .extra-recommend-btn .button-text {
+    display: block;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* 额外推荐按钮的波纹效果容器 */
+  .extra-recommend-btn .ripple-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* 额外推荐按钮的特殊效果 */
+  .extra-recommend-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .extra-recommend-btn:hover::before {
+    left: 100%;
+  }
+
+  /* 额外推荐按钮加载状态 */
+  .extra-recommend-btn.loading {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+    border-color: rgba(255, 255, 255, 0.4);
+    animation: pulse 1.5s ease-in-out infinite;
   }
 
   .recommendation-action {

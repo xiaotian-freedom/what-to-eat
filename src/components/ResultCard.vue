@@ -17,7 +17,7 @@
     >
       <!-- 选中结果展示 -->
       <div
-        class="w-50 h-50 rounded-full bg-white backdrop-filter backdrop-blur-lg shadow-xl flex flex-col items-center justify-center"
+        class="w-[180px] h-[180px] rounded-full bg-white backdrop-filter backdrop-blur-lg shadow-xl flex flex-col items-center justify-center"
       >
         <div class="w-full h-full rounded-full overflow-hidden shadow-lg relative">
           <!-- 有图片时显示图片 -->
@@ -32,7 +32,7 @@
           <!-- 无图片时显示背景颜色和首字母 -->
           <div
             v-else-if="selectedDish"
-            class="w-full h-full flex items-center justify-center"
+            class="w-full h-full rounded-full flex items-center justify-center"
             :style="{ backgroundColor: selectedDish.backgroundColor || '#4A5568' }"
           >
             <span class="text-white text-6xl font-bold">{{ selectedDish.name.charAt(0) }}</span>
@@ -58,7 +58,8 @@
       <!-- 菜品介绍区域 -->
       <div v-if="selectedDish" class="w-full max-w-sm mt-6 px-4">
         <div
-          class="bg-white/80 backdrop-filter backdrop-blur-lg rounded-2xl p-4 shadow-lg border border-gray-200"
+          class="bg-white/80 backdrop-filter backdrop-blur-lg rounded-2xl p-4 shadow-lg max-h-36 overflow-y-auto overscroll-contain"
+          style="-webkit-overflow-scrolling: touch; scrollbar-width: thin"
         >
           <!-- 菜品详细信息 -->
           <div class="space-y-3">
@@ -80,19 +81,6 @@
                 {{ tag }}
               </span>
             </div>
-
-            <!-- 基础信息 -->
-            <!-- <div class="flex justify-center space-x-4 text-xs text-gray-500">
-              <span v-if="selectedDish.cuisine" class="flex items-center">
-                🍽️ {{ selectedDish.cuisine }}
-              </span>
-              <span v-if="selectedDish.difficulty" class="flex items-center">
-                👨‍🍳 {{ getDifficultyText(selectedDish.difficulty) }}
-              </span>
-              <span v-if="selectedDish.prepTime" class="flex items-center">
-                ⏱️ {{ selectedDish.prepTime }}分钟
-              </span>
-            </div> -->
 
             <!-- 特色标识 -->
             <div class="flex justify-center space-x-2">
@@ -294,3 +282,31 @@
     (e: 'share-result'): void;
   }>();
 </script>
+
+<style scoped>
+  /* 自定义滚动条样式 */
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 2px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  /* 确保在移动端也能正常滚动 */
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.1);
+  }
+</style>

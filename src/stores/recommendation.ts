@@ -19,19 +19,20 @@ import type {
   RecommendationReason,
   WeatherData,
 } from '@/types';
+import { useUserPreferenceStore } from './userPreference';
 
 export const useRecommendationStore = defineStore('recommendation', () => {
   // 状态
   const currentContext = ref<RecommendationContext>({});
   const recommendationConfig = ref<RecommendationConfig>({
-    // 基础维度权重
-    weatherWeight: 0.12,
-    timeWeight: 0.15,
-    moodWeight: 0.2, // 心情权重
-    seasonWeight: 0.1,
+    // 基础维度权重 - 降低权重，增加多样性
+    weatherWeight: 0.08, // 降低天气权重
+    timeWeight: 0.12, // 降低时间权重
+    moodWeight: 0.15, // 降低心情权重
+    seasonWeight: 0.08, // 降低季节权重
     preferenceWeight: 0.15,
-    popularityWeight: 0.08,
-    diversityFactor: 0.3,
+    popularityWeight: 0.06, // 降低热门权重
+    diversityFactor: 0.5, // 增加多样性因子
 
     // 新增维度权重
     physicalStateWeight: 0.15, // 身体状态权重较高，因为影响健康
@@ -482,7 +483,7 @@ export const useRecommendationStore = defineStore('recommendation', () => {
       }
 
       // 计算加权总分
-      const totalScore =
+      let totalScore =
         weatherResult.score * weatherWeight +
         timeResult.score * timeWeight +
         moodResult.score * moodWeight +
@@ -507,6 +508,24 @@ export const useRecommendationStore = defineStore('recommendation', () => {
         ...dietaryRestrictionsResult.reasons,
       ];
 
+      // 特殊处理：对凉皮等容易重复推荐的菜品进行惩罚
+      if (food.name === '凉皮') {
+        const userPreferenceStore = useUserPreferenceStore();
+        // 检查最近是否推荐过凉皮
+        const recentChoices = userPreferenceStore.getRecentChoiceNames(3); // 最近3天
+        const recentLiangpiCount = recentChoices.filter((name: string) => name === '凉皮').length;
+
+        if (recentLiangpiCount > 0) {
+          // 如果最近推荐过凉皮，大幅降低分数
+          totalScore *= 0.3 - recentLiangpiCount * 0.2;
+          allReasons.push({
+            type: RecommendationReasonType.POPULARITY,
+            message: `最近已推荐过${recentLiangpiCount}次，降低推荐权重`,
+            weight: -0.3,
+          });
+        }
+      }
+
       // 计算置信度（基于匹配的因素数量）
       const confidence = allReasons.length > 0 ? Math.min(allReasons.length / 3, 1) : 0.3;
 
@@ -521,8 +540,8 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     // 按分数排序，对于相近分数的菜品增加随机性
     const sortedResults = results.sort((a, b) => {
       const scoreDiff = b.score - a.score;
-      // 如果分数差异较小（小于0.15），引入更强的随机性以避免重复推荐
-      if (Math.abs(scoreDiff) < 0.15) {
+      // 如果分数差异较小（小于0.1），引入更强的随机性以避免重复推荐
+      if (Math.abs(scoreDiff) < 0.1) {
         return Math.random() - 0.5;
       }
       return scoreDiff;
