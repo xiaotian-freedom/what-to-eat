@@ -17,7 +17,7 @@
     >
       <!-- 选中结果展示 -->
       <div
-        class="w-64 h-64 rounded-full bg-white backdrop-filter backdrop-blur-lg shadow-xl flex flex-col items-center justify-center"
+        class="w-50 h-50 rounded-full bg-white backdrop-filter backdrop-blur-lg shadow-xl flex flex-col items-center justify-center"
       >
         <div class="w-full h-full rounded-full overflow-hidden shadow-lg relative">
           <!-- 有图片时显示图片 -->
@@ -82,7 +82,7 @@
             </div>
 
             <!-- 基础信息 -->
-            <div class="flex justify-center space-x-4 text-xs text-gray-500">
+            <!-- <div class="flex justify-center space-x-4 text-xs text-gray-500">
               <span v-if="selectedDish.cuisine" class="flex items-center">
                 🍽️ {{ selectedDish.cuisine }}
               </span>
@@ -92,7 +92,7 @@
               <span v-if="selectedDish.prepTime" class="flex items-center">
                 ⏱️ {{ selectedDish.prepTime }}分钟
               </span>
-            </div>
+            </div> -->
 
             <!-- 特色标识 -->
             <div class="flex justify-center space-x-2">
@@ -139,6 +139,9 @@
       :recipe="recipeData"
       :loading="recipeLoading"
       :error="recipeError"
+      :streamingLoading="streamingLoading"
+      :streamingContent="streamingContent"
+      :partialRecipe="partialRecipe"
       @close="closeRecipeSheet"
       @retry="retryGetRecipe"
     />
@@ -168,6 +171,11 @@
   const recipeData = ref<any>(null);
   const recipeError = ref<string | null>(null);
 
+  // 流式相关状态
+  const streamingLoading = ref(false);
+  const streamingContent = ref('');
+  const partialRecipe = ref<any>(null);
+
   // 处理图片加载失败
   const handleImageError = (): void => {
     imageLoadFailed.value = true;
@@ -185,12 +193,6 @@
     );
   });
 
-  // 获取难度文本
-  const getDifficultyText = (difficulty: number): string => {
-    const levels = ['非常简单', '简单', '一般', '困难', '非常困难'];
-    return levels[difficulty - 1] || '未知';
-  };
-
   // 处理查看做法
   const handleViewRecipe = async () => {
     if (!props.selectedDish) {
@@ -204,18 +206,68 @@
       return;
     }
 
+    // 重置状态
+    recipeLoading.value = false;
+    streamingLoading.value = true;
+    recipeError.value = null;
+    streamingContent.value = '';
+    partialRecipe.value = null;
+    recipeData.value = null;
+
+    // 立即显示弹窗，开始流式加载
+    showRecipeSheet.value = true;
+
+    try {
+      // 尝试使用智能流式API
+      await deepseekService.getRecipeSmartStream(
+        props.selectedDish.name,
+        // onChunk: 处理每个数据块
+        (chunk: string) => {
+          streamingContent.value += chunk;
+        },
+        // onPartialRecipe: 处理部分菜谱
+        (partial: any) => {
+          partialRecipe.value = partial;
+        },
+        // onComplete: 处理完成
+        (recipe: any) => {
+          recipeData.value = recipe;
+          streamingLoading.value = false;
+          partialRecipe.value = null;
+          // 弹窗已经在开始时显示了，这里不需要再设置
+        },
+        // onError: 处理错误
+        (error: string) => {
+          console.error('智能流式获取失败，尝试传统方式:', error);
+          // 如果智能流式失败，降级到传统方式
+          fallbackToTraditionalMethod();
+        }
+      );
+    } catch (error) {
+      console.error('智能流式API调用失败:', error);
+      // 如果智能流式API不可用，降级到传统方式
+      fallbackToTraditionalMethod();
+    }
+  };
+
+  // 降级到传统获取方式
+  const fallbackToTraditionalMethod = async () => {
+    streamingLoading.value = false;
     recipeLoading.value = true;
     recipeError.value = null;
 
-    try {
-      const recipe = await deepseekService.getRecipe(props.selectedDish.name);
-      recipeData.value = recipe;
+    // 确保弹窗显示（如果还没有显示的话）
+    if (!showRecipeSheet.value) {
       showRecipeSheet.value = true;
+    }
+
+    try {
+      const recipe = await deepseekService.getRecipe(props.selectedDish!.name);
+      recipeData.value = recipe;
+      // 弹窗已经在开始时显示了，这里不需要再设置
     } catch (error) {
       console.error('获取做法失败:', error);
       recipeError.value = error instanceof Error ? error.message : '获取做法失败，请稍后重试';
-
-      // 显示错误提示
       showFailToast(recipeError.value);
     } finally {
       recipeLoading.value = false;
@@ -227,6 +279,8 @@
   const retryGetRecipe = () => {
     recipeData.value = null;
     recipeError.value = null;
+    streamingContent.value = '';
+    partialRecipe.value = null;
     handleViewRecipe();
   };
 

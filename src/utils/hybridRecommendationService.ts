@@ -28,7 +28,7 @@ export class HybridRecommendationService {
     timeoutMs: 15000, // 15秒超时，与 DeepSeek 服务一致
     maxRetries: 2,
     cacheResults: true,
-    cacheExpiryMs: 5 * 60 * 1000, // 5分钟缓存
+    cacheExpiryMs: 2 * 60 * 1000, // 减少到2分钟缓存，增加推荐多样性
   };
 
   private strategy: RecommendationStrategy = Strategy.HYBRID;
@@ -84,7 +84,11 @@ export class HybridRecommendationService {
       .map(f => f.id)
       .sort()
       .join(',');
-    return `${contextStr}-${foodIds}`;
+
+    // 添加时间戳的部分，以减少重复缓存的可能性
+    const hourSlot = Math.floor(Date.now() / (1000 * 60 * 30)); // 每30分钟一个时间段
+
+    return `${contextStr}-${foodIds}-${hourSlot}`;
   }
 
   /**
@@ -235,8 +239,12 @@ export class HybridRecommendationService {
     try {
       console.log(`尝试 AI 推荐 (第${retryCount + 1}次)`);
 
+      // 获取用户最近选择的菜品名称（用于避免重复推荐）
+      const userPreferenceStore = useUserPreferenceStore();
+      const recentChoiceNames = userPreferenceStore.getRecentChoiceNames(7); // 直接获取最近7天选择的菜品名称
+
       const result = await Promise.race([
-        deepseekService.getAIRecommendation(context, foods),
+        deepseekService.getAIRecommendation(context, foods, recentChoiceNames),
         new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('AI 推荐超时')), this.config.timeoutMs)
         ),
@@ -393,13 +401,24 @@ export class HybridRecommendationService {
     networkStatus: NetworkStatus;
     canUseAI: boolean;
     strategy: RecommendationStrategy;
+    recentAIRecommendations: string[];
   } {
     return {
       cacheSize: this.cache.size,
       networkStatus: this.networkStatus,
       canUseAI: this.canUseAI(),
       strategy: this.strategy,
+      recentAIRecommendations: deepseekService.getRecentRecommendations(),
     };
+  }
+
+  /**
+   * 重置推荐多样性（清空AI推荐历史）
+   */
+  public resetDiversity(): void {
+    deepseekService.clearRecentRecommendations();
+    this.clearCache();
+    console.log('推荐多样性已重置');
   }
 }
 

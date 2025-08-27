@@ -396,6 +396,16 @@ export const useUserPreferenceStore = defineStore('userPreference', () => {
       .map((choice: UserChoiceHistory) => choice.foodId);
   };
 
+  // 获取最近选择的菜品名称
+  const getRecentChoiceNames = (days: number = 7): string[] => {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+
+    return choiceHistory.value
+      .filter((choice: UserChoiceHistory) => choice.selectedAt > cutoffDate)
+      .map((choice: UserChoiceHistory) => choice.foodName);
+  };
+
   // 计算多样性分数（避免重复推荐）
   const getDiversityScore = (foodId: string, recentDays: number = 7): number => {
     const recentChoices = getRecentChoiceIds(recentDays);
@@ -473,6 +483,7 @@ export const useUserPreferenceStore = defineStore('userPreference', () => {
     getPreferenceScore,
     getDiversityScore,
     getRecentChoiceIds,
+    getRecentChoiceNames,
     analyzePreferenceTrends,
     updatePreferenceSettings,
     clearHistory,

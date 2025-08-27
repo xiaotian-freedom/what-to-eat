@@ -36,10 +36,12 @@
   import { useRouter } from 'vue-router';
   import { showFailToast, showSuccessToast } from 'vant';
   import { useChallengeStore } from '@/stores/challenge';
+  import { useDevModeStore } from '@/stores/devMode';
 
   const { t } = useI18n();
   const router = useRouter();
   const challengeStore = useChallengeStore();
+  const devModeStore = useDevModeStore();
 
   const selectedDish = ref<Food | null>(null);
   const showResult = ref(false);
@@ -151,6 +153,8 @@
   onMounted(() => {
     // 添加GPU加速类
     document.body.classList.add('gpu-accelerated');
+    // 加载开发模式状态
+    devModeStore.loadDevModeState();
     // 加载挑战数据
     challengeStore.loadChallengeData();
   });

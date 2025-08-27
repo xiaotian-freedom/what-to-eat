@@ -521,8 +521,8 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     // 按分数排序，对于相近分数的菜品增加随机性
     const sortedResults = results.sort((a, b) => {
       const scoreDiff = b.score - a.score;
-      // 如果分数差异很小（小于0.1），引入随机性
-      if (Math.abs(scoreDiff) < 0.1) {
+      // 如果分数差异较小（小于0.15），引入更强的随机性以避免重复推荐
+      if (Math.abs(scoreDiff) < 0.15) {
         return Math.random() - 0.5;
       }
       return scoreDiff;
