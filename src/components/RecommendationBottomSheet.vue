@@ -152,7 +152,7 @@
             'active loading': isLoading,
             success: showSuccessEffect,
           }"
-          :disabled="isLoading || isExtraRecommendationLoading"
+          :disabled="isLoading"
           @click="getRecommendations($event)"
         >
           <!-- 波纹效果容器 -->
@@ -172,8 +172,9 @@
           class="extra-recommend-btn"
           :class="{
             'active loading': isExtraRecommendationLoading,
+            success: showExtraSuccessEffect,
           }"
-          :disabled="isLoading || isExtraRecommendationLoading"
+          :disabled="isExtraRecommendationLoading"
           @click="getExtraRecommendation($event)"
         >
           <!-- 额外推荐按钮的波纹效果容器 -->
@@ -260,6 +261,7 @@
 
     // 重置UI状态
     showSuccessEffect.value = false;
+    showExtraSuccessEffect.value = false;
     isLoading.value = false;
     isExtraRecommendationLoading.value = false;
     usingAI.value = false;
@@ -305,6 +307,7 @@
   const showDietaryRestrictions = ref(true); // 控制是否显示特殊需求选择器
   const recommendations = ref<RecommendationResult[]>([]);
   const showSuccessEffect = ref(false);
+  const showExtraSuccessEffect = ref(false); // 额外推荐成功效果
   const networkStatus = ref<NetworkStatus>(hybridRecommendationService.getNetworkStatus());
   const usingAI = ref(false);
   const isExtraRecommendationLoading = ref(false); // 额外推荐加载状态
@@ -789,7 +792,7 @@
         showFailToast(t('recommendation.noSuitableRecommendation'));
       } else {
         // 显示成功效果
-        showSuccessEffect.value = true;
+        showExtraSuccessEffect.value = true;
 
         // 等待一小段时间让用户看到成功动画
         await new Promise(resolve => setTimeout(resolve, 800));
@@ -798,6 +801,7 @@
         const topRecommendation = recommendations.value[0];
 
         // 触发选择事件，交由父组件决定如何处理（卡片动画或直接跳转）
+        // 确保额外推荐按钮的行为与智能推荐按钮完全一致
         emit('foodSelected', topRecommendation);
       }
     } catch (error) {
@@ -824,7 +828,7 @@
 
       // 重置成功状态
       setTimeout(() => {
-        showSuccessEffect.value = false;
+        showExtraSuccessEffect.value = false;
       }, 1000);
     }
   };
