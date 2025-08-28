@@ -8,9 +8,13 @@ export const APP_CONFIG = {
   featureKeys: [
     'app.features.randomFood',
     'app.features.foodManagement',
+    'app.features.recipeInstructions',
+    'app.features.smartRecommendation',
+    'app.features.weatherIntegration',
+    'app.features.moodBasedRecommendation',
+    'app.features.multipleSelectionModes',
     'app.features.achievements',
     'app.features.dailyChallenge',
-    'app.features.animations',
   ],
   // 开发模式配置
   devMode: {

@@ -133,7 +133,7 @@ export default {
   'settings.theme': 'Theme',
   'settings.themeDesc': 'Choose your favorite theme style',
   'settings.selectionMode': 'Selection Mode',
-  'settings.selectionModeDesc': 'Choose card or wheel lottery mode',
+  'settings.selectionModeDesc': 'Choose card or wheel selection mode',
 
   'settings.language': 'Language',
   'settings.languageDesc': 'Choose app language',
@@ -157,9 +157,13 @@ export default {
   'app.description': 'A simple and fun random food selection app',
   'app.features.randomFood': 'Random Food Selection',
   'app.features.foodManagement': 'Custom Food Management',
+  'app.features.recipeInstructions': 'Recipe Instructions',
+  'app.features.smartRecommendation': 'Smart Recommendation System',
+  'app.features.weatherIntegration': 'Weather-aware Recommendations',
+  'app.features.moodBasedRecommendation': 'Mood-based Recommendations',
+  'app.features.multipleSelectionModes': 'Multiple Selection Modes',
   'app.features.achievements': 'Achievement System',
   'app.features.dailyChallenge': 'Daily Challenge',
-  'app.features.animations': 'Beautiful Animations',
 
   // Menu
   'menu.smartRecommendation': 'Smart Recommendation',
@@ -175,5 +179,5 @@ export default {
   'mode.card.title': 'Card Mode',
   'mode.card.description': 'Classic card flip, quick selection',
   'mode.wheel.title': 'Wheel Mode',
-  'mode.wheel.description': 'Fun wheel lottery with ceremony',
+  'mode.wheel.description': 'Fun wheel selection with ceremony',
 };

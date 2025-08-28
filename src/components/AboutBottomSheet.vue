@@ -260,9 +260,13 @@
     const iconMap: Record<string, string> = {
       'app.features.randomFood': '🎲',
       'app.features.foodManagement': '📝',
+      'app.features.recipeInstructions': '👨‍🍳',
+      'app.features.smartRecommendation': '🤖',
+      'app.features.weatherIntegration': '🌤️',
+      'app.features.moodBasedRecommendation': '😊',
+      'app.features.multipleSelectionModes': '🔄',
       'app.features.achievements': '🏆',
       'app.features.dailyChallenge': '🎯',
-      'app.features.animations': '✨',
     };
     return iconMap[featureKey] || '🍽️';
   };

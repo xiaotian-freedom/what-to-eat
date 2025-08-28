@@ -140,8 +140,8 @@ export default {
   'settings.title': '设置',
   'settings.theme': '主题',
   'settings.themeDesc': '选择你喜欢的主题风格',
-  'settings.selectionMode': '抽奖模式',
-  'settings.selectionModeDesc': '选择卡片或转盘抽奖模式',
+  'settings.selectionMode': '选择模式',
+  'settings.selectionModeDesc': '选择卡片或转盘选菜模式',
 
   'settings.language': '语言',
   'settings.languageDesc': '选择应用语言',
@@ -165,12 +165,13 @@ export default {
   'app.description': '一个简单而有趣的随机选菜应用',
   'app.features.randomFood': '随机选菜功能',
   'app.features.foodManagement': '自定义菜品管理',
-  'app.features.achievements': '成就系统',
-  'app.features.dailyChallenge': '每日挑战',
-  'app.features.animations': '精美动画效果',
+  'app.features.recipeInstructions': '菜品做法指导',
   'app.features.smartRecommendation': '智能推荐系统',
   'app.features.weatherIntegration': '天气感知推荐',
   'app.features.moodBasedRecommendation': '心情感知推荐',
+  'app.features.multipleSelectionModes': '多种选择模式',
+  'app.features.achievements': '成就系统',
+  'app.features.dailyChallenge': '每日挑战',
   'app.features.personalizedLearning': '个性化学习',
 
   // 推荐系统
@@ -200,5 +201,5 @@ export default {
   'mode.card.title': '卡片模式',
   'mode.card.description': '经典卡片翻转，快速选择',
   'mode.wheel.title': '转盘模式',
-  'mode.wheel.description': '趣味转盘抽奖，增加仪式感',
+  'mode.wheel.description': '趣味转盘选择，增加仪式感',
 };
