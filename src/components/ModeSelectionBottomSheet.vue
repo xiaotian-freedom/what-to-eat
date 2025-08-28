@@ -1,24 +1,34 @@
 <template>
-  <div class="p-6">
-    <h2 class="text-xl font-bold text-gray-800 mb-6">{{ $t('settings.selectionMode') }}</h2>
+  <BottomSheet :visible="visible" @close="$emit('close')" :closeOnBackdrop="true" maxHeight="85vh">
+    <h2 class="text-xl font-bold mb-6" style="color: var(--color-text)">
+      {{ $t('settings.selectionMode') }}
+    </h2>
     <div class="space-y-4">
       <!-- 卡片模式 -->
       <div
         @click="selectMode('card')"
         class="relative p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer"
-        :class="
-          selectedMode === 'card'
-            ? 'border-blue-500 bg-blue-50'
-            : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
-        "
+        :class="selectedMode === 'card' ? 'theme-border-primary' : 'hover:border-gray-300'"
+        :style="{
+          backgroundColor:
+            selectedMode === 'card'
+              ? 'var(--color-primary-light, rgba(99, 102, 241, 0.1))'
+              : 'var(--color-surface)',
+          borderColor: selectedMode === 'card' ? 'var(--color-primary)' : 'var(--color-border)',
+        }"
       >
         <div class="flex items-center space-x-4">
           <div class="flex-shrink-0">
             <div
-              class="w-12 h-12 rounded-lg flex items-center justify-center"
-              :class="
-                selectedMode === 'card' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
-              "
+              class="w-12 h-12 rounded-lg flex items-center justify-center transition-colors"
+              :style="{
+                backgroundColor:
+                  selectedMode === 'card'
+                    ? 'var(--color-primary-light, rgba(99, 102, 241, 0.15))'
+                    : 'var(--color-border)',
+                color:
+                  selectedMode === 'card' ? 'var(--color-primary)' : 'var(--color-textSecondary)',
+              }"
             >
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -31,13 +41,18 @@
             </div>
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-gray-800">{{ $t('mode.card.title') }}</h3>
-            <p class="text-sm text-gray-600 mt-1">{{ $t('mode.card.description') }}</p>
+            <h3 class="text-lg font-semibold" style="color: var(--color-text)">
+              {{ $t('mode.card.title') }}
+            </h3>
+            <p class="text-sm mt-1" style="color: var(--color-textSecondary)">
+              {{ $t('mode.card.description') }}
+            </p>
           </div>
           <div class="flex-shrink-0">
             <div
               v-if="selectedMode === 'card'"
-              class="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center"
+              class="w-6 h-6 rounded-full flex items-center justify-center"
+              :style="{ backgroundColor: 'var(--color-primary)' }"
             >
               <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -47,7 +62,11 @@
                 />
               </svg>
             </div>
-            <div v-else class="w-6 h-6 rounded-full border-2 border-gray-300"></div>
+            <div
+              v-else
+              class="w-6 h-6 rounded-full border-2"
+              :style="{ borderColor: 'var(--color-border)' }"
+            ></div>
           </div>
         </div>
       </div>
@@ -56,21 +75,29 @@
       <div
         @click="selectMode('wheel')"
         class="relative p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer"
-        :class="
-          selectedMode === 'wheel'
-            ? 'border-purple-500 bg-purple-50'
-            : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
-        "
+        :class="selectedMode === 'wheel' ? 'theme-border-secondary' : 'hover:border-gray-300'"
+        :style="{
+          backgroundColor:
+            selectedMode === 'wheel'
+              ? 'var(--color-secondary-light, rgba(139, 92, 246, 0.1))'
+              : 'var(--color-surface)',
+          borderColor: selectedMode === 'wheel' ? 'var(--color-secondary)' : 'var(--color-border)',
+        }"
       >
         <div class="flex items-center space-x-4">
           <div class="flex-shrink-0">
             <div
-              class="w-12 h-12 rounded-lg flex items-center justify-center"
-              :class="
-                selectedMode === 'wheel'
-                  ? 'bg-purple-100 text-purple-600'
-                  : 'bg-gray-100 text-gray-600'
-              "
+              class="w-12 h-12 rounded-lg flex items-center justify-center transition-colors"
+              :style="{
+                backgroundColor:
+                  selectedMode === 'wheel'
+                    ? 'var(--color-secondary-light, rgba(139, 92, 246, 0.15))'
+                    : 'var(--color-border)',
+                color:
+                  selectedMode === 'wheel'
+                    ? 'var(--color-secondary)'
+                    : 'var(--color-textSecondary)',
+              }"
             >
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -83,13 +110,18 @@
             </div>
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-gray-800">{{ $t('mode.wheel.title') }}</h3>
-            <p class="text-sm text-gray-600 mt-1">{{ $t('mode.wheel.description') }}</p>
+            <h3 class="text-lg font-semibold" style="color: var(--color-text)">
+              {{ $t('mode.wheel.title') }}
+            </h3>
+            <p class="text-sm mt-1" style="color: var(--color-textSecondary)">
+              {{ $t('mode.wheel.description') }}
+            </p>
           </div>
           <div class="flex-shrink-0">
             <div
               v-if="selectedMode === 'wheel'"
-              class="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center"
+              class="w-6 h-6 rounded-full flex items-center justify-center"
+              :style="{ backgroundColor: 'var(--color-secondary)' }"
             >
               <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -99,7 +131,11 @@
                 />
               </svg>
             </div>
-            <div v-else class="w-6 h-6 rounded-full border-2 border-gray-300"></div>
+            <div
+              v-else
+              class="w-6 h-6 rounded-full border-2"
+              :style="{ borderColor: 'var(--color-border)' }"
+            ></div>
           </div>
         </div>
       </div>
@@ -107,31 +143,42 @@
 
     <!-- 转盘大小设置 (仅在转盘模式下显示) -->
     <div v-if="selectedMode === 'wheel'" class="mt-6">
-      <h3 class="text-lg font-semibold text-gray-800 mb-4">{{ $t('settings.wheelSize') }}</h3>
-      <div class="grid grid-cols-3 gap-3">
+      <h3 class="text-lg font-semibold mb-4" style="color: var(--color-text)">
+        {{ $t('settings.wheelSize') }}
+      </h3>
+      <div class="grid grid-cols-2 gap-3">
         <div
-          v-for="size in (['small', 'medium', 'large'] as const)"
+          v-for="size in (['small', 'medium'] as const)"
           :key="size"
           @click="selectWheelSize(size as WheelSize)"
           class="relative p-3 rounded-lg border-2 transition-all duration-200 cursor-pointer text-center"
-          :class="
-            selectedWheelSize === size
-              ? 'border-purple-500 bg-purple-50'
-              : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
-          "
+          :class="selectedWheelSize === size ? 'theme-border-secondary' : 'hover:border-gray-300'"
+          :style="{
+            backgroundColor:
+              selectedWheelSize === size
+                ? 'var(--color-secondary-light, rgba(139, 92, 246, 0.1))'
+                : 'var(--color-surface)',
+            borderColor:
+              selectedWheelSize === size ? 'var(--color-secondary)' : 'var(--color-border)',
+          }"
         >
           <div class="flex flex-col items-center space-y-2">
             <div
               class="rounded-full border-2 transition-all"
-              :class="{
-                'w-6 h-6 border-purple-400': size === 'small',
-                'w-8 h-8 border-purple-500': size === 'medium',
-                'w-10 h-10 border-purple-600': size === 'large',
+              :style="{
+                width: size === 'small' ? '1.5rem' : '2rem',
+                height: size === 'small' ? '1.5rem' : '2rem',
+                borderColor: 'var(--color-secondary)',
               }"
             ></div>
             <span
               class="text-sm font-medium"
-              :class="selectedWheelSize === size ? 'text-purple-600' : 'text-gray-600'"
+              :style="{
+                color:
+                  selectedWheelSize === size
+                    ? 'var(--color-secondary)'
+                    : 'var(--color-textSecondary)',
+              }"
             >
               {{ $t(`settings.wheelSizeOptions.${size}`) }}
             </span>
@@ -139,7 +186,8 @@
           <!-- 选中标识 -->
           <div
             v-if="selectedWheelSize === size"
-            class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-purple-500 flex items-center justify-center"
+            class="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center"
+            :style="{ backgroundColor: 'var(--color-secondary)' }"
           >
             <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -154,21 +202,18 @@
     </div>
 
     <!-- 操作按钮 -->
-    <div class="mt-8 flex space-x-3">
-      <button
-        @click="$emit('close')"
-        class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-      >
-        {{ $t('common.cancel') }}
-      </button>
+    <div class="mt-8">
       <button
         @click="confirmSelection"
-        class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all"
+        class="w-full px-6 py-3 rounded-lg font-medium transition-all text-white"
+        :style="{
+          background: `linear-gradient(135deg, var(--color-primary), var(--color-secondary))`,
+        }"
       >
         {{ $t('common.confirm') }}
       </button>
     </div>
-  </div>
+  </BottomSheet>
 </template>
 
 <script setup lang="ts">
@@ -176,10 +221,17 @@
   import { useWheelModeStore, type SelectionMode, type WheelSize } from '@/stores/wheelMode';
   import { showSuccessToast } from 'vant';
   import { useI18n } from 'vue-i18n';
+  import BottomSheet from './BottomSheet.vue';
+
+  interface Props {
+    visible: boolean;
+  }
 
   interface Emits {
     (e: 'close'): void;
   }
+
+  defineProps<Props>();
 
   const emit = defineEmits<Emits>();
   const wheelModeStore = useWheelModeStore();

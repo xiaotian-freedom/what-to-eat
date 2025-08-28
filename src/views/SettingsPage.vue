@@ -166,9 +166,7 @@
     </BottomSheet>
 
     <!-- 抽奖模式选择器 BottomSheet -->
-    <BottomSheet :visible="showModeSelector" @close="showModeSelector = false" maxHeight="60vh">
-      <ModeSelectionBottomSheet @close="showModeSelector = false" />
-    </BottomSheet>
+    <ModeSelectionBottomSheet :visible="showModeSelector" @close="showModeSelector = false" />
 
     <!-- 关于我们模态框 -->
     <BottomSheet :visible="showAboutModal" @close="showAboutModal = false" maxHeight="80vh">

@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 export type SelectionMode = 'card' | 'wheel';
-export type WheelSize = 'small' | 'medium' | 'large';
+export type WheelSize = 'small' | 'medium';
 
 export const useWheelModeStore = defineStore('wheelMode', () => {
   // 当前选择模式
@@ -19,9 +19,12 @@ export const useWheelModeStore = defineStore('wheelMode', () => {
         currentMode.value = storedMode;
       }
 
-      const storedSize = localStorage.getItem('wheelSize') as WheelSize;
-      if (storedSize && ['small', 'medium', 'large'].includes(storedSize)) {
-        wheelSize.value = storedSize;
+      const storedSize = localStorage.getItem('wheelSize');
+      if (storedSize && ['small', 'medium'].includes(storedSize)) {
+        wheelSize.value = storedSize as WheelSize;
+      } else if (storedSize === 'large') {
+        // 如果之前存储的是 large，则重置为 medium
+        wheelSize.value = 'medium';
       }
     } catch (error) {
       console.error('加载模式设置出错:', error);
@@ -74,8 +77,7 @@ export const useWheelModeStore = defineStore('wheelMode', () => {
   const getWheelSizeInPixels = (): number => {
     const sizeMap = {
       small: 240,
-      medium: 320,
-      large: 400,
+      medium: 300,
     };
     return sizeMap[wheelSize.value];
   };

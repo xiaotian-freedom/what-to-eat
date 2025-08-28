@@ -2,12 +2,13 @@
   <div
     class="font-sans flex justify-center items-center px-5 w-full h-screen"
     :class="`theme-gradient-${themeStore.currentTheme}`"
+    :style="getTransparentBackgroundStyle()"
   >
     <!-- 卡片容器 -->
     <div class="card-container" :class="{ flipped: showResult }">
-      <!-- 主页面 - 卡片模式 -->
+      <!-- 主页面 - 统一的 HomeCard -->
       <HomeCard
-        v-if="wheelModeStore.isCardMode() && !showResult"
+        v-if="!showResult"
         ref="homeCardRef"
         class="card-face"
         :dishList="enhancedDishList"
@@ -18,33 +19,6 @@
         @selected-dish="selectedDish = $event"
         @show-result="showResult = true"
       />
-
-      <!-- 主页面 - 转盘模式 -->
-      <div
-        v-if="wheelModeStore.isWheelMode() && !showResult"
-        class="wheel-page card-face bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative flex flex-col w-full h-full"
-      >
-        <!-- 顶部状态栏 -->
-        <HeaderBar :title="$t('app.name')" :showBackButton="false" :centerTitle="true" />
-
-        <!-- 转盘区域 -->
-        <div class="flex-1 flex flex-col items-center justify-center p-4">
-          <LuckyWheel
-            :foodList="foodStore.foodItems"
-            :currentTheme="themeStore.currentTheme"
-            @result="handleWheelResult"
-          />
-        </div>
-
-        <!-- 底部操作按钮 -->
-        <ActionButtons
-          v-if="wheelModeStore.isCardMode()"
-          :disabled="false"
-          :showMainButtons="false"
-          @add-food="addFood"
-          @show-food-list="showFoodList"
-        />
-      </div>
 
       <!-- 结果页面 -->
       <ResultCard
@@ -64,9 +38,6 @@
   import { useI18n } from 'vue-i18n';
   import HomeCard from '@/components/HomeCard.vue';
   import ResultCard from '@/components/ResultCard.vue';
-  import LuckyWheel from '@/components/LuckyWheel.vue';
-  import HeaderBar from '@/components/HeaderBar.vue';
-  import ActionButtons from '@/components/ActionButtons.vue';
   import type { Food } from '@/types';
   import { enhancedDishList } from '@/data/enhancedDishList';
   import { useRouter } from 'vue-router';
@@ -96,12 +67,6 @@
       // 动画完成后会自动触发 show-result 事件
       await homeCardRef.value.startRandomAnimation();
     }
-  };
-
-  // 处理转盘结果
-  const handleWheelResult = (food: Food) => {
-    selectedDish.value = food;
-    showResult.value = true;
   };
 
   // 添加菜品
@@ -196,6 +161,29 @@
       console.log('Legacy copy failed:', error);
       showFailToast(t('messages.copyFailed'));
     }
+  };
+
+  // 获取透明背景样式
+  const getTransparentBackgroundStyle = () => {
+    const theme = themeStore.currentTheme;
+
+    const gradients = {
+      default:
+        'linear-gradient(135deg, rgba(224, 231, 255, 0.3), rgba(221, 214, 254, 0.3), rgba(252, 231, 243, 0.3))',
+      dark: 'linear-gradient(135deg, rgba(15, 23, 42, 0.5), rgba(88, 28, 135, 0.5), rgba(15, 23, 42, 0.5))',
+      sunset:
+        'linear-gradient(135deg, rgba(254, 215, 170, 0.3), rgba(252, 231, 243, 0.3), rgba(254, 243, 199, 0.3))',
+      ocean:
+        'linear-gradient(135deg, rgba(207, 250, 254, 0.3), rgba(219, 234, 254, 0.3), rgba(224, 242, 254, 0.3))',
+      forest:
+        'linear-gradient(135deg, rgba(220, 252, 231, 0.3), rgba(209, 250, 229, 0.3), rgba(204, 251, 241, 0.3))',
+      vintage:
+        'linear-gradient(135deg, rgba(243, 232, 255, 0.3), rgba(237, 233, 254, 0.3), rgba(253, 244, 255, 0.3))',
+    };
+
+    return {
+      background: gradients[theme] || gradients.default,
+    };
   };
 
   onMounted(() => {

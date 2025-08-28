@@ -16,7 +16,7 @@
           @click.stop="toggleMenu"
           class="p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
           :style="{
-            color: 'var(--color-textSecondary)',
+            color: 'var(--color-primary)',
             backgroundColor: 'transparent',
           }"
         >
@@ -45,7 +45,7 @@
 
     <!-- 内容区域 -->
     <div
-      class="flex-1 flex flex-col items-center p-6 overflow-hidden relative"
+      class="flex-1 flex flex-col items-center overflow-hidden relative"
       :style="{
         backgroundColor: 'var(--color-background)',
       }"
@@ -65,29 +65,47 @@
         @recommendationsUpdated="onRecommendationsUpdated"
       />
 
-      <!-- 占位区域 -->
-      <div
-        ref="canvasContainer"
-        class="w-full flex items-center justify-center relative transition-all duration-300 flex-grow"
-      >
-        <DishCanvas
-          ref="dishCanvasRef"
-          :dishList="combinedDishList"
-          :targetDish="recommendedDish || undefined"
-          @animation-complete="onAnimationComplete"
-        />
-        <div class="w-52 h-52"></div>
-      </div>
+      <!-- 主内容区域 -->
+      <div class="flex-1 flex flex-col items-center justify-center w-full p-6">
+        <!-- 卡片模式 -->
+        <div v-if="wheelModeStore.isCardMode()" class="w-full flex-1 flex flex-col">
+          <!-- 占位区域 -->
+          <div
+            ref="canvasContainer"
+            class="w-full flex items-center justify-center relative transition-all duration-300 flex-grow"
+          >
+            <DishCanvas
+              ref="dishCanvasRef"
+              :dishList="combinedDishList"
+              :targetDish="recommendedDish || undefined"
+              @animation-complete="onAnimationComplete"
+            />
+            <div class="w-52 h-52"></div>
+          </div>
 
-      <!-- 底部按钮区域 - 固定在底部 -->
-      <div class="mt-auto pt-6 w-full">
-        <ActionButtons
-          :disabled="isAnimating || !canUseToday"
-          :showMainButtons="true"
-          @randomFood="handleRandomFood"
-          @addFood="$emit('add-food')"
-          @showFoodList="$emit('show-food-list')"
-        />
+          <!-- 底部按钮区域 - 固定在底部 -->
+          <div class="mt-auto pt-6 w-full">
+            <ActionButtons
+              :disabled="isAnimating || !canUseToday"
+              :showMainButtons="true"
+              @randomFood="handleRandomFood"
+              @addFood="$emit('add-food')"
+              @showFoodList="$emit('show-food-list')"
+            />
+          </div>
+        </div>
+
+        <!-- 转盘模式 -->
+        <div v-if="wheelModeStore.isWheelMode()" class="w-full flex-1 flex flex-col">
+          <!-- 转盘区域 -->
+          <div class="flex-1 flex flex-col items-center justify-center">
+            <LuckyWheel
+              :foodList="combinedDishList"
+              :currentTheme="themeStore.currentTheme"
+              @result="handleWheelResult"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -103,11 +121,14 @@
   import ChallengeBottomSheet from './ChallengeBottomSheet.vue';
   import RecommendationBottomSheet from './RecommendationBottomSheet.vue';
   import MenuPopover from './MenuPopover.vue';
+  import LuckyWheel from './LuckyWheel.vue';
   import type { Food, RecommendationResult } from '@/types';
   import HeaderBar from '@/components/HeaderBar.vue';
   import { useFoodStore } from '@/stores';
   import { useChallengeStore } from '@/stores/challenge';
   import { useDevModeStore } from '@/stores/devMode';
+  import { useWheelModeStore } from '@/stores/wheelMode';
+  import { useThemeStore } from '@/stores/theme';
   import { showFailToast } from 'vant';
 
   const { t } = useI18n();
@@ -121,6 +142,8 @@
   const foodStore = useFoodStore();
   const challengeStore = useChallengeStore();
   const devModeStore = useDevModeStore();
+  const wheelModeStore = useWheelModeStore();
+  const themeStore = useThemeStore();
 
   // 优先使用 store 中的数据，如果为空才使用 dishList
   const combinedDishList = computed(() => {
@@ -156,6 +179,7 @@
   onMounted(() => {
     foodStore.loadFoodItems();
     challengeStore.loadChallengeData();
+    wheelModeStore.loadModeSettings();
   });
 
   // 处理随机选菜
@@ -273,6 +297,22 @@
         router.push('/settings');
         break;
     }
+  };
+
+  // 处理转盘结果
+  const handleWheelResult = (food: Food) => {
+    // 记录挑战数据
+    const success = challengeStore.useRandomFood(food.name);
+    if (!success) {
+      showFailToast(t('messages.todayLimitReached'));
+      return;
+    }
+
+    // 发送选择事件
+    emit('selected-dish', food);
+
+    // 显示结果页面
+    emit('show-result');
   };
 
   // 将方法暴露给父组件
