@@ -132,15 +132,15 @@ body.theme-monochrome {
 
 /* 粉彩主题 */
 body.theme-pastel {
-    --color-primary: #a78bfa;
-    --color-secondary: #f9a8d4;
+    --color-primary: #f9a8d4;
+    --color-secondary: #a78bfa;
     --color-accent: #86efac;
     --color-background: #fafafa;
     --color-surface: #ffffff;
     --color-text: #6b7280;
     --color-textSecondary: #9ca3af;
     --color-border: #f3f4f6;
-    --color-shadow: rgba(167, 139, 250, 0.15);
+    --color-shadow: rgba(249, 168, 212, 0.15);
 }
 
 /* 玻璃主题 */
@@ -314,7 +314,7 @@ body {
 }
 
 .theme-gradient-pastel {
-    background: linear-gradient(135deg, #fafafa, #f3f4f6, #fafafa);
+    background: linear-gradient(135deg, #fdf2f8, #f3e8ff, #f0fdf4);
 }
 
 .theme-gradient-glass {

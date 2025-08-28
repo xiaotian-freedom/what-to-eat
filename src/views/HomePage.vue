@@ -2,7 +2,6 @@
   <div
     class="font-sans flex justify-center items-center px-5 w-full h-screen"
     :class="`theme-gradient-${themeStore.currentTheme}`"
-    :style="getTransparentBackgroundStyle()"
   >
     <!-- 卡片容器 -->
     <div class="card-container" :class="{ flipped: showResult }">
@@ -161,29 +160,6 @@
       console.log('Legacy copy failed:', error);
       showFailToast(t('messages.copyFailed'));
     }
-  };
-
-  // 获取透明背景样式
-  const getTransparentBackgroundStyle = () => {
-    const theme = themeStore.currentTheme;
-
-    const gradients = {
-      default:
-        'linear-gradient(135deg, rgba(224, 231, 255, 0.3), rgba(221, 214, 254, 0.3), rgba(252, 231, 243, 0.3))',
-      dark: 'linear-gradient(135deg, rgba(15, 23, 42, 0.5), rgba(88, 28, 135, 0.5), rgba(15, 23, 42, 0.5))',
-      sunset:
-        'linear-gradient(135deg, rgba(254, 215, 170, 0.3), rgba(252, 231, 243, 0.3), rgba(254, 243, 199, 0.3))',
-      ocean:
-        'linear-gradient(135deg, rgba(207, 250, 254, 0.3), rgba(219, 234, 254, 0.3), rgba(224, 242, 254, 0.3))',
-      forest:
-        'linear-gradient(135deg, rgba(220, 252, 231, 0.3), rgba(209, 250, 229, 0.3), rgba(204, 251, 241, 0.3))',
-      vintage:
-        'linear-gradient(135deg, rgba(243, 232, 255, 0.3), rgba(237, 233, 254, 0.3), rgba(253, 244, 255, 0.3))',
-    };
-
-    return {
-      background: gradients[theme] || gradients.default,
-    };
   };
 
   onMounted(() => {
