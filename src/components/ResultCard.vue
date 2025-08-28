@@ -53,7 +53,10 @@
           <div
             class="absolute bottom-0 left-0 right-0 bg-black/30 backdrop-filter backdrop-blur-sm p-2 text-center overflow-hidden"
           >
-            <div class="marquee-container" :class="{ 'is-marquee': needsMarquee }">
+            <div
+              class="marquee-container"
+              :class="{ 'is-marquee': needsMarquee && isMarqueeActive }"
+            >
               <p class="text-lg font-medium text-white marquee-text" ref="dishNameRef">
                 {{ selectedDish?.name }}
               </p>
@@ -167,7 +170,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch, nextTick } from 'vue';
+  import { ref, watch, nextTick, onUnmounted } from 'vue';
   import { showFailToast, closeToast } from 'vant';
 
   import type { Food } from '@/types';
@@ -194,6 +197,8 @@
   const dishNameRef = ref<HTMLElement | null>(null);
   const needsMarquee = ref(false);
   const marqueeDistance = ref(159); // 默认值
+  const isMarqueeActive = ref(false); // 控制跑马灯是否激活
+  let marqueeTimeout: number | null = null; // 存储定时器ID
 
   // 做法相关状态
   const showRecipeSheet = ref(false);
@@ -239,7 +244,7 @@
         const availableWidth = calculateCircleBottomWidth(radius, distanceFromBottom);
 
         // 减去左右padding (约20px，考虑视觉效果)
-        const usableWidth = availableWidth - 20;
+        const usableWidth = availableWidth - 10;
 
         // 更新跑马灯距离 - 现在是文字从右侧进入的起始位置
         marqueeDistance.value = Math.max(usableWidth, 120); // 最小120px
@@ -252,6 +257,28 @@
             '--marquee-distance',
             `${marqueeDistance.value}px`
           );
+        }
+
+        // 如果文字过长，延迟激活跑马灯效果
+        if (needsMarquee.value) {
+          // 先重置为居中状态
+          isMarqueeActive.value = false;
+          // 清除之前的定时器
+          if (marqueeTimeout) {
+            clearTimeout(marqueeTimeout);
+          }
+          // 延迟2秒后激活跑马灯
+          marqueeTimeout = setTimeout(() => {
+            isMarqueeActive.value = true;
+          }, 2000);
+        } else {
+          // 如果不需要跑马灯，确保保持居中
+          isMarqueeActive.value = false;
+          // 清除定时器
+          if (marqueeTimeout) {
+            clearTimeout(marqueeTimeout);
+            marqueeTimeout = null;
+          }
         }
       }
     }
@@ -362,6 +389,13 @@
     showRecipeSheet.value = false;
   };
 
+  // 组件卸载时清理定时器
+  onUnmounted(() => {
+    if (marqueeTimeout) {
+      clearTimeout(marqueeTimeout);
+    }
+  });
+
   defineEmits<{
     (e: 'choose-again'): void;
     (e: 'share-result'): void;
@@ -400,11 +434,12 @@
     align-items: center;
     justify-content: center;
     overflow: hidden; /* 确保文字可以隐藏在容器外 */
+    transition: justify-content 0.5s ease;
   }
 
   .marquee-text {
     white-space: nowrap;
-    transition: transform 0.3s ease;
+    transition: transform 0.5s ease;
   }
 
   /* 当需要跑马灯时的样式 */
@@ -414,7 +449,7 @@
 
   .marquee-container.is-marquee .marquee-text {
     animation: marquee 6s linear infinite;
-    animation-delay: 1s; /* 延迟1秒开始动画，让用户能先看到开头 */
+    animation-delay: 0.5s; /* 延迟0.5秒开始动画，让过渡更平滑 */
   }
 
   /* 圆形容器底部名称区域 */

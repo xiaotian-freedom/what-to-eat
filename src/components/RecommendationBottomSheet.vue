@@ -573,11 +573,6 @@
       return;
     }
 
-    // if (foodStore.foodItems.length === 0) {
-    //   showFailToast('请先添加一些菜品');
-    //   return;
-    // }
-
     // 创建点击波纹效果
     if (event) {
       createRippleEffect(event);
@@ -586,16 +581,16 @@
     isLoading.value = true;
     usingAI.value = canUseAI.value;
 
-    // 延迟启动粒子效果，让用户看到光效动画
     createSparkleEffect();
 
     try {
-      // 确保有天气数据
-      if (!weatherData.value) {
-        await loadWeatherData();
-      }
+      // 并行加载天气数据和构建推荐上下文
+      await Promise.allSettled([
+        // 如果没有天气数据，异步加载（不阻塞推荐）
+        !weatherData.value ? loadWeatherData() : Promise.resolve(),
+      ]);
 
-      // 构建推荐上下文
+      // 构建推荐上下文（使用当前天气数据，如果没有则使用默认值）
       const context = {
         // 环境因素
         currentWeather: weatherData.value?.weatherType,
@@ -651,11 +646,6 @@
 
         // 触发选择事件，交由父组件决定如何处理（卡片动画或直接跳转）
         emit('foodSelected', topRecommendation);
-
-        // 不再自动关闭弹窗，由父组件的处理逻辑决定何时关闭
-        // setTimeout(() => {
-        //   handleClose();
-        // }, 100);
       }
     } catch (error) {
       console.error('获取推荐失败:', error);
@@ -710,12 +700,13 @@
     createSparkleEffect(extraSparklesContainer.value);
 
     try {
-      // 确保有天气数据
-      if (!weatherData.value) {
-        await loadWeatherData();
-      }
+      // 并行加载天气数据和构建推荐上下文
+      await Promise.allSettled([
+        // 如果没有天气数据，异步加载（不阻塞推荐）
+        !weatherData.value ? loadWeatherData() : Promise.resolve(),
+      ]);
 
-      // 构建推荐上下文
+      // 构建推荐上下文（使用当前天气数据，如果没有则使用默认值）
       const context = {
         // 环境因素
         currentWeather: weatherData.value?.weatherType,
@@ -773,11 +764,6 @@
 
         // 触发选择事件，交由父组件决定如何处理（卡片动画或直接跳转）
         emit('foodSelected', topRecommendation);
-
-        // 不再自动关闭弹窗，由父组件的处理逻辑决定何时关闭
-        // setTimeout(() => {
-        //   handleClose();
-        // }, 100);
       }
     } catch (error) {
       console.error('获取额外推荐失败:', error);
@@ -824,17 +810,17 @@
 
   // 生命周期
   onMounted(async () => {
-    // 加载用户偏好数据
-    userPreferenceStore.loadUserPreference();
-
-    // 加载菜品数据
-    foodStore.loadFoodItems();
-
-    // 加载挑战数据
-    challengeStore.loadChallengeData();
-
-    // 加载天气数据
-    await loadWeatherData();
+    // 并行加载所有数据，提升初始化速度
+    await Promise.allSettled([
+      // 加载用户偏好数据
+      userPreferenceStore.loadUserPreference(),
+      // 加载菜品数据
+      foodStore.loadFoodItems(),
+      // 加载挑战数据
+      challengeStore.loadChallengeData(),
+      // 异步加载天气数据（不阻塞其他初始化）
+      loadWeatherData().catch(err => console.warn('天气数据加载失败:', err)),
+    ]);
 
     // 监听网络状态变化
     const updateNetworkStatus = () => {

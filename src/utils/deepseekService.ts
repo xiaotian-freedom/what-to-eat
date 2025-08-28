@@ -5,6 +5,7 @@ import type {
   RecommendationReason,
 } from '@/types';
 import { RecommendationReasonType } from '@/types';
+import { monitorPerformance } from './performanceMonitor';
 
 // DeepSeek API 配置
 interface DeepSeekConfig {
@@ -331,7 +332,7 @@ ${foodListStr}${recentChoicesStr}
     };
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15秒超时
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 减少到8秒超时，提升响应速度
 
     try {
       const response = await fetch(this.config.apiUrl, {
@@ -476,40 +477,43 @@ ${foodListStr}${recentChoicesStr}
   /**
    * 获取 AI 推荐
    */
-  public async getAIRecommendation(
-    context: RecommendationContext,
-    foods: Food[],
-    userRecentChoices: string[] = [],
-    options?: { forceExtendedRecommendation?: boolean }
-  ): Promise<RecommendationResult> {
-    if (foods.length === 0) {
-      throw new Error('菜品列表为空');
-    }
-
-    try {
-      // 如果强制扩展推荐，清空最近选择历史
-      let recentChoices = userRecentChoices;
-      if (options?.forceExtendedRecommendation) {
-        recentChoices = [];
-        console.log('强制扩展推荐模式，清空最近选择历史');
+  public getAIRecommendation = monitorPerformance(
+    'ai_recommendation',
+    async (
+      context: RecommendationContext,
+      foods: Food[],
+      userRecentChoices: string[] = [],
+      options?: { forceExtendedRecommendation?: boolean }
+    ): Promise<RecommendationResult> => {
+      if (foods.length === 0) {
+        throw new Error('菜品列表为空');
       }
 
-      // 合并AI自己的推荐历史和用户选择历史
-      const allRecentChoices = [...this.recentRecommendations, ...recentChoices];
-      const uniqueRecentChoices = [...new Set(allRecentChoices)].slice(0, 15); // 限制为15个，避免prompt过长
+      try {
+        // 如果强制扩展推荐，清空最近选择历史
+        let recentChoices = userRecentChoices;
+        if (options?.forceExtendedRecommendation) {
+          recentChoices = [];
+          console.log('强制扩展推荐模式，清空最近选择历史');
+        }
 
-      const aiResponse = await this.callDeepSeekAPI(
-        context,
-        foods,
-        uniqueRecentChoices,
-        options?.forceExtendedRecommendation
-      );
-      return this.convertToRecommendationResult(aiResponse, foods);
-    } catch (error) {
-      console.error('AI 推荐失败:', error);
-      throw error;
+        // 合并AI自己的推荐历史和用户选择历史
+        const allRecentChoices = [...this.recentRecommendations, ...recentChoices];
+        const uniqueRecentChoices = [...new Set(allRecentChoices)].slice(0, 15); // 限制为15个，避免prompt过长
+
+        const aiResponse = await this.callDeepSeekAPI(
+          context,
+          foods,
+          uniqueRecentChoices,
+          options?.forceExtendedRecommendation
+        );
+        return this.convertToRecommendationResult(aiResponse, foods);
+      } catch (error) {
+        console.error('AI 推荐失败:', error);
+        throw error;
+      }
     }
-  }
+  );
 
   // 辅助方法 - 获取描述文本
   private getWeatherDescription(weather: string): string {

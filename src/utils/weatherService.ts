@@ -12,7 +12,7 @@ interface WeatherServiceConfig {
 const defaultConfig: WeatherServiceConfig = {
   apiKey: import.meta.env.VITE_OPENWEATHER_API_KEY,
   provider: (import.meta.env.VITE_WEATHER_PROVIDER as 'openweather' | 'mock') || 'mock',
-  cacheDuration: Number(import.meta.env.VITE_WEATHER_CACHE_DURATION) || 30,
+  cacheDuration: Number(import.meta.env.VITE_WEATHER_CACHE_DURATION) || 60, // 增加到60分钟缓存
 };
 
 // OpenWeatherMap API响应接口
@@ -163,9 +163,9 @@ export class WeatherService {
           resolve({ lat: 0, lon: 0, error: errorMessage });
         },
         {
-          timeout: 15000, // 增加超时时间，iOS 可能需要更长时间
+          timeout: 10000, // 减少超时时间，提升响应速度
           enableHighAccuracy: false, // iOS Safari 上避免使用高精度模式
-          maximumAge: 600000, // 10分钟内的缓存位置可接受
+          maximumAge: 1800000, // 30分钟内的缓存位置可接受，减少重复请求
         }
       );
     });

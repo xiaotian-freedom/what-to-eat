@@ -1,6 +1,7 @@
 import { deepseekService } from './deepseekService';
 import { useRecommendationStore } from '@/stores/recommendation';
 import { useUserPreferenceStore } from '@/stores/userPreference';
+import { monitorPerformance } from './performanceMonitor';
 import type {
   Food,
   RecommendationContext,
@@ -25,10 +26,10 @@ export class HybridRecommendationService {
   private config: AIRecommendationConfig = {
     preferAI: true,
     fallbackToLocal: true,
-    timeoutMs: 15000, // 15秒超时，与 DeepSeek 服务一致
-    maxRetries: 2,
+    timeoutMs: 8000, // 减少到8秒超时，提升响应速度
+    maxRetries: 1, // 减少重试次数，避免长时间等待
     cacheResults: true,
-    cacheExpiryMs: 2 * 60 * 1000, // 减少到2分钟缓存，增加推荐多样性
+    cacheExpiryMs: 5 * 60 * 1000, // 增加到5分钟缓存，减少重复API调用
   };
 
   private strategy: RecommendationStrategy = Strategy.HYBRID;
@@ -77,7 +78,12 @@ export class HybridRecommendationService {
       time: context.currentTime,
       mood: context.userMood,
       season: context.currentSeason,
-      temperature: Math.round(context.temperature || 0 / 5) * 5, // 按5度归类
+      temperature: Math.round((context.temperature || 0) / 5) * 5, // 按5度归类
+      physicalState: context.physicalState,
+      postMealFeeling: context.postMealFeeling,
+      dietaryRestrictions: context.dietaryRestrictions
+        ? context.dietaryRestrictions.sort()
+        : undefined,
     });
 
     const foodIds = foods
@@ -86,7 +92,7 @@ export class HybridRecommendationService {
       .join(',');
 
     // 添加时间戳的部分，以减少重复缓存的可能性
-    const hourSlot = Math.floor(Date.now() / (1000 * 60 * 30)); // 每30分钟一个时间段
+    const hourSlot = Math.floor(Date.now() / (1000 * 60 * 60)); // 每小时一个时间段
 
     return `${contextStr}-${foodIds}-${hourSlot}`;
   }
@@ -241,7 +247,7 @@ export class HybridRecommendationService {
 
       // 获取用户最近选择的菜品名称（用于避免重复推荐）
       const userPreferenceStore = useUserPreferenceStore();
-      const recentChoiceNames = userPreferenceStore.getRecentChoiceNames(7); // 直接获取最近7天选择的菜品名称
+      const recentChoiceNames = userPreferenceStore.getRecentChoiceNames(5); // 减少到5天，提升响应速度
 
       const result = await Promise.race([
         deepseekService.getAIRecommendation(context, foods, recentChoiceNames),
@@ -258,8 +264,8 @@ export class HybridRecommendationService {
       console.error(`AI 推荐失败 (第${retryCount + 1}次):`, error);
 
       if (retryCount < this.config.maxRetries) {
-        // 指数退避：等待时间逐渐增加
-        const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
+        // 减少退避延迟：等待时间更短
+        const delay = Math.min(500 * Math.pow(2, retryCount), 2000);
         await new Promise(resolve => setTimeout(resolve, delay));
 
         return this.getAIRecommendationWithRetry(context, foods, retryCount + 1);
@@ -307,91 +313,103 @@ export class HybridRecommendationService {
   }
 
   /**
-   * 主推荐方法 - 混合推荐策略
+   * 主推荐方法 - 混合推荐策略（优化版本）
    */
-  public async getRecommendation(
-    context: RecommendationContext,
-    foods: Food[]
-  ): Promise<RecommendationResult> {
-    if (foods.length === 0) {
-      throw new Error('菜品列表为空');
-    }
-
-    // 检查缓存
-    const cachedResult = this.getCachedRecommendation(context, foods);
-    if (cachedResult) {
-      return cachedResult;
-    }
-
-    let result: RecommendationResult;
-    let error: Error | null = null;
-
-    try {
-      switch (this.strategy) {
-        case Strategy.AI_ONLY:
-          result = await this.getAIRecommendationWithRetry(context, foods);
-          break;
-
-        case Strategy.LOCAL_ONLY:
-          result = await this.getLocalRecommendation(context, foods);
-          break;
-
-        case Strategy.HYBRID:
-          // 默认混合策略：优先 AI，失败时降级到本地
-          if (this.canUseAI() && this.config.preferAI) {
-            try {
-              console.log('尝试使用 AI 推荐');
-              result = await this.getAIRecommendationWithRetry(context, foods);
-            } catch (aiError) {
-              console.warn('AI 推荐失败，降级到本地算法:', aiError);
-              if (this.config.fallbackToLocal) {
-                result = await this.getLocalRecommendation(context, foods);
-              } else {
-                throw aiError;
-              }
-            }
-          } else {
-            console.log('使用本地推荐算法');
-            result = await this.getLocalRecommendation(context, foods);
-          }
-          break;
-
-        case Strategy.COMPARE:
-          // 对比模式：同时运行两种算法（主要用于调试）
-          const [aiResult, localResult] = await Promise.allSettled([
-            this.canUseAI()
-              ? this.getAIRecommendationWithRetry(context, foods)
-              : Promise.reject(new Error('AI 不可用')),
-            this.getLocalRecommendation(context, foods),
-          ]);
-
-          console.log('AI 推荐结果:', aiResult);
-          console.log('本地推荐结果:', localResult);
-
-          // 优先返回 AI 结果
-          if (aiResult.status === 'fulfilled') {
-            result = aiResult.value;
-          } else if (localResult.status === 'fulfilled') {
-            result = localResult.value;
-          } else {
-            throw new Error('所有推荐方法都失败了');
-          }
-          break;
-
-        default:
-          throw new Error(`未知的推荐策略: ${this.strategy}`);
+  public getRecommendation = monitorPerformance(
+    'hybrid_recommendation',
+    async (context: RecommendationContext, foods: Food[]): Promise<RecommendationResult> => {
+      if (foods.length === 0) {
+        throw new Error('菜品列表为空');
       }
 
-      // 缓存成功的结果
-      this.cacheRecommendation(context, foods, result);
+      // 检查缓存
+      const cachedResult = this.getCachedRecommendation(context, foods);
+      if (cachedResult) {
+        return cachedResult;
+      }
 
-      return result;
-    } catch (err) {
-      error = err instanceof Error ? err : new Error('推荐失败');
-      console.error('推荐失败:', error);
-      throw error;
+      let result: RecommendationResult;
+      let error: Error | null = null;
+
+      try {
+        switch (this.strategy) {
+          case Strategy.AI_ONLY:
+            result = await this.getAIRecommendationWithRetry(context, foods);
+            break;
+
+          case Strategy.LOCAL_ONLY:
+            result = await this.getLocalRecommendation(context, foods);
+            break;
+
+          case Strategy.HYBRID:
+            // 优化混合策略：并行执行AI和本地推荐，选择更快的响应
+            if (this.canUseAI() && this.config.preferAI) {
+              try {
+                console.log('并行执行AI和本地推荐');
+
+                // 并行执行AI和本地推荐
+                const aiPromise = this.getAIRecommendationWithRetry(context, foods);
+                const localPromise = this.getLocalRecommendation(context, foods);
+
+                // 等待第一个成功的结果
+                const firstResult = await Promise.race([
+                  aiPromise.then(result => ({ result, source: 'ai' as const })),
+                  localPromise.then(result => ({ result, source: 'local' as const })),
+                ]);
+
+                result = firstResult.result;
+                console.log(`使用${firstResult.source}推荐结果`);
+              } catch (aiError) {
+                console.warn('并行推荐失败，降级到本地算法:', aiError);
+                if (this.config.fallbackToLocal) {
+                  result = await this.getLocalRecommendation(context, foods);
+                } else {
+                  throw aiError;
+                }
+              }
+            } else {
+              console.log('使用本地推荐算法');
+              result = await this.getLocalRecommendation(context, foods);
+            }
+            break;
+
+          case Strategy.COMPARE:
+            // 对比模式：同时运行两种算法（主要用于调试）
+            const [aiResult, localResult] = await Promise.allSettled([
+              this.canUseAI()
+                ? this.getAIRecommendationWithRetry(context, foods)
+                : Promise.reject(new Error('AI 不可用')),
+              this.getLocalRecommendation(context, foods),
+            ]);
+
+            console.log('AI 推荐结果:', aiResult);
+            console.log('本地推荐结果:', localResult);
+
+            // 优先返回 AI 结果
+            if (aiResult.status === 'fulfilled') {
+              result = aiResult.value;
+            } else if (localResult.status === 'fulfilled') {
+              result = localResult.value;
+            } else {
+              throw new Error('所有推荐方法都失败了');
+            }
+            break;
+
+          default:
+            throw new Error(`未知的推荐策略: ${this.strategy}`);
+        }
+
+        // 缓存成功的结果
+        this.cacheRecommendation(context, foods, result);
+
+        return result;
+      } catch (err) {
+        error = err instanceof Error ? err : new Error('推荐失败');
+        console.error('推荐失败:', error);
+        throw error;
+      }
     }
-  }
+  );
 
   /**
    * 获取推荐统计信息
