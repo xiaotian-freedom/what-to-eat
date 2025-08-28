@@ -4,20 +4,21 @@
     @close="$emit('close')"
     :closeOnBackdrop="true"
     maxHeight="85vh"
-    :title="$t('settings.selectionMode')"
+    :title="$t('settings.language')"
   >
     <div class="space-y-4">
-      <!-- 卡片模式 -->
+      <!-- 中文 -->
       <div
-        @click="selectMode('card')"
+        @click="selectLanguage('zh-CN')"
         class="relative p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer"
-        :class="selectedMode === 'card' ? 'theme-border-primary' : 'hover:border-gray-300'"
+        :class="selectedLanguage === 'zh-CN' ? 'theme-border-primary' : 'hover:border-gray-300'"
         :style="{
           backgroundColor:
-            selectedMode === 'card'
+            selectedLanguage === 'zh-CN'
               ? 'var(--color-primary-light, rgba(99, 102, 241, 0.1))'
               : 'var(--color-surface)',
-          borderColor: selectedMode === 'card' ? 'var(--color-primary)' : 'var(--color-border)',
+          borderColor:
+            selectedLanguage === 'zh-CN' ? 'var(--color-primary)' : 'var(--color-border)',
         }"
       >
         <div class="flex items-center space-x-4">
@@ -26,34 +27,25 @@
               class="w-12 h-12 rounded-lg flex items-center justify-center transition-colors"
               :style="{
                 backgroundColor:
-                  selectedMode === 'card'
+                  selectedLanguage === 'zh-CN'
                     ? 'var(--color-primary-light, rgba(99, 102, 241, 0.15))'
                     : 'var(--color-border)',
                 color:
-                  selectedMode === 'card' ? 'var(--color-primary)' : 'var(--color-textSecondary)',
+                  selectedLanguage === 'zh-CN'
+                    ? 'var(--color-primary)'
+                    : 'var(--color-textSecondary)',
               }"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                />
-              </svg>
+              <span class="text-2xl">🇨🇳</span>
             </div>
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold" style="color: var(--color-text)">
-              {{ $t('mode.card.title') }}
-            </h3>
-            <p class="text-sm mt-1" style="color: var(--color-textSecondary)">
-              {{ $t('mode.card.description') }}
-            </p>
+            <h3 class="text-lg font-semibold" style="color: var(--color-text)">简体中文</h3>
+            <p class="text-sm mt-1" style="color: var(--color-textSecondary)">中文</p>
           </div>
           <div class="flex-shrink-0">
             <div
-              v-if="selectedMode === 'card'"
+              v-if="selectedLanguage === 'zh-CN'"
               class="w-6 h-6 rounded-full flex items-center justify-center"
               :style="{ backgroundColor: 'var(--color-primary)' }"
             >
@@ -74,17 +66,18 @@
         </div>
       </div>
 
-      <!-- 转盘模式 -->
+      <!-- 英文 -->
       <div
-        @click="selectMode('wheel')"
+        @click="selectLanguage('en-US')"
         class="relative p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer"
-        :class="selectedMode === 'wheel' ? 'theme-border-secondary' : 'hover:border-gray-300'"
+        :class="selectedLanguage === 'en-US' ? 'theme-border-secondary' : 'hover:border-gray-300'"
         :style="{
           backgroundColor:
-            selectedMode === 'wheel'
+            selectedLanguage === 'en-US'
               ? 'var(--color-secondary-light, rgba(139, 92, 246, 0.1))'
               : 'var(--color-surface)',
-          borderColor: selectedMode === 'wheel' ? 'var(--color-secondary)' : 'var(--color-border)',
+          borderColor:
+            selectedLanguage === 'en-US' ? 'var(--color-secondary)' : 'var(--color-border)',
         }"
       >
         <div class="flex items-center space-x-4">
@@ -93,36 +86,25 @@
               class="w-12 h-12 rounded-lg flex items-center justify-center transition-colors"
               :style="{
                 backgroundColor:
-                  selectedMode === 'wheel'
+                  selectedLanguage === 'en-US'
                     ? 'var(--color-secondary-light, rgba(139, 92, 246, 0.15))'
                     : 'var(--color-border)',
                 color:
-                  selectedMode === 'wheel'
+                  selectedLanguage === 'en-US'
                     ? 'var(--color-secondary)'
                     : 'var(--color-textSecondary)',
               }"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                />
-              </svg>
+              <span class="text-2xl">🇺🇸</span>
             </div>
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold" style="color: var(--color-text)">
-              {{ $t('mode.wheel.title') }}
-            </h3>
-            <p class="text-sm mt-1" style="color: var(--color-textSecondary)">
-              {{ $t('mode.wheel.description') }}
-            </p>
+            <h3 class="text-lg font-semibold" style="color: var(--color-text)">English</h3>
+            <p class="text-sm mt-1" style="color: var(--color-textSecondary)">English</p>
           </div>
           <div class="flex-shrink-0">
             <div
-              v-if="selectedMode === 'wheel'"
+              v-if="selectedLanguage === 'en-US'"
               class="w-6 h-6 rounded-full flex items-center justify-center"
               :style="{ backgroundColor: 'var(--color-secondary)' }"
             >
@@ -161,9 +143,8 @@
 
 <script setup lang="ts">
   import { ref } from 'vue';
-  import { useWheelModeStore, type SelectionMode } from '@/stores/wheelMode';
-  import { showSuccessToast } from 'vant';
   import { useI18n } from 'vue-i18n';
+  import { showSuccessToast } from 'vant';
   import BottomSheet from './BottomSheet.vue';
 
   interface Props {
@@ -177,20 +158,22 @@
   defineProps<Props>();
 
   const emit = defineEmits<Emits>();
-  const wheelModeStore = useWheelModeStore();
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
 
-  const selectedMode = ref<SelectionMode>(wheelModeStore.currentMode);
+  const selectedLanguage = ref<string>(locale.value);
 
-  // 选择模式
-  const selectMode = (mode: SelectionMode) => {
-    selectedMode.value = mode;
+  // 选择语言
+  const selectLanguage = (language: string) => {
+    selectedLanguage.value = language;
   };
 
   // 确认选择
   const confirmSelection = () => {
-    wheelModeStore.setMode(selectedMode.value);
-    showSuccessToast(t('messages.modeChanged'));
+    // 更新语言设置
+    locale.value = selectedLanguage.value;
+    localStorage.setItem('locale', selectedLanguage.value);
+
+    showSuccessToast(t('messages.languageChanged'));
     emit('close');
   };
 </script>

@@ -9,8 +9,8 @@
     --color-surface: #ffffff;
     --color-text: #1f2937;
     --color-textSecondary: #6b7280;
-    --color-border: #e5e7eb;
-    --color-shadow: rgba(0, 0, 0, 0.1);
+    --color-border: #c7d2fe;
+    --color-shadow: rgba(99, 102, 241, 0.1);
 }
 
 /* 深色主题 */
@@ -22,8 +22,8 @@ body.theme-dark {
     --color-surface: #1e293b;
     --color-text: #f1f5f9;
     --color-textSecondary: #94a3b8;
-    --color-border: #334155;
-    --color-shadow: rgba(0, 0, 0, 0.3);
+    --color-border: #60a5fa;
+    --color-shadow: rgba(59, 130, 246, 0.25);
 }
 
 /* 日落主题 */
@@ -35,8 +35,8 @@ body.theme-sunset {
     --color-surface: #ffffff;
     --color-text: #92400e;
     --color-textSecondary: #d97706;
-    --color-border: #fde68a;
-    --color-shadow: rgba(251, 191, 36, 0.2);
+    --color-border: #fed7aa;
+    --color-shadow: rgba(251, 146, 60, 0.15);
 }
 
 /* 海洋主题 */
@@ -48,8 +48,8 @@ body.theme-ocean {
     --color-surface: #ffffff;
     --color-text: #0c4a6e;
     --color-textSecondary: #0369a1;
-    --color-border: #bae6fd;
-    --color-shadow: rgba(6, 182, 212, 0.2);
+    --color-border: #a5f3fc;
+    --color-shadow: rgba(6, 182, 212, 0.12);
 }
 
 /* 森林主题 */
@@ -61,8 +61,8 @@ body.theme-forest {
     --color-surface: #ffffff;
     --color-text: #064e3b;
     --color-textSecondary: #065f46;
-    --color-border: #bbf7d0;
-    --color-shadow: rgba(5, 150, 105, 0.2);
+    --color-border: #a7f3d0;
+    --color-shadow: rgba(5, 150, 105, 0.12);
 }
 
 /* 复古主题 */
@@ -74,8 +74,8 @@ body.theme-vintage {
     --color-surface: #ffffff;
     --color-text: #581c87;
     --color-textSecondary: #7c3aed;
-    --color-border: #e9d5ff;
-    --color-shadow: rgba(168, 85, 247, 0.2);
+    --color-border: #ddd6fe;
+    --color-shadow: rgba(168, 85, 247, 0.15);
 }
 
 /* 主题过渡动画 */

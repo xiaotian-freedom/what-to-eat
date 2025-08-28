@@ -24,18 +24,60 @@
         }"
       >
         <!-- 拖拽指示器 -->
-        <div class="flex justify-center pt-3 pb-2">
+        <!-- <div class="flex justify-center pt-3 pb-2">
           <div
             class="w-12 h-1 rounded-full"
             :style="{ backgroundColor: indicatorColor || 'var(--color-border)' }"
           ></div>
+        </div> -->
+
+        <!-- 标题栏 -->
+        <div v-if="title || showCloseButton" class="flex items-center justify-between px-6 py-5">
+          <!-- 占位符，用于平衡布局 -->
+          <div class="w-8 h-8" v-if="showCloseButton && title"></div>
+
+          <!-- 标题 -->
+          <h3
+            v-if="title"
+            class="text-lg font-semibold text-center theme-transition"
+            :style="{ color: 'var(--color-text)' }"
+          >
+            {{ title }}
+          </h3>
+
+          <!-- 关闭按钮 -->
+          <button
+            v-if="showCloseButton"
+            @click="emit('close')"
+            class="close-button w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-0 theme-transition"
+            :style="{
+              backgroundColor: 'transparent',
+              color: 'var(--color-text)',
+            }"
+            :class="{ 'ml-auto': !title }"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
 
         <!-- 内容区域 -->
         <div
           class="px-6 pb-6 overflow-y-auto"
           :style="{
-            maxHeight: `calc(${maxHeight} - 60px)`,
+            maxHeight: `calc(${maxHeight} - ${title || showCloseButton ? '120px' : '60px'})`,
             background: backgroundStyle.background,
             backgroundColor: backgroundStyle.backgroundColor,
           }"
@@ -58,6 +100,8 @@
     backgroundStyle?: string | Record<string, string>;
     customClass?: string;
     indicatorColor?: string;
+    title?: string;
+    showCloseButton?: boolean;
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -67,6 +111,8 @@
     backgroundStyle: undefined,
     customClass: '',
     indicatorColor: 'var(--color-border)',
+    title: '',
+    showCloseButton: true,
   });
 
   // 计算背景样式
@@ -122,5 +168,9 @@
   .slide-up-leave-from {
     transform: translateY(0);
     opacity: 1;
+  }
+
+  .close-button:active {
+    transform: scale(0.95);
   }
 </style>

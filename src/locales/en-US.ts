@@ -85,6 +85,7 @@ export default {
   'messages.shareText': 'I randomly selected this dish using "What to Eat Today", try it too!',
   'messages.imageSizeLimit': 'Image size cannot exceed 10M',
   'messages.modeChanged': 'Mode changed successfully',
+  'messages.languageChanged': 'Language changed successfully',
 
   // Achievement system
   'achievements.title': 'Achievements',
@@ -133,10 +134,7 @@ export default {
   'settings.themeDesc': 'Choose your favorite theme style',
   'settings.selectionMode': 'Selection Mode',
   'settings.selectionModeDesc': 'Choose card or wheel lottery mode',
-  'settings.wheelSize': 'Wheel Size',
-  'settings.wheelSizeOptions.small': 'Small',
-  'settings.wheelSizeOptions.medium': 'Medium',
-  'settings.wheelSizeOptions.large': 'Large',
+
   'settings.language': 'Language',
   'settings.languageDesc': 'Choose app language',
   'settings.version': 'Version',
@@ -157,11 +155,11 @@ export default {
   // App configuration
   'app.name': 'What to Eat Today',
   'app.description': 'A simple and fun random food selection app',
-  'app.features.randomFood': '🎯 Random Food Selection',
-  'app.features.foodManagement': '📝 Custom Food Management',
-  'app.features.achievements': '🏆 Achievement System',
-  'app.features.dailyChallenge': '🔥 Daily Challenge',
-  'app.features.animations': '🎨 Beautiful Animations',
+  'app.features.randomFood': 'Random Food Selection',
+  'app.features.foodManagement': 'Custom Food Management',
+  'app.features.achievements': 'Achievement System',
+  'app.features.dailyChallenge': 'Daily Challenge',
+  'app.features.animations': 'Beautiful Animations',
 
   // Menu
   'menu.smartRecommendation': 'Smart Recommendation',

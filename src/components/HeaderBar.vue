@@ -159,24 +159,6 @@
     transition: all 0.3s ease;
   }
 
-  /* 返回按钮悬停效果 */
-  .back-btn:hover {
-    background-color: var(--color-border) !important;
-    transform: scale(1.05);
-  }
-
-  /* 右侧按钮悬停效果 */
-  .right-btn:hover {
-    background-color: var(--color-border) !important;
-    transform: scale(1.05);
-  }
-
-  /* 右侧图标悬停效果 */
-  .right-icon-btn:hover {
-    background-color: var(--color-border) !important;
-    transform: scale(1.05);
-  }
-
   /* 链接样式 */
   a {
     -webkit-tap-highlight-color: transparent;

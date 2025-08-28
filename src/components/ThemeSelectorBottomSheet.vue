@@ -1,8 +1,11 @@
 <template>
-  <div class="theme-selector">
-    <div class="p-6">
-      <h2 class="text-xl font-bold text-gray-800 mb-6">{{ $t('settings.theme') }}</h2>
-
+  <BottomSheet
+    :visible="visible"
+    @close="handleClose"
+    maxHeight="80vh"
+    :title="$t('settings.theme')"
+  >
+    <div class="theme-selector-content">
       <!-- 主题网格 -->
       <div class="grid grid-cols-2 gap-4">
         <div
@@ -14,7 +17,7 @@
             currentTheme === theme.id ? 'ring-2 ring-blue-500 ring-offset-2' : 'hover:shadow-lg',
           ]"
           :style="{
-                         background: `linear-gradient(135deg, ${getThemeGradient(theme.id as ThemeId)})`,
+            background: `linear-gradient(135deg, ${getThemeGradient(theme.id as ThemeId)})`,
             border: `1px solid ${theme.colors.border}`
           }"
         >
@@ -58,31 +61,80 @@
       </div>
 
       <!-- 主题说明 -->
-      <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-        <p class="text-sm text-gray-600">
+      <div
+        class="mt-6 p-4 rounded-lg theme-transition"
+        :style="{
+          backgroundColor: 'var(--color-border)',
+          color: 'var(--color-textSecondary)',
+        }"
+      >
+        <p class="text-sm">
           {{ $t('settings.themeDesc') }}
         </p>
       </div>
     </div>
-  </div>
+  </BottomSheet>
 </template>
 
 <script setup lang="ts">
   import { computed } from 'vue';
-  // import { useI18n } from 'vue-i18n';
+  import { useI18n } from 'vue-i18n';
   import { useThemeStore } from '@/stores/theme';
   import type { ThemeId } from '@/types/theme';
+  import BottomSheet from './BottomSheet.vue';
 
-  // const { t } = useI18n();
+  interface Props {
+    /** 是否显示 BottomSheet */
+    visible: boolean;
+    /** 自定义样式类名 */
+    customClass?: string;
+    /** 主题选择后是否自动关闭 */
+    autoClose?: boolean;
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    customClass: '',
+    autoClose: true,
+  });
+
+  const emit = defineEmits<{
+    /** 关闭事件 */
+    (e: 'close'): void;
+    /** 主题选择事件 */
+    (e: 'select', themeId: ThemeId): void;
+    /** 主题更改事件 */
+    (e: 'change', themeId: ThemeId): void;
+  }>();
+
+  useI18n();
   const themeStore = useThemeStore();
 
   // 计算属性
   const currentTheme = computed(() => themeStore.currentTheme);
   const availableThemes = computed(() => themeStore.availableThemes);
 
-  // 方法
+  // 选择主题
   const selectTheme = (themeId: ThemeId) => {
+    if (themeId === currentTheme.value) {
+      return;
+    }
+
+    // 设置主题
     themeStore.setTheme(themeId);
+
+    // 触发事件
+    emit('select', themeId);
+    emit('change', themeId);
+
+    // 自动关闭
+    if (props.autoClose) {
+      handleClose();
+    }
+  };
+
+  // 处理关闭事件
+  const handleClose = () => {
+    emit('close');
   };
 
   // 获取主题渐变色
@@ -123,16 +175,16 @@
 </script>
 
 <style scoped>
+  .theme-selector-content {
+    padding: 1.5rem;
+  }
+
   .theme-card {
     min-height: 120px;
     backdrop-filter: blur(10px);
   }
 
-  .theme-card:hover {
-    transform: translateY(-2px);
-  }
-
   .theme-card:active {
-    transform: translateY(0);
+    transform: translateY(0) scale(0.95);
   }
 </style>

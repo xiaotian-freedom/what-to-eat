@@ -197,29 +197,14 @@
     transition: all 0.2s ease;
   }
 
-  .edit-btn:hover {
-    background-color: var(--color-secondary) !important;
-    transform: scale(1.05);
-  }
-
   /* 删除按钮效果 */
   .delete-btn {
     transition: all 0.2s ease;
   }
 
-  .delete-btn:hover {
-    background-color: #dc2626 !important;
-    transform: scale(1.05);
-  }
-
   /* 分类标签动画 */
   .category-tag {
     transition: all 0.2s ease;
-  }
-
-  .category-tag:hover:not(.active-tag) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px var(--color-shadow);
   }
 
   .active-tag {
@@ -275,11 +260,6 @@
     transition: all 0.3s ease;
   }
 
-  .add-btn:hover {
-    transform: rotate(90deg);
-    background: linear-gradient(to right, var(--color-primary), var(--color-accent));
-  }
-
   /* 空状态样式 */
   .custom-empty {
     padding: 32px 0;
@@ -305,17 +285,5 @@
   /* 设备容器主题样式 */
   .device-container {
     transition: all 0.3s ease;
-  }
-
-  /* 菜品卡片悬停效果 */
-  .van-swipe-cell:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px var(--color-shadow);
-  }
-
-  /* 图片悬停效果 */
-  img:hover {
-    transform: scale(1.05);
-    transition: transform 0.2s ease;
   }
 </style>

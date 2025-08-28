@@ -93,6 +93,7 @@ export default {
   'messages.weatherLoadFailed': '获取天气信息失败',
   'messages.recommendationFailed': '推荐失败，请重试',
   'messages.modeChanged': '模式切换成功',
+  'messages.languageChanged': '语言切换成功',
 
   // 成就系统
   'achievements.title': '成就',
@@ -141,10 +142,7 @@ export default {
   'settings.themeDesc': '选择你喜欢的主题风格',
   'settings.selectionMode': '抽奖模式',
   'settings.selectionModeDesc': '选择卡片或转盘抽奖模式',
-  'settings.wheelSize': '转盘大小',
-  'settings.wheelSizeOptions.small': '小',
-  'settings.wheelSizeOptions.medium': '中',
-  'settings.wheelSizeOptions.large': '大',
+
   'settings.language': '语言',
   'settings.languageDesc': '选择应用语言',
   'settings.version': '版本号',
@@ -165,15 +163,15 @@ export default {
   // 应用配置
   'app.name': '今天吃什么',
   'app.description': '一个简单而有趣的随机选菜应用',
-  'app.features.randomFood': '🎯 随机选菜功能',
-  'app.features.foodManagement': '📝 自定义菜品管理',
-  'app.features.achievements': '🏆 成就系统',
-  'app.features.dailyChallenge': '🔥 每日挑战',
-  'app.features.animations': '🎨 精美动画效果',
-  'app.features.smartRecommendation': '🧠 智能推荐系统',
-  'app.features.weatherIntegration': '🌤️ 天气感知推荐',
-  'app.features.moodBasedRecommendation': '😊 心情感知推荐',
-  'app.features.personalizedLearning': '📊 个性化学习',
+  'app.features.randomFood': '随机选菜功能',
+  'app.features.foodManagement': '自定义菜品管理',
+  'app.features.achievements': '成就系统',
+  'app.features.dailyChallenge': '每日挑战',
+  'app.features.animations': '精美动画效果',
+  'app.features.smartRecommendation': '智能推荐系统',
+  'app.features.weatherIntegration': '天气感知推荐',
+  'app.features.moodBasedRecommendation': '心情感知推荐',
+  'app.features.personalizedLearning': '个性化学习',
 
   // 推荐系统
   'recommendation.title': '智能推荐',

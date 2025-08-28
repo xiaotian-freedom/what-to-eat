@@ -948,11 +948,6 @@
     transition: all 0.3s ease;
   }
 
-  .mood-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-  }
-
   .mood-btn.active {
     background: rgba(255, 255, 255, 0.3);
     border-color: rgba(255, 255, 255, 0.6);
@@ -1006,13 +1001,6 @@
     transition: all 0.3s ease;
   }
 
-  .state-btn:hover,
-  .level-btn:hover,
-  .restriction-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-  }
-
   .state-btn.active,
   .level-btn.active,
   .restriction-btn.active {
@@ -1050,11 +1038,6 @@
     margin: 20px 0;
     position: relative;
     overflow: hidden;
-  }
-
-  .recommend-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
   .recommend-btn:disabled {
@@ -1099,12 +1082,6 @@
     backdrop-filter: blur(10px);
   }
 
-  .extra-recommend-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    background: linear-gradient(135deg, #ff5722, #ff9800);
-  }
-
   .extra-recommend-btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
@@ -1140,10 +1117,6 @@
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
     transition: left 0.5s;
-  }
-
-  .extra-recommend-btn:hover::before {
-    left: 100%;
   }
 
   /* 额外推荐按钮加载状态 */

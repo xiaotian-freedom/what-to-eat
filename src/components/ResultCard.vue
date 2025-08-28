@@ -384,10 +384,6 @@
     border-radius: 2px;
   }
 
-  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.5);
-  }
-
   /* 确保在移动端也能正常滚动 */
   .overflow-y-auto {
     -webkit-overflow-scrolling: touch;
@@ -419,10 +415,6 @@
   .marquee-container.is-marquee .marquee-text {
     animation: marquee 6s linear infinite;
     animation-delay: 1s; /* 延迟1秒开始动画，让用户能先看到开头 */
-  }
-
-  .marquee-container.is-marquee .marquee-text:hover {
-    animation-play-state: paused;
   }
 
   /* 圆形容器底部名称区域 */

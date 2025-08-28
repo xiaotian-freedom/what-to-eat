@@ -551,11 +551,6 @@
     transition: all 0.3s ease;
   }
 
-  .recipe-content-card:hover {
-    box-shadow: 0 6px 20px var(--color-shadow);
-    transform: translateY(-1px);
-  }
-
   /* 骨架屏样式 */
   .recipe-skeleton-bg {
     background-color: var(--color-border);
@@ -575,11 +570,6 @@
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
     transition: all 0.2s ease;
-  }
-
-  .recipe-ingredient-item:hover {
-    background-color: var(--color-background);
-    border-color: var(--color-primary);
   }
 
   .recipe-ingredient-amount {
@@ -629,11 +619,6 @@
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
     transition: all 0.2s ease;
-  }
-
-  .recipe-tip-item:hover {
-    background-color: var(--color-background);
-    border-color: var(--color-accent);
   }
 
   .recipe-tip-bullet {

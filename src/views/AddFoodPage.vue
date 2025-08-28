@@ -516,21 +516,10 @@
     transition: all 0.3s ease;
   }
 
-  .image-upload-area:hover {
-    border-color: var(--color-primary);
-    box-shadow: 0 8px 25px var(--color-shadow);
-  }
-
   .upload-icon-pulse {
     animation: pulse 2s infinite;
     background: var(--color-surface);
     opacity: 0.9;
-  }
-
-  /* 按钮hover效果 */
-  button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px var(--color-shadow);
   }
 
   button:active {
@@ -643,11 +632,6 @@
     border: 2px solid var(--color-border);
     position: relative;
     user-select: none;
-  }
-
-  .dish-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px var(--color-shadow);
   }
 
   .dish-card:active {

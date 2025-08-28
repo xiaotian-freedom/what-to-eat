@@ -297,10 +297,6 @@
     max-width: 200px;
   }
 
-  .tab-item:hover {
-    background: var(--color-hover);
-  }
-
   .tab-item:active {
     transform: scale(0.98);
   }
@@ -309,10 +305,6 @@
     opacity: 0.5;
     cursor: not-allowed;
     pointer-events: none;
-  }
-
-  .tab-disabled:hover {
-    background: transparent;
   }
 
   .tab-disabled:active {

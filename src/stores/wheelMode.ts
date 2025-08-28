@@ -2,14 +2,10 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 export type SelectionMode = 'card' | 'wheel';
-export type WheelSize = 'small' | 'medium';
 
 export const useWheelModeStore = defineStore('wheelMode', () => {
   // 当前选择模式
   const currentMode = ref<SelectionMode>('card');
-
-  // 转盘大小设置
-  const wheelSize = ref<WheelSize>('medium');
 
   // 从localStorage加载模式设置
   const loadModeSettings = (): void => {
@@ -17,14 +13,6 @@ export const useWheelModeStore = defineStore('wheelMode', () => {
       const storedMode = localStorage.getItem('selectionMode') as SelectionMode;
       if (storedMode && ['card', 'wheel'].includes(storedMode)) {
         currentMode.value = storedMode;
-      }
-
-      const storedSize = localStorage.getItem('wheelSize');
-      if (storedSize && ['small', 'medium'].includes(storedSize)) {
-        wheelSize.value = storedSize as WheelSize;
-      } else if (storedSize === 'large') {
-        // 如果之前存储的是 large，则重置为 medium
-        wheelSize.value = 'medium';
       }
     } catch (error) {
       console.error('加载模式设置出错:', error);
@@ -35,7 +23,6 @@ export const useWheelModeStore = defineStore('wheelMode', () => {
   const saveModeSettings = (): void => {
     try {
       localStorage.setItem('selectionMode', currentMode.value);
-      localStorage.setItem('wheelSize', wheelSize.value);
     } catch (error) {
       console.error('保存模式设置出错:', error);
     }
@@ -67,31 +54,19 @@ export const useWheelModeStore = defineStore('wheelMode', () => {
     return currentMode.value === 'wheel';
   };
 
-  // 设置转盘大小
-  const setWheelSize = (size: WheelSize): void => {
-    wheelSize.value = size;
-    saveModeSettings();
-  };
-
-  // 获取转盘大小对应的像素值
+  // 获取转盘大小对应的像素值（固定为中等大小）
   const getWheelSizeInPixels = (): number => {
-    const sizeMap = {
-      small: 240,
-      medium: 300,
-    };
-    return sizeMap[wheelSize.value];
+    return 300; // 固定为中等大小
   };
 
   return {
     currentMode,
-    wheelSize,
     loadModeSettings,
     setMode,
     switchToCardMode,
     switchToWheelMode,
     isCardMode,
     isWheelMode,
-    setWheelSize,
     getWheelSizeInPixels,
   };
 });
