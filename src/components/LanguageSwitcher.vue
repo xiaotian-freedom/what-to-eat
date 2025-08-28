@@ -66,10 +66,6 @@
   const isOpen = ref(false);
   const currentLocale = computed(() => locale.value);
 
-  const currentLanguageFlag = computed(() => {
-    return currentLocale.value === 'zh-CN' ? '🇨🇳' : '🇺🇸';
-  });
-
   const currentLanguageName = computed(() => {
     return currentLocale.value === 'zh-CN' ? '中文' : 'English';
   });
@@ -80,10 +76,6 @@
       { value: 'en-US', label: '🇺🇸 English' },
     ];
   });
-
-  const toggleLanguage = () => {
-    isOpen.value = !isOpen.value;
-  };
 
   const selectLanguage = (lang: string) => {
     locale.value = lang;
