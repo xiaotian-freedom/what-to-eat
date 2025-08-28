@@ -28,20 +28,43 @@
         </div>
 
         <!-- 当前状态显示 -->
-        <div class="current-status" v-if="weatherData && !isLoadingLocation">
-          <div class="status-item">
-            <span class="status-icon">🌡️</span>
-            <span class="status-text"
-              >{{ weatherData.temperature }}°C {{ weatherData.condition }}</span
-            >
+        <div class="current-status" v-if="!isLoadingLocation">
+          <!-- 天气信息 -->
+          <div class="weather-info" v-if="weatherData">
+            <div class="status-item">
+              <span class="status-icon">🌡️</span>
+              <span class="status-text"
+                >{{ weatherData.temperature }}°C {{ weatherData.condition }}</span
+              >
+            </div>
+            <div class="status-item">
+              <span class="status-icon">📍</span>
+              <span class="status-text">{{ weatherData.location }}</span>
+            </div>
           </div>
-          <div class="status-item">
-            <span class="status-icon">📍</span>
-            <span class="status-text">{{ weatherData.location }}</span>
+
+          <!-- 天气信息占位符 -->
+          <div class="weather-info" v-else>
+            <div class="status-item">
+              <span class="status-icon">🌡️</span>
+              <span class="status-text">{{ $t('recommendation.weatherUnavailable') }}</span>
+            </div>
+            <div class="status-item">
+              <span class="status-icon">📍</span>
+              <span class="status-text">{{ $t('recommendation.locationUnavailable') }}</span>
+            </div>
           </div>
-          <div class="status-item">
-            <span class="status-icon">🕐</span>
-            <span class="status-text">{{ currentTimeText }}</span>
+
+          <!-- 季节和时间信息 -->
+          <div class="season-time-info">
+            <div class="status-item">
+              <span class="status-icon">🌱</span>
+              <span class="status-text">{{ currentSeasonText }}</span>
+            </div>
+            <div class="status-item">
+              <span class="status-icon">🕐</span>
+              <span class="status-text">{{ currentTimeText }}</span>
+            </div>
           </div>
         </div>
 
@@ -203,6 +226,7 @@
     DietaryRestriction as DietaryRestrictionEnum,
     TimeOfDay,
     NetworkStatus as NetStatus,
+    Season,
   } from '@/types';
   import '@/assets/css/glow-animation.css';
 
@@ -369,6 +393,17 @@
       [TimeOfDay.ANYTIME]: t('timeOfDay.anytime'),
     };
     return timeMap[timeOfDay] || t('timeOfDay.default');
+  });
+
+  const currentSeasonText = computed(() => {
+    const season = recommendationStore.getCurrentSeason();
+    const seasonMap = {
+      [Season.SPRING]: t('season.spring'),
+      [Season.SUMMER]: t('season.summer'),
+      [Season.AUTUMN]: t('season.autumn'),
+      [Season.WINTER]: t('season.winter'),
+    };
+    return seasonMap[season] || t('season.default');
   });
 
   const hasPreferenceData = computed(() => {
@@ -878,6 +913,20 @@
     color: white;
   }
 
+  .current-status {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .weather-info,
+  .season-time-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
   .network-status.offline {
     background: rgba(255, 152, 0, 0.2);
     border: 1px solid rgba(255, 152, 0, 0.3);
@@ -1207,6 +1256,17 @@
   @media (max-width: 768px) {
     .mood-options {
       grid-template-columns: repeat(4, 1fr);
+    }
+
+    .current-status {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .weather-info,
+    .season-time-info {
+      flex-direction: row;
+      justify-content: space-around;
     }
 
     .recommendation-item {

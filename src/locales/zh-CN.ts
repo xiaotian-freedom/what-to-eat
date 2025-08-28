@@ -187,6 +187,8 @@ export default {
   'recommendation.learningHint': '系统已根据您的{count}次选择优化推荐',
   'recommendation.locationError': '无法获取位置信息，推荐将基于其他因素',
   'recommendation.weatherFailed': '获取天气信息失败，推荐将基于其他因素',
+  'recommendation.weatherUnavailable': '天气信息暂不可用',
+  'recommendation.locationUnavailable': '位置信息暂不可用',
   'recommendation.aiAnalyzing': '🤖 AI 分析中...',
   'recommendation.smartAnalyzing': '🔮 智能分析中...',
   'recommendation.aiRecommendation': '🤖 AI 智能推荐',
@@ -250,6 +252,13 @@ export default {
   'timeOfDay.snack': '零食时间',
   'timeOfDay.anytime': '任何时候',
   'timeOfDay.default': '用餐时间',
+
+  // 季节
+  'season.spring': '春季',
+  'season.summer': '夏季',
+  'season.autumn': '秋季',
+  'season.winter': '冬季',
+  'season.default': '当前季节',
 
   // 应用配置
   'app.name': '今天吃什么',

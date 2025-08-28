@@ -181,6 +181,8 @@ export default {
     'Unable to get location info, recommendations based on other factors',
   'recommendation.weatherFailed':
     'Failed to get weather info, recommendations based on other factors',
+  'recommendation.weatherUnavailable': 'Weather unavailable',
+  'recommendation.locationUnavailable': 'Location unavailable',
   'recommendation.aiAnalyzing': '🤖 AI analyzing...',
   'recommendation.smartAnalyzing': '🔮 Smart analyzing...',
   'recommendation.aiRecommendation': '🤖 AI Smart Recommendation',
@@ -246,6 +248,13 @@ export default {
   'timeOfDay.snack': 'Snack Time',
   'timeOfDay.anytime': 'Anytime',
   'timeOfDay.default': 'Meal Time',
+
+  // Season
+  'season.spring': 'Spring',
+  'season.summer': 'Summer',
+  'season.autumn': 'Autumn',
+  'season.winter': 'Winter',
+  'season.default': 'Current Season',
 
   // App configuration
   'app.name': 'What to Eat Today',
