@@ -5,9 +5,11 @@
   >
     <!-- 卡片容器 -->
     <div class="card-container" :class="{ flipped: showResult }">
-      <!-- 主页面 -->
+      <!-- 主页面 - 卡片模式 -->
       <HomeCard
+        v-if="wheelModeStore.isCardMode() && !showResult"
         ref="homeCardRef"
+        class="card-face"
         :dishList="enhancedDishList"
         :showResult="showResult"
         @random-food="randomFood"
@@ -17,8 +19,38 @@
         @show-result="showResult = true"
       />
 
+      <!-- 主页面 - 转盘模式 -->
+      <div
+        v-if="wheelModeStore.isWheelMode() && !showResult"
+        class="wheel-page card-face bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative flex flex-col w-full h-full"
+      >
+        <!-- 顶部状态栏 -->
+        <HeaderBar :title="$t('app.name')" :showBackButton="false" :centerTitle="true" />
+
+        <!-- 转盘区域 -->
+        <div class="flex-1 flex flex-col items-center justify-center p-4">
+          <LuckyWheel
+            :foodList="foodStore.foodItems"
+            :currentTheme="themeStore.currentTheme"
+            @result="handleWheelResult"
+          />
+        </div>
+
+        <!-- 底部操作按钮 -->
+        <ActionButtons
+          v-if="wheelModeStore.isCardMode()"
+          :disabled="false"
+          :showMainButtons="false"
+          @add-food="addFood"
+          @show-food-list="showFoodList"
+        />
+      </div>
+
       <!-- 结果页面 -->
       <ResultCard
+        v-if="showResult"
+        id="resultPage"
+        class="card-face"
         :selectedDish="selectedDish"
         @choose-again="chooseAgain"
         @share-result="shareResult"
@@ -32,6 +64,9 @@
   import { useI18n } from 'vue-i18n';
   import HomeCard from '@/components/HomeCard.vue';
   import ResultCard from '@/components/ResultCard.vue';
+  import LuckyWheel from '@/components/LuckyWheel.vue';
+  import HeaderBar from '@/components/HeaderBar.vue';
+  import ActionButtons from '@/components/ActionButtons.vue';
   import type { Food } from '@/types';
   import { enhancedDishList } from '@/data/enhancedDishList';
   import { useRouter } from 'vue-router';
@@ -39,12 +74,16 @@
   import { useChallengeStore } from '@/stores/challenge';
   import { useDevModeStore } from '@/stores/devMode';
   import { useThemeStore } from '@/stores/theme';
+  import { useWheelModeStore } from '@/stores/wheelMode';
+  import { useFoodStore } from '@/stores/food';
 
   const { t } = useI18n();
   const router = useRouter();
   const challengeStore = useChallengeStore();
   const devModeStore = useDevModeStore();
   const themeStore = useThemeStore();
+  const wheelModeStore = useWheelModeStore();
+  const foodStore = useFoodStore();
 
   const selectedDish = ref<Food | null>(null);
   const showResult = ref(false);
@@ -57,6 +96,12 @@
       // 动画完成后会自动触发 show-result 事件
       await homeCardRef.value.startRandomAnimation();
     }
+  };
+
+  // 处理转盘结果
+  const handleWheelResult = (food: Food) => {
+    selectedDish.value = food;
+    showResult.value = true;
   };
 
   // 添加菜品
@@ -160,6 +205,10 @@
     devModeStore.loadDevModeState();
     // 加载挑战数据
     challengeStore.loadChallengeData();
+    // 加载模式设置
+    wheelModeStore.loadModeSettings();
+    // 加载食物数据
+    foodStore.loadFoodItems();
   });
 </script>
 

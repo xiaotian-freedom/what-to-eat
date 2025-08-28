@@ -19,8 +19,6 @@
             color: 'var(--color-textSecondary)',
             backgroundColor: 'transparent',
           }"
-          @mouseenter="handleMenuMouseEnter"
-          @mouseleave="handleMenuMouseLeave"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -274,21 +272,6 @@
         // 系统设置：跳转到设置页面
         router.push('/settings');
         break;
-    }
-  };
-
-  // 处理菜单按钮鼠标悬停事件
-  const handleMenuMouseEnter = (event: MouseEvent) => {
-    const target = event.target as HTMLElement;
-    if (target) {
-      target.style.backgroundColor = 'var(--color-border)';
-    }
-  };
-
-  const handleMenuMouseLeave = (event: MouseEvent) => {
-    const target = event.target as HTMLElement;
-    if (target) {
-      target.style.backgroundColor = 'transparent';
     }
   };
 

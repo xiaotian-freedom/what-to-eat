@@ -84,6 +84,7 @@ export default {
   'messages.shareSuccess': 'Shared successfully',
   'messages.shareText': 'I randomly selected this dish using "What to Eat Today", try it too!',
   'messages.imageSizeLimit': 'Image size cannot exceed 10M',
+  'messages.modeChanged': 'Mode changed successfully',
 
   // Achievement system
   'achievements.title': 'Achievements',
@@ -130,6 +131,12 @@ export default {
   'settings.title': 'Settings',
   'settings.theme': 'Theme',
   'settings.themeDesc': 'Choose your favorite theme style',
+  'settings.selectionMode': 'Selection Mode',
+  'settings.selectionModeDesc': 'Choose card or wheel lottery mode',
+  'settings.wheelSize': 'Wheel Size',
+  'settings.wheelSizeOptions.small': 'Small',
+  'settings.wheelSizeOptions.medium': 'Medium',
+  'settings.wheelSizeOptions.large': 'Large',
   'settings.language': 'Language',
   'settings.languageDesc': 'Choose app language',
   'settings.version': 'Version',
@@ -161,4 +168,14 @@ export default {
   'menu.dailyChallenge': 'Daily Challenge',
   'menu.achievements': 'Achievements',
   'menu.settings': 'Settings',
+
+  // Wheel related
+  'wheel.spin': 'Tap to Spin',
+  'wheel.spinning': 'Spinning...',
+
+  // Mode selection
+  'mode.card.title': 'Card Mode',
+  'mode.card.description': 'Classic card flip, quick selection',
+  'mode.wheel.title': 'Wheel Mode',
+  'mode.wheel.description': 'Fun wheel lottery with ceremony',
 };

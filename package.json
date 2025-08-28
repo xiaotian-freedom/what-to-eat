@@ -16,6 +16,7 @@
     "clean:all": "rm -rf dist node_modules package-lock.json && npm install"
   },
   "dependencies": {
+    "@lucky-canvas/vue": "^0.1.11",
     "@tailwindcss/vite": "^4.0.14",
     "axios": "^1.8.3",
     "gsap": "^3.12.7",

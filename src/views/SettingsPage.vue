@@ -57,6 +57,25 @@
               </div>
             </div>
 
+            <!-- 抽奖模式设置 -->
+            <div
+              @click="showModeSelector = true"
+              class="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl p-4 border border-green-100 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-95"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <h3 class="text-lg font-semibold text-gray-800">
+                    {{ $t('settings.selectionMode') }}
+                  </h3>
+                  <p class="text-sm text-gray-600 mt-1">{{ $t('settings.selectionModeDesc') }}</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-2xl">{{ wheelModeStore.isWheelMode() ? '🎡' : '🃏' }}</span>
+                  <span class="text-green-400 text-xl">›</span>
+                </div>
+              </div>
+            </div>
+
             <!-- 语言设置 -->
             <div
               @click="showLanguageSelector = true"
@@ -146,6 +165,11 @@
       </div>
     </BottomSheet>
 
+    <!-- 抽奖模式选择器 BottomSheet -->
+    <BottomSheet :visible="showModeSelector" @close="showModeSelector = false" maxHeight="60vh">
+      <ModeSelectionBottomSheet @close="showModeSelector = false" />
+    </BottomSheet>
+
     <!-- 关于我们模态框 -->
     <BottomSheet :visible="showAboutModal" @close="showAboutModal = false" maxHeight="80vh">
       <div class="p-6">
@@ -233,23 +257,28 @@
   import HeaderBar from '@/components/HeaderBar.vue';
   import BottomSheet from '@/components/BottomSheet.vue';
   import ThemeSelector from '@/components/ThemeSelector.vue';
+  import ModeSelectionBottomSheet from '@/components/ModeSelectionBottomSheet.vue';
   import { APP_CONFIG } from '@/config/app';
   import { useDevModeStore } from '@/stores/devMode';
   import { useThemeStore } from '@/stores/theme';
+  import { useWheelModeStore } from '@/stores/wheelMode';
 
   const { locale } = useI18n();
   const devModeStore = useDevModeStore();
   const themeStore = useThemeStore();
+  const wheelModeStore = useWheelModeStore();
 
   // 页面加载时加载开发模式状态
   onMounted(() => {
     devModeStore.loadDevModeState();
+    wheelModeStore.loadModeSettings();
   });
 
   // 响应式数据
   const showLanguageSelector = ref(false);
   const showThemeSelector = ref(false);
   const showAboutModal = ref(false);
+  const showModeSelector = ref(false);
 
   // 计算属性
   const currentLocale = computed(() => locale.value);

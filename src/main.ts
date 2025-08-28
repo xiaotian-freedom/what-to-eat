@@ -11,6 +11,7 @@ import router from './router';
 import i18n, { $t } from './locales';
 import 'vant/lib/index.css';
 import { Button, Toast, Empty, Field, Dialog, SwipeCell, Tabs, Tab, Icon, Popup, Cell } from 'vant';
+import VueLuckyCanvas from '@lucky-canvas/vue';
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -31,6 +32,7 @@ app.use(Tab);
 app.use(Icon);
 app.use(Popup);
 app.use(Cell);
+app.use(VueLuckyCanvas);
 
 // 创建扩展的触摸事件接口
 interface TouchEventWithScale extends TouchEvent {

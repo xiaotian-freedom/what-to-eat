@@ -1,6 +1,6 @@
 <template>
   <div
-    class="backdrop-filter backdrop-blur-lg p-4 relative flex justify-between items-center theme-transition"
+    class="backdrop-filter backdrop-blur-lg p-4 relative flex justify-between items-center theme-transition header-bar"
     :style="{
       backgroundColor: 'var(--color-surface)',
       borderBottom: '1px solid var(--color-border)',
@@ -148,6 +148,12 @@
 </script>
 
 <style scoped>
+  /* 导航栏固定高度 */
+  .header-bar {
+    min-height: 50px; /* 固定最小高度 */
+    height: 50px; /* 固定高度 */
+  }
+
   /* 主题过渡动画 */
   .theme-transition {
     transition: all 0.3s ease;

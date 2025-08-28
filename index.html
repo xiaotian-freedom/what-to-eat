@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#6366f1" id="theme-color-meta" />
+    <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
     <meta name="description" content="帮你决定今天吃什么的美食选择应用" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -24,15 +24,27 @@
 
     <!-- 动态主题色脚本 -->
     <script>
-        // 主题色映射 - 使用主题系统中的 primary 颜色
+        // 主题色映射 - 使用更浅的颜色用于状态栏
         const themeColors = {
-            'default': '#6366f1',    // 默认主题 - 蓝紫色
-            'dark': '#3b82f6',       // 深色主题 - 蓝色
-            'sunset': '#f97316',     // 日落主题 - 橙色
-            'ocean': '#06b6d4',      // 海洋主题 - 青色
-            'forest': '#059669',     // 森林主题 - 绿色
-            'vintage': '#a855f7'     // 复古主题 - 紫色
+            'default': '#e0e7ff',    // 默认主题 - 浅蓝紫色
+            'dark': '#1e293b',       // 深色主题 - 浅深色
+            'sunset': '#fed7aa',     // 日落主题 - 浅橙色
+            'ocean': '#cffafe',      // 海洋主题 - 浅青色
+            'forest': '#dcfce7',     // 森林主题 - 浅绿色
+            'vintage': '#f3e8ff'     // 复古主题 - 浅紫色
         };
+
+        // 将十六进制颜色转换为RGBA格式
+        function hexToRgba(hex, alpha) {
+            const color = hex.replace('#', '');
+            if (color.length !== 6) return `rgba(99, 102, 241, ${alpha})`; // 默认颜色
+
+            const r = parseInt(color.substr(0, 2), 16);
+            const g = parseInt(color.substr(2, 2), 16);
+            const b = parseInt(color.substr(4, 2), 16);
+
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
 
         // 更新主题色的函数
         function updateThemeColor(themeId) {

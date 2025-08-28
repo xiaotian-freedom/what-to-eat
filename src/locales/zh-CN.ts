@@ -92,6 +92,7 @@ export default {
   'messages.noRecommendations': '暂无合适的推荐',
   'messages.weatherLoadFailed': '获取天气信息失败',
   'messages.recommendationFailed': '推荐失败，请重试',
+  'messages.modeChanged': '模式切换成功',
 
   // 成就系统
   'achievements.title': '成就',
@@ -138,6 +139,12 @@ export default {
   'settings.title': '设置',
   'settings.theme': '主题',
   'settings.themeDesc': '选择你喜欢的主题风格',
+  'settings.selectionMode': '抽奖模式',
+  'settings.selectionModeDesc': '选择卡片或转盘抽奖模式',
+  'settings.wheelSize': '转盘大小',
+  'settings.wheelSizeOptions.small': '小',
+  'settings.wheelSizeOptions.medium': '中',
+  'settings.wheelSizeOptions.large': '大',
   'settings.language': '语言',
   'settings.languageDesc': '选择应用语言',
   'settings.version': '版本号',
@@ -186,4 +193,14 @@ export default {
   'menu.dailyChallenge': '每日挑战',
   'menu.achievements': '成就系统',
   'menu.settings': '系统设置',
+
+  // 转盘相关
+  'wheel.spin': '点击旋转',
+  'wheel.spinning': '转动中...',
+
+  // 模式选择
+  'mode.card.title': '卡片模式',
+  'mode.card.description': '经典卡片翻转，快速选择',
+  'mode.wheel.title': '转盘模式',
+  'mode.wheel.description': '趣味转盘抽奖，增加仪式感',
 };
