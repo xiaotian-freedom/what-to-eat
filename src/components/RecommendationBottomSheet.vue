@@ -2,20 +2,18 @@
   <BottomSheet
     :visible="visible"
     @close="handleClose"
-    maxHeight="85vh"
+    maxHeight="80vh"
     backgroundStyle="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-    indicatorColor="rgba(255, 255, 255, 0.6)"
+    :title="$t('recommendation.personalizedTitle')"
   >
     <div class="recommendation-bottom-sheet">
       <!-- 推荐配置区域 -->
       <div class="config-section">
-        <h3 class="section-title">🎯 个性化推荐</h3>
-
         <!-- 位置加载状态 -->
         <div class="location-status" v-if="isLoadingLocation">
           <div class="status-item loading">
             <span class="status-icon">📍</span>
-            <span class="status-text">正在获取您的位置...</span>
+            <span class="status-text">{{ $t('recommendation.gettingLocation') }}</span>
           </div>
         </div>
 
@@ -57,7 +55,7 @@
 
         <!-- 心情选择 -->
         <div class="mood-selector">
-          <label class="input-label">现在的心情：</label>
+          <label class="input-label">{{ $t('recommendation.currentMoodLabel') }}</label>
           <div class="mood-options">
             <button
               v-for="mood in moodOptions"
@@ -73,7 +71,7 @@
 
         <!-- 身体状态选择 -->
         <div class="physical-state-selector">
-          <label class="input-label">身体状态：</label>
+          <label class="input-label">{{ $t('recommendation.physicalStateLabel') }}</label>
           <div class="physical-state-options">
             <button
               v-for="state in physicalStateOptions"
@@ -89,7 +87,7 @@
 
         <!-- 活动水平选择 -->
         <div class="activity-level-selector">
-          <label class="input-label">今日活动水平：</label>
+          <label class="input-label">{{ $t('recommendation.activityLevelLabel') }}</label>
           <div class="activity-level-options">
             <button
               v-for="level in activityLevelOptions"
@@ -105,7 +103,7 @@
 
         <!-- 特殊需求选择 -->
         <div class="dietary-restrictions-selector" v-if="showDietaryRestrictions">
-          <label class="input-label">特殊饮食需求：</label>
+          <label class="input-label">{{ $t('recommendation.dietaryRestrictionsLabel') }}</label>
           <div class="dietary-restrictions-options">
             <button
               v-for="restriction in dietaryRestrictionOptions"
@@ -166,7 +164,9 @@
       <!-- 偏好学习提示 -->
       <div class="learning-hint" v-if="hasPreferenceData">
         <span class="hint-icon">🧠</span>
-        <span class="hint-text">系统已根据您的{{ choiceCount }}次选择优化推荐</span>
+        <span class="hint-text">{{
+          $t('recommendation.learningHint', { count: choiceCount })
+        }}</span>
       </div>
     </div>
   </BottomSheet>
@@ -174,6 +174,7 @@
 
 <script setup lang="ts">
   import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import BottomSheet from './BottomSheet.vue';
   import { useRecommendationStore } from '@/stores/recommendation';
   import { useUserPreferenceStore } from '@/stores/userPreference';
@@ -264,6 +265,7 @@
   const foodStore = useFoodStore();
   const challengeStore = useChallengeStore();
   const devModeStore = useDevModeStore();
+  const { t } = useI18n();
 
   // 响应式数据
   const isLoading = ref(false);
@@ -288,59 +290,75 @@
   const extraSparklesContainer = ref<HTMLDivElement | null>(null);
 
   // 心情选项
-  const moodOptions = [
-    { value: MoodEnum.HAPPY, emoji: '😊', label: '开心' },
-    { value: MoodEnum.RELAXED, emoji: '😌', label: '放松' },
-    { value: MoodEnum.ENERGETIC, emoji: '⚡', label: '精力充沛' },
-    { value: MoodEnum.TIRED, emoji: '😴', label: '疲惫' },
-    { value: MoodEnum.STRESSED, emoji: '😰', label: '压力大' },
-    { value: MoodEnum.SAD, emoji: '😢', label: '难过' },
-    { value: MoodEnum.COMFORT, emoji: '🤗', label: '需要安慰' },
-    { value: MoodEnum.ADVENTUROUS, emoji: '🚀', label: '想尝试新事物' },
-  ];
+  const moodOptions = computed(() => [
+    { value: MoodEnum.HAPPY, emoji: '😊', label: t('mood.happy') },
+    { value: MoodEnum.RELAXED, emoji: '😌', label: t('mood.relaxed') },
+    { value: MoodEnum.ENERGETIC, emoji: '⚡', label: t('mood.energetic') },
+    { value: MoodEnum.TIRED, emoji: '😴', label: t('mood.tired') },
+    { value: MoodEnum.STRESSED, emoji: '😰', label: t('mood.stressed') },
+    { value: MoodEnum.SAD, emoji: '😢', label: t('mood.sad') },
+    { value: MoodEnum.COMFORT, emoji: '🤗', label: t('mood.comfort') },
+    { value: MoodEnum.ADVENTUROUS, emoji: '🚀', label: t('mood.adventurous') },
+  ]);
 
   // 身体状态选项
-  const physicalStateOptions = [
-    { value: PhysicalStateEnum.NORMAL, emoji: '🆗', label: '正常' },
-    { value: PhysicalStateEnum.SICK, emoji: '🤒', label: '感冒生病' },
-    { value: PhysicalStateEnum.RECOVERING, emoji: '🌱', label: '病后恢复' },
-    { value: PhysicalStateEnum.EXERCISED, emoji: '💪', label: '刚运动完' },
-    { value: PhysicalStateEnum.HANGOVER, emoji: '🥴', label: '宿醉' },
-    { value: PhysicalStateEnum.INSOMNIA, emoji: '🌙', label: '失眠' },
-    { value: PhysicalStateEnum.PREGNANT, emoji: '🤱', label: '孕期' },
-    { value: PhysicalStateEnum.MENSTRUAL, emoji: '🩸', label: '生理期' },
-    { value: PhysicalStateEnum.PMS, emoji: '🌪️', label: '经前综合征' },
-  ];
+  const physicalStateOptions = computed(() => [
+    { value: PhysicalStateEnum.NORMAL, emoji: '🆗', label: t('physicalState.normal') },
+    { value: PhysicalStateEnum.SICK, emoji: '🤒', label: t('physicalState.sick') },
+    { value: PhysicalStateEnum.RECOVERING, emoji: '🌱', label: t('physicalState.recovering') },
+    { value: PhysicalStateEnum.EXERCISED, emoji: '💪', label: t('physicalState.exercised') },
+    { value: PhysicalStateEnum.HANGOVER, emoji: '🥴', label: t('physicalState.hangover') },
+    { value: PhysicalStateEnum.INSOMNIA, emoji: '🌙', label: t('physicalState.insomnia') },
+    { value: PhysicalStateEnum.PREGNANT, emoji: '🤱', label: t('physicalState.pregnant') },
+    { value: PhysicalStateEnum.MENSTRUAL, emoji: '🩸', label: t('physicalState.menstrual') },
+    { value: PhysicalStateEnum.PMS, emoji: '🌪️', label: t('physicalState.pms') },
+  ]);
 
   // 活动水平选项
-  const activityLevelOptions = [
-    { value: ActivityLevelEnum.SEDENTARY, emoji: '🪑', label: '久坐' },
-    { value: ActivityLevelEnum.LIGHT, emoji: '🚶', label: '轻度活动' },
-    { value: ActivityLevelEnum.MODERATE, emoji: '🏃', label: '中度活动' },
-    { value: ActivityLevelEnum.INTENSIVE, emoji: '🏋️', label: '高强度' },
-  ];
+  const activityLevelOptions = computed(() => [
+    { value: ActivityLevelEnum.SEDENTARY, emoji: '🪑', label: t('activityLevel.sedentary') },
+    { value: ActivityLevelEnum.LIGHT, emoji: '🚶', label: t('activityLevel.light') },
+    { value: ActivityLevelEnum.MODERATE, emoji: '🏃', label: t('activityLevel.moderate') },
+    { value: ActivityLevelEnum.INTENSIVE, emoji: '🏋️', label: t('activityLevel.intensive') },
+  ]);
 
   // 特殊饮食需求选项（只显示常用的）
-  const dietaryRestrictionOptions = [
-    { value: DietaryRestrictionEnum.VEGETARIAN, emoji: '🥬', label: '素食' },
-    { value: DietaryRestrictionEnum.VEGAN, emoji: '🌱', label: '纯素' },
-    { value: DietaryRestrictionEnum.GLUTEN_FREE, emoji: '🚫', label: '无麸质' },
-    { value: DietaryRestrictionEnum.DIABETIC, emoji: '🩺', label: '糖尿病友好' },
-    { value: DietaryRestrictionEnum.LOW_SODIUM, emoji: '🧂', label: '低钠' },
-    { value: DietaryRestrictionEnum.KETO, emoji: '🥓', label: '生酮' },
-  ];
+  const dietaryRestrictionOptions = computed(() => [
+    {
+      value: DietaryRestrictionEnum.VEGETARIAN,
+      emoji: '🥬',
+      label: t('dietaryRestriction.vegetarian'),
+    },
+    { value: DietaryRestrictionEnum.VEGAN, emoji: '🌱', label: t('dietaryRestriction.vegan') },
+    {
+      value: DietaryRestrictionEnum.GLUTEN_FREE,
+      emoji: '🚫',
+      label: t('dietaryRestriction.glutenFree'),
+    },
+    {
+      value: DietaryRestrictionEnum.DIABETIC,
+      emoji: '🩺',
+      label: t('dietaryRestriction.diabetic'),
+    },
+    {
+      value: DietaryRestrictionEnum.LOW_SODIUM,
+      emoji: '🧂',
+      label: t('dietaryRestriction.lowSodium'),
+    },
+    { value: DietaryRestrictionEnum.KETO, emoji: '🥓', label: t('dietaryRestriction.keto') },
+  ]);
 
   // 计算属性
   const currentTimeText = computed(() => {
     const timeOfDay = recommendationStore.getCurrentTimeOfDay();
     const timeMap = {
-      [TimeOfDay.BREAKFAST]: '早餐时间',
-      [TimeOfDay.LUNCH]: '午餐时间',
-      [TimeOfDay.DINNER]: '晚餐时间',
-      [TimeOfDay.SNACK]: '零食时间',
-      [TimeOfDay.ANYTIME]: '任何时候',
+      [TimeOfDay.BREAKFAST]: t('timeOfDay.breakfast'),
+      [TimeOfDay.LUNCH]: t('timeOfDay.lunch'),
+      [TimeOfDay.DINNER]: t('timeOfDay.dinner'),
+      [TimeOfDay.SNACK]: t('timeOfDay.snack'),
+      [TimeOfDay.ANYTIME]: t('timeOfDay.anytime'),
     };
-    return timeMap[timeOfDay] || '用餐时间';
+    return timeMap[timeOfDay] || t('timeOfDay.default');
   });
 
   const hasPreferenceData = computed(() => {
@@ -360,28 +378,30 @@
 
   const recommendationButtonText = computed(() => {
     if (isLoading.value) {
-      return usingAI.value ? '🤖 AI 分析中...' : '🔮 智能分析中...';
+      return usingAI.value ? t('recommendation.aiAnalyzing') : t('recommendation.smartAnalyzing');
     }
-    return canUseAI.value ? '🤖 AI 智能推荐' : '🔮 智能推荐';
+    return canUseAI.value
+      ? t('recommendation.aiRecommendation')
+      : t('recommendation.smartRecommendation');
   });
 
   const extraRecommendationButtonText = computed(() => {
     if (isExtraRecommendationLoading.value) {
-      return '🎲 AI 扩展分析中...';
+      return t('recommendation.extraAnalyzing');
     }
-    return '🎲 推荐新菜品';
+    return t('recommendation.extraRecommendation');
   });
 
   const networkStatusText = computed(() => {
     switch (networkStatus.value) {
       case NetStatus.ONLINE:
-        return canUseAI.value ? 'AI 推荐可用' : '仅本地推荐';
+        return canUseAI.value ? t('recommendation.aiAvailable') : t('recommendation.localOnly');
       case NetStatus.OFFLINE:
-        return '离线模式';
+        return t('recommendation.offlineMode');
       case NetStatus.CHECKING:
-        return '检查网络...';
+        return t('recommendation.checkingNetwork');
       default:
-        return '未知状态';
+        return t('recommendation.unknownStatus');
     }
   });
 
@@ -403,13 +423,13 @@
       } else {
         // 无法获取天气数据（位置权限被拒绝或API配置问题）
         weatherData.value = null;
-        locationError.value = '无法获取位置信息，推荐将基于其他因素';
+        locationError.value = t('recommendation.locationError');
         // 不更新推荐系统的天气数据，让其使用其他因素进行推荐
       }
     } catch (error) {
       console.error('加载天气数据失败:', error);
       weatherData.value = null;
-      locationError.value = '获取天气信息失败，推荐将基于其他因素';
+      locationError.value = t('recommendation.weatherFailed');
     } finally {
       isLoadingLocation.value = false;
     }
@@ -536,9 +556,9 @@
     if (!canUseToday.value) {
       // 开发模式下显示不同的提示
       if (devModeStore.isUnlimitedUsesEnabled) {
-        showFailToast('开发模式下应该可以无限使用，请检查配置');
+        showFailToast(t('recommendation.devModeUnlimited'));
       } else {
-        showFailToast('今日使用次数已用完，请明天再试');
+        showFailToast(t('recommendation.dailyLimitReached'));
       }
       return;
     }
@@ -608,7 +628,7 @@
       emit('recommendationsUpdated', recommendations.value);
 
       if (recommendations.value.length === 0) {
-        showFailToast('暂无合适的推荐');
+        showFailToast(t('recommendation.noSuitableRecommendation'));
       } else {
         // 显示成功效果
         showSuccessEffect.value = true;
@@ -633,14 +653,14 @@
       // 根据错误类型显示不同的提示
       if (error instanceof Error) {
         if (error.message.includes('网络') || error.message.includes('超时')) {
-          showFailToast('网络连接问题，已切换到本地推荐');
+          showFailToast(t('recommendation.networkError'));
         } else if (error.message.includes('API')) {
-          showFailToast('AI 服务暂不可用，使用本地推荐');
+          showFailToast(t('recommendation.aiUnavailable'));
         } else {
-          showFailToast('推荐失败，请重试');
+          showFailToast(t('recommendation.recommendationFailed'));
         }
       } else {
-        showFailToast('推荐失败，请重试');
+        showFailToast(t('recommendation.recommendationFailed'));
       }
     } finally {
       isLoading.value = false;
@@ -661,9 +681,9 @@
     // 检查今日使用次数限制
     if (!canUseToday.value) {
       if (devModeStore.isUnlimitedUsesEnabled) {
-        showFailToast('开发模式下应该可以无限使用，请检查配置');
+        showFailToast(t('recommendation.devModeUnlimited'));
       } else {
-        showFailToast('今日使用次数已用完，请明天再试');
+        showFailToast(t('recommendation.dailyLimitReached'));
       }
       return;
     }
@@ -730,7 +750,7 @@
       emit('recommendationsUpdated', recommendations.value);
 
       if (recommendations.value.length === 0) {
-        showFailToast('暂无合适的推荐');
+        showFailToast(t('recommendation.noSuitableRecommendation'));
       } else {
         // 显示成功效果
         showSuccessEffect.value = true;
@@ -755,14 +775,14 @@
       // 根据错误类型显示不同的提示
       if (error instanceof Error) {
         if (error.message.includes('网络') || error.message.includes('超时')) {
-          showFailToast('网络连接问题，无法获取额外推荐');
+          showFailToast(t('recommendation.extraNetworkError'));
         } else if (error.message.includes('API')) {
-          showFailToast('AI 服务暂不可用，无法获取额外推荐');
+          showFailToast(t('recommendation.extraAiUnavailable'));
         } else {
-          showFailToast('额外推荐失败，请重试');
+          showFailToast(t('recommendation.extraRecommendationFailed'));
         }
       } else {
-        showFailToast('额外推荐失败，请重试');
+        showFailToast(t('recommendation.extraRecommendationFailed'));
       }
     } finally {
       isExtraRecommendationLoading.value = false;

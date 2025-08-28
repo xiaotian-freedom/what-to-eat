@@ -34,7 +34,7 @@
           class="text-lg font-semibold mb-3 theme-transition"
           :style="{ color: 'var(--color-text)' }"
         >
-          ✨ 主要功能
+          {{ $t('settings.aboutContent.features') }}
         </h3>
         <div class="space-y-2">
           <div
@@ -94,7 +94,7 @@
                   color: isClicked ? 'rgba(255,255,255,0.8)' : 'var(--color-textSecondary)',
                 }"
               >
-                全栈开发者
+                {{ $t('settings.aboutContent.fullStackDeveloper') }}
               </div>
             </div>
           </div>
@@ -199,7 +199,7 @@
     (e: 'close'): void;
   }>();
 
-  useI18n();
+  const { t } = useI18n();
 
   const devModeStore = useDevModeStore();
 
@@ -251,7 +251,7 @@
       devModeStore.showDevModeSwitch();
       developerClickCount.value = 0; // 重置计数器
 
-      showSuccessToast('开发模式开关已开启');
+      showSuccessToast(t('settings.aboutContent.devModeEnabled'));
     }
   };
 

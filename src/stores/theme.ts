@@ -6,8 +6,8 @@ import type { Theme, ThemeId } from '@/types/theme';
 const defaultThemes: Record<ThemeId, Theme> = {
   default: {
     id: 'default',
-    name: '默认主题',
-    description: '清新简约的默认主题',
+    name: 'themes.default.name',
+    description: 'themes.default.description',
     colors: {
       primary: '#6366f1',
       secondary: '#8b5cf6',
@@ -28,8 +28,8 @@ const defaultThemes: Record<ThemeId, Theme> = {
   },
   dark: {
     id: 'dark',
-    name: '深色主题',
-    description: '护眼的深色主题',
+    name: 'themes.dark.name',
+    description: 'themes.dark.description',
     colors: {
       primary: '#3b82f6',
       secondary: '#8b5cf6',
@@ -50,8 +50,8 @@ const defaultThemes: Record<ThemeId, Theme> = {
   },
   sunset: {
     id: 'sunset',
-    name: '日落主题',
-    description: '温暖的日落色彩',
+    name: 'themes.sunset.name',
+    description: 'themes.sunset.description',
     colors: {
       primary: '#f97316',
       secondary: '#ec4899',
@@ -72,8 +72,8 @@ const defaultThemes: Record<ThemeId, Theme> = {
   },
   ocean: {
     id: 'ocean',
-    name: '海洋主题',
-    description: '清凉的海洋色调',
+    name: 'themes.ocean.name',
+    description: 'themes.ocean.description',
     colors: {
       primary: '#06b6d4',
       secondary: '#0891b2',
@@ -94,8 +94,8 @@ const defaultThemes: Record<ThemeId, Theme> = {
   },
   forest: {
     id: 'forest',
-    name: '森林主题',
-    description: '自然的森林绿色',
+    name: 'themes.forest.name',
+    description: 'themes.forest.description',
     colors: {
       primary: '#059669',
       secondary: '#047857',
@@ -116,8 +116,8 @@ const defaultThemes: Record<ThemeId, Theme> = {
   },
   vintage: {
     id: 'vintage',
-    name: '复古主题',
-    description: '怀旧的复古风格',
+    name: 'themes.vintage.name',
+    description: 'themes.vintage.description',
     colors: {
       primary: '#a855f7',
       secondary: '#7c3aed',

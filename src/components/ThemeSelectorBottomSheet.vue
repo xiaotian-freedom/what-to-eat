@@ -27,10 +27,10 @@
           <!-- 主题信息 -->
           <div class="space-y-1">
             <h3 class="font-semibold text-sm" :style="{ color: theme.colors.text }">
-              {{ theme.name }}
+              {{ $t(theme.name) }}
             </h3>
             <p class="text-xs opacity-80" :style="{ color: theme.colors.textSecondary }">
-              {{ theme.description }}
+              {{ $t(theme.description) }}
             </p>
           </div>
 

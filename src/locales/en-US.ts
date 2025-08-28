@@ -151,6 +151,101 @@ export default {
   'settings.aboutContent.contact': 'Contact Us',
   'settings.aboutContent.email': 'Email',
   'settings.aboutContent.github': 'GitHub',
+  'settings.aboutContent.features': '✨ Key Features',
+  'settings.aboutContent.fullStackDeveloper': 'Full-Stack Developer',
+  'settings.aboutContent.devModeEnabled': 'Developer mode switch enabled',
+
+  // Theme system
+  'themes.default.name': 'Default Theme',
+  'themes.default.description': 'Fresh and clean default theme',
+  'themes.dark.name': 'Dark Theme',
+  'themes.dark.description': 'Eye-friendly dark theme',
+  'themes.sunset.name': 'Sunset Theme',
+  'themes.sunset.description': 'Warm sunset colors',
+  'themes.ocean.name': 'Ocean Theme',
+  'themes.ocean.description': 'Cool ocean tones',
+  'themes.forest.name': 'Forest Theme',
+  'themes.forest.description': 'Natural forest green',
+  'themes.vintage.name': 'Vintage Theme',
+  'themes.vintage.description': 'Nostalgic vintage style',
+
+  // Recommendation system
+  'recommendation.personalizedTitle': '🎯 Personalized Recommendation',
+  'recommendation.gettingLocation': 'Getting your location...',
+  'recommendation.currentMoodLabel': 'Current mood:',
+  'recommendation.physicalStateLabel': 'Physical state:',
+  'recommendation.activityLevelLabel': "Today's activity level:",
+  'recommendation.dietaryRestrictionsLabel': 'Special dietary needs:',
+  'recommendation.learningHint': 'System optimized recommendations based on your {{count}} choices',
+  'recommendation.locationError':
+    'Unable to get location info, recommendations based on other factors',
+  'recommendation.weatherFailed':
+    'Failed to get weather info, recommendations based on other factors',
+  'recommendation.aiAnalyzing': '🤖 AI analyzing...',
+  'recommendation.smartAnalyzing': '🔮 Smart analyzing...',
+  'recommendation.aiRecommendation': '🤖 AI Smart Recommendation',
+  'recommendation.smartRecommendation': '🔮 Smart Recommendation',
+  'recommendation.extraAnalyzing': '🎲 AI extended analysis...',
+  'recommendation.extraRecommendation': '🎲 Recommend New Dishes',
+  'recommendation.aiAvailable': 'AI recommendation available',
+  'recommendation.localOnly': 'Local recommendation only',
+  'recommendation.offlineMode': 'Offline mode',
+  'recommendation.checkingNetwork': 'Checking network...',
+  'recommendation.unknownStatus': 'Unknown status',
+  'recommendation.devModeUnlimited': 'Should have unlimited use in dev mode, please check config',
+  'recommendation.dailyLimitReached': "Today's usage limit reached, try again tomorrow",
+  'recommendation.noSuitableRecommendation': 'No suitable recommendations available',
+  'recommendation.networkError': 'Network connection issue, switched to local recommendation',
+  'recommendation.aiUnavailable': 'AI service unavailable, using local recommendation',
+  'recommendation.recommendationFailed': 'Recommendation failed, please retry',
+  'recommendation.extraNetworkError':
+    'Network connection issue, unable to get extra recommendations',
+  'recommendation.extraAiUnavailable':
+    'AI service unavailable, unable to get extra recommendations',
+  'recommendation.extraRecommendationFailed': 'Extra recommendation failed, please retry',
+
+  // Mood options
+  'mood.happy': 'Happy',
+  'mood.relaxed': 'Relaxed',
+  'mood.energetic': 'Energetic',
+  'mood.tired': 'Tired',
+  'mood.stressed': 'Stressed',
+  'mood.sad': 'Sad',
+  'mood.comfort': 'Need Comfort',
+  'mood.adventurous': 'Adventurous',
+
+  // Physical state options
+  'physicalState.normal': 'Normal',
+  'physicalState.sick': 'Sick/Cold',
+  'physicalState.recovering': 'Recovering',
+  'physicalState.exercised': 'Just Exercised',
+  'physicalState.hangover': 'Hangover',
+  'physicalState.insomnia': 'Insomnia',
+  'physicalState.pregnant': 'Pregnant',
+  'physicalState.menstrual': 'Menstrual',
+  'physicalState.pms': 'PMS',
+
+  // Activity level options
+  'activityLevel.sedentary': 'Sedentary',
+  'activityLevel.light': 'Light Activity',
+  'activityLevel.moderate': 'Moderate Activity',
+  'activityLevel.intensive': 'High Intensity',
+
+  // Dietary restriction options
+  'dietaryRestriction.vegetarian': 'Vegetarian',
+  'dietaryRestriction.vegan': 'Vegan',
+  'dietaryRestriction.glutenFree': 'Gluten-Free',
+  'dietaryRestriction.diabetic': 'Diabetic-Friendly',
+  'dietaryRestriction.lowSodium': 'Low Sodium',
+  'dietaryRestriction.keto': 'Keto',
+
+  // Time of day
+  'timeOfDay.breakfast': 'Breakfast Time',
+  'timeOfDay.lunch': 'Lunch Time',
+  'timeOfDay.dinner': 'Dinner Time',
+  'timeOfDay.snack': 'Snack Time',
+  'timeOfDay.anytime': 'Anytime',
+  'timeOfDay.default': 'Meal Time',
 
   // App configuration
   'app.name': 'What to Eat Today',

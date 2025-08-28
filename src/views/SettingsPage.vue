@@ -87,6 +87,7 @@
                   <p class="text-sm text-gray-600 mt-1">{{ $t('settings.languageDesc') }}</p>
                 </div>
                 <div class="flex items-center space-x-2">
+                  <span class="text-2xl">{{ currentLanguageIcon }}</span>
                   <span class="text-blue-400 text-xl">›</span>
                 </div>
               </div>
@@ -135,7 +136,8 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted } from 'vue';
+  import { ref, onMounted, computed } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
   import HeaderBar from '@/components/HeaderBar.vue';
   import ThemeSelectorBottomSheet from '@/components/ThemeSelectorBottomSheet.vue';
@@ -149,6 +151,12 @@
   const devModeStore = useDevModeStore();
   const themeStore = useThemeStore();
   const wheelModeStore = useWheelModeStore();
+  const { locale } = useI18n();
+
+  // 获取当前语言图标
+  const currentLanguageIcon = computed(() => {
+    return locale.value === 'zh-CN' ? '🇨🇳' : '🇺🇸';
+  });
 
   // 页面加载时加载开发模式状态
   onMounted(() => {
