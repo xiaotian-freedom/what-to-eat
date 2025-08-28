@@ -63,29 +63,36 @@
           {{ $t('settings.aboutContent.developer') }}
         </h3>
         <div
-          class="p-4 rounded-lg theme-transition"
+          @click="handleDeveloperClick"
+          class="p-4 rounded-lg theme-transition cursor-pointer select-none hover:opacity-80 transition-all duration-150"
           :style="{
-            backgroundColor: 'var(--color-surface)',
-            border: '1px solid var(--color-border)',
+            backgroundColor: isClicked ? 'var(--color-primary)' : 'var(--color-surface)',
+            border: `1px solid ${isClicked ? 'var(--color-primary)' : 'var(--color-border)'}`,
+            opacity: isClicked ? '0.9' : '1',
           }"
         >
           <div class="flex items-center space-x-3">
             <div
               class="w-12 h-12 rounded-full flex items-center justify-center theme-transition"
               :style="{
-                backgroundColor: 'var(--color-primary)',
-                color: 'white',
+                backgroundColor: isClicked ? 'white' : 'var(--color-primary)',
+                color: isClicked ? 'var(--color-primary)' : 'white',
               }"
             >
               👨‍💻
             </div>
             <div>
-              <div class="font-medium theme-transition" :style="{ color: 'var(--color-text)' }">
+              <div
+                class="font-medium theme-transition"
+                :style="{ color: isClicked ? 'white' : 'var(--color-text)' }"
+              >
                 {{ APP_CONFIG.developer.name }}
               </div>
               <div
                 class="text-sm theme-transition"
-                :style="{ color: 'var(--color-textSecondary)' }"
+                :style="{
+                  color: isClicked ? 'rgba(255,255,255,0.8)' : 'var(--color-textSecondary)',
+                }"
               >
                 全栈开发者
               </div>
@@ -169,9 +176,12 @@
 </template>
 
 <script setup lang="ts">
+  import { ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { APP_CONFIG } from '@/config/app';
+  import { useDevModeStore } from '@/stores/devMode';
   import BottomSheet from './BottomSheet.vue';
+  import { showSuccessToast } from 'vant';
 
   interface Props {
     /** 是否显示 BottomSheet */
@@ -191,9 +201,58 @@
 
   useI18n();
 
+  const devModeStore = useDevModeStore();
+
+  // 开发者信息点击计数
+  const developerClickCount = ref<number>(0);
+
+  // 点击效果状态
+  const isClicked = ref<boolean>(false);
+
+  // 连续点击定时器
+  let clickTimer: number | null = null;
+
   // 处理关闭事件
   const handleClose = () => {
     emit('close');
+  };
+
+  // 处理开发者信息点击
+  const handleDeveloperClick = () => {
+    // 触发点击效果
+    isClicked.value = true;
+    setTimeout(() => {
+      isClicked.value = false;
+    }, 150); // 150ms后恢复
+
+    // 清除之前的定时器
+    if (clickTimer) {
+      clearTimeout(clickTimer);
+    }
+
+    // 增加点击计数
+    developerClickCount.value++;
+
+    // 设置新的定时器，500ms后重置计数
+    clickTimer = setTimeout(() => {
+      if (developerClickCount.value < 10) {
+        developerClickCount.value = 0; // 重置计数器
+      }
+    }, 500);
+
+    // 连续点击10次后显示开发模式开关
+    if (developerClickCount.value >= 10) {
+      // 清除定时器，因为已经达成目标
+      if (clickTimer) {
+        clearTimeout(clickTimer);
+        clickTimer = null;
+      }
+
+      devModeStore.showDevModeSwitch();
+      developerClickCount.value = 0; // 重置计数器
+
+      showSuccessToast('开发模式开关已开启');
+    }
   };
 
   // 获取功能图标

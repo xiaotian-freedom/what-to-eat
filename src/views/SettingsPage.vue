@@ -4,7 +4,7 @@
     :class="`theme-gradient-${themeStore.currentTheme}`"
   >
     <!-- 卡片容器 -->
-    <div class="card-container w-full h-[80vh] max-w-md">
+    <div class="card-container w-full h-[70vh] max-w-md">
       <!-- 设置卡片 -->
       <div
         class="card-face bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative flex flex-col w-full h-full"
@@ -15,9 +15,9 @@
         <!-- 内容区域 -->
         <div class="flex-1 flex flex-col p-6 overflow-y-auto">
           <div class="space-y-4">
-            <!-- 开发模式开关 - 仅在开发环境下显示 -->
+            <!-- 开发模式开关 - 开关可见时显示 -->
             <div
-              v-if="isDevelopment"
+              v-if="devModeStore.isDevModeSwitchVisible"
               @click="toggleDevMode"
               class="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-4 border border-orange-100 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-95"
             >
@@ -135,7 +135,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, onMounted } from 'vue';
+  import { ref, onMounted } from 'vue';
 
   import HeaderBar from '@/components/HeaderBar.vue';
   import ThemeSelectorBottomSheet from '@/components/ThemeSelectorBottomSheet.vue';
@@ -161,9 +161,6 @@
   const showThemeSelector = ref(false);
   const showAboutModal = ref(false);
   const showModeSelector = ref(false);
-
-  // 计算属性
-  const isDevelopment = computed(() => import.meta.env.MODE === 'development');
 
   // 处理语言选择
   const handleLanguageSelect = () => {
