@@ -67,12 +67,12 @@ export enum PhysicalState {
   PMS = 'pms', // 经前综合征 - 推荐甜食、安慰食物
 }
 
-// 身体活动水平枚举
-export enum ActivityLevel {
-  SEDENTARY = 'sedentary', // 久坐 - 推荐清淡
-  LIGHT = 'light', // 轻度活动 - 均衡营养
-  MODERATE = 'moderate', // 中度活动 - 增加蛋白质
-  INTENSIVE = 'intensive', // 高强度 - 高蛋白高碳水
+// 餐后感受偏好枚举
+export enum PostMealFeeling {
+  SATISFYING = 'satisfying', // 想要饱腹感 - 推荐分量足、有嚼劲的菜品
+  REFRESHING = 'refreshing', // 想要清爽感 - 推荐清淡、爽口的菜品
+  WARMING = 'warming', // 想要暖胃感 - 推荐温热、养胃的菜品
+  COMFORTING = 'comforting', // 想要治愈感 - 推荐安慰型、甜腻的菜品
 }
 
 // 工作类型枚举
@@ -87,12 +87,12 @@ export enum WorkType {
 export enum DietaryRestriction {
   NONE = 'none', // 无限制
   VEGETARIAN = 'vegetarian', // 素食
-  VEGAN = 'vegan', // 纯素
-  GLUTEN_FREE = 'gluten_free', // 无麸质
+  MEAT_LOVER = 'meat_lover', // 肉食
+  LIGHT_OIL = 'light_oil', // 清淡少油
   DIABETIC = 'diabetic', // 糖尿病友好
-  LOW_SODIUM = 'low_sodium', // 低钠
+  MUSCLE_GAIN = 'muscle_gain', // 增肌
   LOW_FAT = 'low_fat', // 低脂
-  KETO = 'keto', // 生酮饮食
+  WEIGHT_LOSS = 'weight_loss', // 减肥瘦身
   PALEO = 'paleo', // 原始人饮食
   MEDITERRANEAN = 'mediterranean', // 地中海饮食
 }
@@ -139,8 +139,8 @@ export interface Food {
   suitablePhysicalState?: PhysicalState[]; // 适合的身体状态
   benefitsForPhysicalState?: { [key in PhysicalState]?: string }; // 对特定身体状态的益处描述
 
-  // 新增活动水平相关属性
-  suitableActivityLevel?: ActivityLevel[]; // 适合的活动水平
+  // 新增餐后感受相关属性
+  suitablePostMealFeeling?: PostMealFeeling[]; // 适合的餐后感受
   suitableWorkType?: WorkType[]; // 适合的工作类型
 
   // 新增特殊饮食需求属性

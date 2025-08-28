@@ -40,7 +40,7 @@
           <h3
             v-if="title"
             class="text-lg font-semibold text-center theme-transition"
-            :style="{ color: 'var(--color-text)' }"
+            :style="{ color: titleColor || 'var(--color-text)' }"
           >
             {{ title }}
           </h3>
@@ -52,7 +52,7 @@
             class="close-button w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-0 theme-transition"
             :style="{
               backgroundColor: 'transparent',
-              color: 'var(--color-text)',
+              color: closeButtonColor || 'var(--color-text)',
             }"
             :class="{ 'ml-auto': !title }"
           >
@@ -102,6 +102,8 @@
     indicatorColor?: string;
     title?: string;
     showCloseButton?: boolean;
+    titleColor?: string;
+    closeButtonColor?: string;
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -113,6 +115,8 @@
     indicatorColor: 'var(--color-border)',
     title: '',
     showCloseButton: true,
+    titleColor: undefined,
+    closeButtonColor: undefined,
   });
 
   // 计算背景样式

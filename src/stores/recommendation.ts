@@ -6,7 +6,7 @@ import {
   MoodType,
   Season,
   PhysicalState,
-  ActivityLevel,
+  PostMealFeeling,
   WorkType,
   DietaryRestriction,
   RecommendationReasonType,
@@ -36,7 +36,7 @@ export const useRecommendationStore = defineStore('recommendation', () => {
 
     // 新增维度权重
     physicalStateWeight: 0.15, // 身体状态权重较高，因为影响健康
-    activityLevelWeight: 0.08, // 活动水平权重
+    postMealFeelingWeight: 0.08, // 餐后感受权重
     workTypeWeight: 0.05, // 工作类型权重
     dietaryRestrictionsWeight: 0.12, // 饮食限制权重较高，因为是硬性要求
 
@@ -322,26 +322,28 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     return { score: Math.min(score, 1), reasons };
   };
 
-  // 计算活动水平匹配分数
-  const calculateActivityLevelScore = (
+  // 计算餐后感受匹配分数
+  const calculatePostMealFeelingScore = (
     food: Food
   ): { score: number; reasons: RecommendationReason[] } => {
     const reasons: RecommendationReason[] = [];
     let score = 0.5;
 
-    if (!food.suitableActivityLevel || !currentContext.value.activityLevel) {
+    if (!food.suitablePostMealFeeling || !currentContext.value.postMealFeeling) {
       return { score, reasons };
     }
 
-    const isActivityLevelSuitable = food.suitableActivityLevel.includes(
-      currentContext.value.activityLevel
+    const isPostMealFeelingSuitable = food.suitablePostMealFeeling.includes(
+      currentContext.value.postMealFeeling
     );
-    if (isActivityLevelSuitable) {
+    if (isPostMealFeelingSuitable) {
       score = 0.8;
       reasons.push({
-        type: RecommendationReasonType.ACTIVITY_LEVEL,
-        message: `适合${getActivityLevelDescription(currentContext.value.activityLevel)}的活动水平`,
-        weight: recommendationConfig.value.activityLevelWeight || 0.08,
+        type: RecommendationReasonType.POST_MEAL_FEELING,
+        message: `满足您想要的${getPostMealFeelingDescription(
+          currentContext.value.postMealFeeling
+        )}`,
+        weight: recommendationConfig.value.postMealFeelingWeight || 0.08,
       });
     }
 
@@ -453,7 +455,7 @@ export const useRecommendationStore = defineStore('recommendation', () => {
 
       // 新增维度评分
       const physicalStateResult = calculatePhysicalStateScore(food);
-      const activityLevelResult = calculateActivityLevelScore(food);
+      const postMealFeelingResult = calculatePostMealFeelingScore(food);
       const workTypeResult = calculateWorkTypeScore(food);
       const dietaryRestrictionsResult = calculateDietaryRestrictionsScore(food);
 
@@ -467,7 +469,7 @@ export const useRecommendationStore = defineStore('recommendation', () => {
 
       // 新增维度权重
       let physicalStateWeight = recommendationConfig.value.physicalStateWeight || 0.15;
-      let activityLevelWeight = recommendationConfig.value.activityLevelWeight || 0.08;
+      let postMealFeelingWeight = recommendationConfig.value.postMealFeelingWeight || 0.08;
       let workTypeWeight = recommendationConfig.value.workTypeWeight || 0.05;
       let dietaryRestrictionsWeight = recommendationConfig.value.dietaryRestrictionsWeight || 0.12;
 
@@ -490,7 +492,7 @@ export const useRecommendationStore = defineStore('recommendation', () => {
         seasonResult.score * seasonWeight +
         popularityResult.score * popularityWeight +
         physicalStateResult.score * physicalStateWeight +
-        activityLevelResult.score * activityLevelWeight +
+        postMealFeelingResult.score * postMealFeelingWeight +
         workTypeResult.score * workTypeWeight +
         dietaryRestrictionsResult.score * dietaryRestrictionsWeight +
         0.5 * preferenceWeight; // 偏好分数暂时设为0.5
@@ -503,7 +505,7 @@ export const useRecommendationStore = defineStore('recommendation', () => {
         ...seasonResult.reasons,
         ...popularityResult.reasons,
         ...physicalStateResult.reasons,
-        ...activityLevelResult.reasons,
+        ...postMealFeelingResult.reasons,
         ...workTypeResult.reasons,
         ...dietaryRestrictionsResult.reasons,
       ];
@@ -643,15 +645,15 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     return descriptions[state] || state;
   };
 
-  // 辅助函数 - 获取活动水平描述
-  const getActivityLevelDescription = (level: ActivityLevel): string => {
+  // 辅助函数 - 获取餐后感受描述
+  const getPostMealFeelingDescription = (feeling: PostMealFeeling): string => {
     const descriptions = {
-      [ActivityLevel.SEDENTARY]: '久坐少动',
-      [ActivityLevel.LIGHT]: '轻度活动',
-      [ActivityLevel.MODERATE]: '中度活动',
-      [ActivityLevel.INTENSIVE]: '高强度活动',
+      [PostMealFeeling.SATISFYING]: '饱腹感',
+      [PostMealFeeling.REFRESHING]: '清爽感',
+      [PostMealFeeling.WARMING]: '暖胃感',
+      [PostMealFeeling.COMFORTING]: '治愈感',
     };
-    return descriptions[level] || level;
+    return descriptions[feeling] || feeling;
   };
 
   // 辅助函数 - 获取工作类型描述
@@ -670,12 +672,12 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     const descriptions = {
       [DietaryRestriction.NONE]: '无限制',
       [DietaryRestriction.VEGETARIAN]: '素食',
-      [DietaryRestriction.VEGAN]: '纯素',
-      [DietaryRestriction.GLUTEN_FREE]: '无麸质',
+      [DietaryRestriction.MEAT_LOVER]: '肉食',
+      [DietaryRestriction.LIGHT_OIL]: '清淡少油',
       [DietaryRestriction.DIABETIC]: '糖尿病友好',
-      [DietaryRestriction.LOW_SODIUM]: '低钠',
+      [DietaryRestriction.MUSCLE_GAIN]: '增肌',
       [DietaryRestriction.LOW_FAT]: '低脂',
-      [DietaryRestriction.KETO]: '生酮饮食',
+      [DietaryRestriction.WEIGHT_LOSS]: '减肥瘦身',
       [DietaryRestriction.PALEO]: '原始人饮食',
       [DietaryRestriction.MEDITERRANEAN]: '地中海饮食',
     };

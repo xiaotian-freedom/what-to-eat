@@ -246,22 +246,40 @@
     // 直接使用推荐的Food对象
     const selectedFood = recommendation.food;
 
-    // 设置为推荐菜品
-    recommendedDish.value = selectedFood;
+    // 检查当前模式
+    if (wheelModeStore.isWheelMode()) {
+      // 转盘模式：直接跳转到结果页，类似转盘结果处理
+      // 记录挑战数据
+      const success = challengeStore.useRandomFood(selectedFood.name);
+      if (!success) {
+        showFailToast(t('messages.todayLimitReached'));
+        return;
+      }
 
-    if (dishCanvasRef.value && !isAnimating.value) {
-      isAnimating.value = true;
-      try {
-        // 直接传递菜品参数，确保目标菜品正确设置
-        await dishCanvasRef.value.showTargetDish(selectedFood);
-        // 动画完成后会自动调用 onAnimationComplete
-      } catch (error) {
-        console.error('显示推荐菜品动画失败:', error);
-        isAnimating.value = false;
+      // 发送选择事件
+      emit('selected-dish', selectedFood);
+
+      // 直接显示结果页面
+      emit('show-result');
+    } else {
+      // 卡片模式：使用动画展示推荐结果
+      // 设置为推荐菜品
+      recommendedDish.value = selectedFood;
+
+      if (dishCanvasRef.value && !isAnimating.value) {
+        isAnimating.value = true;
+        try {
+          // 直接传递菜品参数，确保目标菜品正确设置
+          await dishCanvasRef.value.showTargetDish(selectedFood);
+          // 动画完成后会自动调用 onAnimationComplete
+        } catch (error) {
+          console.error('显示推荐菜品动画失败:', error);
+          isAnimating.value = false;
+        }
       }
     }
 
-    // 隐藏推荐面板
+    // 隐藏推荐面板（统一在这里关闭）
     showRecommendation.value = false;
   };
 

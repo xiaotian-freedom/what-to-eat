@@ -1,21 +1,10 @@
 <template>
-  <BottomSheet :visible="visible" @close="$emit('close')" maxHeight="70vh">
-    <!-- 标题 -->
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-bold" :style="{ color: 'var(--color-text)' }">
-        {{ $t('challenge.title') }}
-      </h2>
-      <button
-        @click="$emit('close')"
-        class="p-1"
-        :style="{
-          color: 'var(--color-textSecondary)',
-        }"
-      >
-        <span class="text-lg">✕</span>
-      </button>
-    </div>
-
+  <BottomSheet
+    :visible="visible"
+    :title="$t('challenge.title')"
+    @close="$emit('close')"
+    maxHeight="70vh"
+  >
     <!-- 每日挑战统计 -->
     <div
       class="rounded-2xl p-4 mb-6 theme-transition relative overflow-hidden"

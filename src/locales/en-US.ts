@@ -170,13 +170,13 @@ export default {
   'themes.vintage.description': 'Nostalgic vintage style',
 
   // Recommendation system
-  'recommendation.personalizedTitle': '🎯 Personalized Recommendation',
+  'recommendation.personalizedTitle': 'Personalized Recommendation',
   'recommendation.gettingLocation': 'Getting your location...',
   'recommendation.currentMoodLabel': 'Current mood:',
   'recommendation.physicalStateLabel': 'Physical state:',
-  'recommendation.activityLevelLabel': "Today's activity level:",
+  'recommendation.postMealFeelingLabel': 'Desired post-meal feeling:',
   'recommendation.dietaryRestrictionsLabel': 'Special dietary needs:',
-  'recommendation.learningHint': 'System optimized recommendations based on your {{count}} choices',
+  'recommendation.learningHint': 'System optimized recommendations based on your {count} choices',
   'recommendation.locationError':
     'Unable to get location info, recommendations based on other factors',
   'recommendation.weatherFailed':
@@ -225,19 +225,19 @@ export default {
   'physicalState.menstrual': 'Menstrual',
   'physicalState.pms': 'PMS',
 
-  // Activity level options
-  'activityLevel.sedentary': 'Sedentary',
-  'activityLevel.light': 'Light Activity',
-  'activityLevel.moderate': 'Moderate Activity',
-  'activityLevel.intensive': 'High Intensity',
+  // Post-meal feeling options
+  'postMealFeeling.satisfying': 'Want Satisfaction',
+  'postMealFeeling.refreshing': 'Want Freshness',
+  'postMealFeeling.warming': 'Want Warmth',
+  'postMealFeeling.comforting': 'Want Comfort',
 
   // Dietary restriction options
   'dietaryRestriction.vegetarian': 'Vegetarian',
-  'dietaryRestriction.vegan': 'Vegan',
-  'dietaryRestriction.glutenFree': 'Gluten-Free',
+  'dietaryRestriction.meatLover': 'Meat Lover',
+  'dietaryRestriction.lightOil': 'Light Oil',
   'dietaryRestriction.diabetic': 'Diabetic-Friendly',
-  'dietaryRestriction.lowSodium': 'Low Sodium',
-  'dietaryRestriction.keto': 'Keto',
+  'dietaryRestriction.muscleGain': 'Muscle Gain',
+  'dietaryRestriction.weightLoss': 'Weight Loss',
 
   // Time of day
   'timeOfDay.breakfast': 'Breakfast Time',

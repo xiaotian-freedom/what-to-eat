@@ -5,7 +5,7 @@ import type {
   MoodType,
   Season,
   PhysicalState,
-  ActivityLevel,
+  PostMealFeeling,
   WorkType,
   DietaryRestriction,
 } from './food';
@@ -25,7 +25,7 @@ export interface RecommendationContext {
 
   // 新增：身体状态相关
   physicalState?: PhysicalState; // 当前身体状态
-  activityLevel?: ActivityLevel; // 今日活动水平
+  postMealFeeling?: PostMealFeeling; // 想要的餐后感受
   workType?: WorkType; // 当前工作类型
 
   // 新增：特殊需求
@@ -46,7 +46,7 @@ export interface RecommendationConfig {
 
   // 新增维度权重
   physicalStateWeight?: number; // 身体状态权重 0-1
-  activityLevelWeight?: number; // 活动水平权重 0-1
+  postMealFeelingWeight?: number; // 餐后感受权重 0-1
   workTypeWeight?: number; // 工作类型权重 0-1
   dietaryRestrictionsWeight?: number; // 饮食限制权重 0-1
 
@@ -85,7 +85,7 @@ export enum RecommendationReasonType {
 
   // 新增维度
   PHYSICAL_STATE = 'physical_state', // 基于身体状态
-  ACTIVITY_LEVEL = 'activity_level', // 基于活动水平
+  POST_MEAL_FEELING = 'post_meal_feeling', // 基于餐后感受
   WORK_TYPE = 'work_type', // 基于工作类型
   DIETARY_RESTRICTION = 'dietary_restriction', // 基于饮食限制
 }
@@ -106,7 +106,7 @@ export interface UserPreference {
 
   // 新增：身体状态相关偏好
   preferredPhysicalStates?: PhysicalState[]; // 偏好的身体状态食物
-  defaultActivityLevel?: ActivityLevel; // 默认活动水平
+  defaultPostMealFeeling?: PostMealFeeling; // 默认餐后感受
   workType?: WorkType; // 工作类型
 
   // 新增：特殊需求
@@ -148,7 +148,7 @@ export interface RecommendationAlgorithmConfig {
 
   // 新增推荐开关
   enablePhysicalStateRecommendation?: boolean; // 是否启用身体状态推荐
-  enableActivityLevelRecommendation?: boolean; // 是否启用活动水平推荐
+  enablePostMealFeelingRecommendation?: boolean; // 是否启用餐后感受推荐
   enableWorkTypeRecommendation?: boolean; // 是否启用工作类型推荐
   enableDietaryRestrictionRecommendation?: boolean; // 是否启用饮食限制推荐
 

@@ -178,13 +178,13 @@ export default {
   'themes.vintage.description': '怀旧的复古风格',
 
   // 推荐系统
-  'recommendation.personalizedTitle': '🎯 个性化推荐',
+  'recommendation.personalizedTitle': '个性化推荐',
   'recommendation.gettingLocation': '正在获取您的位置...',
   'recommendation.currentMoodLabel': '现在的心情：',
   'recommendation.physicalStateLabel': '身体状态：',
-  'recommendation.activityLevelLabel': '今日活动水平：',
+  'recommendation.postMealFeelingLabel': '想要的餐后感受：',
   'recommendation.dietaryRestrictionsLabel': '特殊饮食需求：',
-  'recommendation.learningHint': '系统已根据您的{{count}}次选择优化推荐',
+  'recommendation.learningHint': '系统已根据您的{count}次选择优化推荐',
   'recommendation.locationError': '无法获取位置信息，推荐将基于其他因素',
   'recommendation.weatherFailed': '获取天气信息失败，推荐将基于其他因素',
   'recommendation.aiAnalyzing': '🤖 AI 分析中...',
@@ -229,19 +229,19 @@ export default {
   'physicalState.menstrual': '生理期',
   'physicalState.pms': '经前综合征',
 
-  // 活动水平选项
-  'activityLevel.sedentary': '久坐',
-  'activityLevel.light': '轻度活动',
-  'activityLevel.moderate': '中度活动',
-  'activityLevel.intensive': '高强度',
+  // 餐后感受选项
+  'postMealFeeling.satisfying': '想要饱腹感',
+  'postMealFeeling.refreshing': '想要清爽感',
+  'postMealFeeling.warming': '想要暖胃感',
+  'postMealFeeling.comforting': '想要治愈感',
 
   // 特殊饮食需求选项
   'dietaryRestriction.vegetarian': '素食',
-  'dietaryRestriction.vegan': '纯素',
-  'dietaryRestriction.glutenFree': '无麩质',
+  'dietaryRestriction.meatLover': '肉食',
+  'dietaryRestriction.lightOil': '清淡少油',
   'dietaryRestriction.diabetic': '糖尿病友好',
-  'dietaryRestriction.lowSodium': '低钠',
-  'dietaryRestriction.keto': '生酮',
+  'dietaryRestriction.muscleGain': '增肌',
+  'dietaryRestriction.weightLoss': '减肥瘦身',
 
   // 时间段
   'timeOfDay.breakfast': '早餐时间',

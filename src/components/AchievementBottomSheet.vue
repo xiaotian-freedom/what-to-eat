@@ -1,21 +1,10 @@
 <template>
-  <BottomSheet :visible="visible" @close="$emit('close')" maxHeight="70vh">
-    <!-- 标题 -->
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-bold" :style="{ color: 'var(--color-text)' }">
-        {{ $t('achievements.system') }}
-      </h2>
-      <button
-        @click="$emit('close')"
-        class="p-1 rounded-full transition-colors"
-        :style="{
-          color: 'var(--color-textSecondary)',
-        }"
-      >
-        <span class="text-lg">✕</span>
-      </button>
-    </div>
-
+  <BottomSheet
+    :visible="visible"
+    :title="$t('achievements.system')"
+    @close="$emit('close')"
+    maxHeight="70vh"
+  >
     <!-- 成就统计 -->
     <div
       class="rounded-2xl p-4 mb-6 theme-transition"

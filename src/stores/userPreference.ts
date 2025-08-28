@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { MoodType, ActivityLevel, WorkType, DietaryRestriction } from '@/types';
+import { MoodType, PostMealFeeling, WorkType, DietaryRestriction } from '@/types';
 import type { Food, UserPreference, UserChoiceHistory, RecommendationContext } from '@/types';
 
 export const useUserPreferenceStore = defineStore('userPreference', () => {
@@ -18,7 +18,7 @@ export const useUserPreferenceStore = defineStore('userPreference', () => {
 
     // 新增：身体状态相关偏好
     preferredPhysicalStates: [],
-    defaultActivityLevel: ActivityLevel.LIGHT,
+    defaultPostMealFeeling: PostMealFeeling.SATISFYING,
     workType: WorkType.MENTAL,
 
     // 新增：特殊需求
@@ -316,12 +316,12 @@ export const useUserPreferenceStore = defineStore('userPreference', () => {
       }
     }
 
-    // 新增：活动水平匹配
-    if (food.suitableActivityLevel && userPreference.value.defaultActivityLevel) {
-      const activityMatches = food.suitableActivityLevel.includes(
-        userPreference.value.defaultActivityLevel
+    // 新增：餐后感受匹配
+    if (food.suitablePostMealFeeling && userPreference.value.defaultPostMealFeeling) {
+      const feelingMatches = food.suitablePostMealFeeling.includes(
+        userPreference.value.defaultPostMealFeeling
       );
-      if (activityMatches) {
+      if (feelingMatches) {
         score += 0.1;
         factors++;
       }
@@ -454,7 +454,7 @@ export const useUserPreferenceStore = defineStore('userPreference', () => {
 
       // 新增：身体状态相关偏好
       preferredPhysicalStates: [],
-      defaultActivityLevel: ActivityLevel.LIGHT,
+      defaultPostMealFeeling: PostMealFeeling.SATISFYING,
       workType: WorkType.MENTAL,
 
       // 新增：特殊需求

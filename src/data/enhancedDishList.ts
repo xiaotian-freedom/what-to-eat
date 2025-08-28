@@ -6,7 +6,7 @@ import {
   Season,
   CuisineType,
   PhysicalState,
-  ActivityLevel,
+  PostMealFeeling,
   DietaryRestriction,
 } from '@/types';
 
@@ -41,7 +41,7 @@ export const enhancedDishList: Food[] = [
     },
 
     // 新增：活动水平相关
-    suitableActivityLevel: [ActivityLevel.SEDENTARY, ActivityLevel.LIGHT],
+    suitablePostMealFeeling: [PostMealFeeling.REFRESHING, PostMealFeeling.WARMING],
 
     // 新增：特殊需求
     dietaryRestrictions: [DietaryRestriction.NONE],
@@ -80,8 +80,8 @@ export const enhancedDishList: Food[] = [
       [PhysicalState.EXERCISED]: '辛辣刺激，提升新陈代谢',
     },
 
-    // 新增：活动水平相关
-    suitableActivityLevel: [ActivityLevel.MODERATE, ActivityLevel.INTENSIVE],
+    // 新增：餐后感受相关
+    suitablePostMealFeeling: [PostMealFeeling.SATISFYING, PostMealFeeling.COMFORTING],
 
     // 新增：特殊需求
     dietaryRestrictions: [DietaryRestriction.VEGETARIAN], // 豆腐为主，可素食
@@ -506,7 +506,7 @@ export const enhancedDishList: Food[] = [
     },
 
     // 新增：活动水平相关
-    suitableActivityLevel: [ActivityLevel.SEDENTARY, ActivityLevel.LIGHT],
+    suitablePostMealFeeling: [PostMealFeeling.REFRESHING, PostMealFeeling.WARMING],
 
     // 新增：特殊需求
     dietaryRestrictions: [DietaryRestriction.NONE],

@@ -5,6 +5,8 @@
     maxHeight="80vh"
     backgroundStyle="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
     :title="$t('recommendation.personalizedTitle')"
+    titleColor="white"
+    closeButtonColor="white"
   >
     <div class="recommendation-bottom-sheet">
       <!-- 推荐配置区域 -->
@@ -85,18 +87,18 @@
           </div>
         </div>
 
-        <!-- 活动水平选择 -->
-        <div class="activity-level-selector">
-          <label class="input-label">{{ $t('recommendation.activityLevelLabel') }}</label>
-          <div class="activity-level-options">
+        <!-- 餐后感受选择 -->
+        <div class="post-meal-feeling-selector">
+          <label class="input-label">{{ $t('recommendation.postMealFeelingLabel') }}</label>
+          <div class="post-meal-feeling-options">
             <button
-              v-for="level in activityLevelOptions"
-              :key="level.value"
-              :class="['level-btn', { active: currentActivityLevel === level.value }]"
-              @click="selectActivityLevel(level.value)"
+              v-for="feeling in postMealFeelingOptions"
+              :key="feeling.value"
+              :class="['feeling-btn', { active: currentPostMealFeeling === feeling.value }]"
+              @click="selectPostMealFeeling(feeling.value)"
             >
-              <span class="level-emoji">{{ level.emoji }}</span>
-              <span class="level-text">{{ level.label }}</span>
+              <span class="feeling-emoji">{{ feeling.emoji }}</span>
+              <span class="feeling-text">{{ feeling.label }}</span>
             </button>
           </div>
         </div>
@@ -190,14 +192,14 @@
     WeatherData,
     MoodType,
     PhysicalState,
-    ActivityLevel,
+    PostMealFeeling,
     DietaryRestriction,
     NetworkStatus,
   } from '@/types';
   import {
     MoodType as MoodEnum,
     PhysicalState as PhysicalStateEnum,
-    ActivityLevel as ActivityLevelEnum,
+    PostMealFeeling as PostMealFeelingEnum,
     DietaryRestriction as DietaryRestrictionEnum,
     TimeOfDay,
     NetworkStatus as NetStatus,
@@ -226,7 +228,7 @@
     // 重置用户选择的状态
     currentMood.value = null;
     currentPhysicalState.value = null;
-    currentActivityLevel.value = null;
+    currentPostMealFeeling.value = null;
     currentDietaryRestrictions.value = [];
 
     // 重置推荐结果
@@ -246,7 +248,7 @@
     recommendationStore.updateContext({
       userMood: undefined,
       physicalState: undefined,
-      activityLevel: undefined,
+      postMealFeeling: undefined,
       dietaryRestrictions: undefined,
     });
   };
@@ -274,7 +276,7 @@
   const locationError = ref<string | null>(null);
   const currentMood = ref<MoodType | null>(null);
   const currentPhysicalState = ref<PhysicalState | null>(null);
-  const currentActivityLevel = ref<ActivityLevel | null>(null);
+  const currentPostMealFeeling = ref<PostMealFeeling | null>(null);
   const currentDietaryRestrictions = ref<DietaryRestriction[]>([]);
   const showDietaryRestrictions = ref(true); // 控制是否显示特殊需求选择器
   const recommendations = ref<RecommendationResult[]>([]);
@@ -314,12 +316,12 @@
     { value: PhysicalStateEnum.PMS, emoji: '🌪️', label: t('physicalState.pms') },
   ]);
 
-  // 活动水平选项
-  const activityLevelOptions = computed(() => [
-    { value: ActivityLevelEnum.SEDENTARY, emoji: '🪑', label: t('activityLevel.sedentary') },
-    { value: ActivityLevelEnum.LIGHT, emoji: '🚶', label: t('activityLevel.light') },
-    { value: ActivityLevelEnum.MODERATE, emoji: '🏃', label: t('activityLevel.moderate') },
-    { value: ActivityLevelEnum.INTENSIVE, emoji: '🏋️', label: t('activityLevel.intensive') },
+  // 餐后感受选项
+  const postMealFeelingOptions = computed(() => [
+    { value: PostMealFeelingEnum.SATISFYING, emoji: '🍽️', label: t('postMealFeeling.satisfying') },
+    { value: PostMealFeelingEnum.REFRESHING, emoji: '🥗', label: t('postMealFeeling.refreshing') },
+    { value: PostMealFeelingEnum.WARMING, emoji: '🍲', label: t('postMealFeeling.warming') },
+    { value: PostMealFeelingEnum.COMFORTING, emoji: '🍰', label: t('postMealFeeling.comforting') },
   ]);
 
   // 特殊饮食需求选项（只显示常用的）
@@ -329,11 +331,15 @@
       emoji: '🥬',
       label: t('dietaryRestriction.vegetarian'),
     },
-    { value: DietaryRestrictionEnum.VEGAN, emoji: '🌱', label: t('dietaryRestriction.vegan') },
     {
-      value: DietaryRestrictionEnum.GLUTEN_FREE,
-      emoji: '🚫',
-      label: t('dietaryRestriction.glutenFree'),
+      value: DietaryRestrictionEnum.MEAT_LOVER,
+      emoji: '🥩',
+      label: t('dietaryRestriction.meatLover'),
+    },
+    {
+      value: DietaryRestrictionEnum.LIGHT_OIL,
+      emoji: '💧',
+      label: t('dietaryRestriction.lightOil'),
     },
     {
       value: DietaryRestrictionEnum.DIABETIC,
@@ -341,11 +347,15 @@
       label: t('dietaryRestriction.diabetic'),
     },
     {
-      value: DietaryRestrictionEnum.LOW_SODIUM,
-      emoji: '🧂',
-      label: t('dietaryRestriction.lowSodium'),
+      value: DietaryRestrictionEnum.MUSCLE_GAIN,
+      emoji: '💪',
+      label: t('dietaryRestriction.muscleGain'),
     },
-    { value: DietaryRestrictionEnum.KETO, emoji: '🥓', label: t('dietaryRestriction.keto') },
+    {
+      value: DietaryRestrictionEnum.WEIGHT_LOSS,
+      emoji: '🏃‍♀️',
+      label: t('dietaryRestriction.weightLoss'),
+    },
   ]);
 
   // 计算属性
@@ -445,9 +455,9 @@
     recommendationStore.updateContext({ physicalState: state });
   };
 
-  const selectActivityLevel = (level: ActivityLevel) => {
-    currentActivityLevel.value = level;
-    recommendationStore.updateContext({ activityLevel: level });
+  const selectPostMealFeeling = (feeling: PostMealFeeling) => {
+    currentPostMealFeeling.value = feeling;
+    recommendationStore.updateContext({ postMealFeeling: feeling });
   };
 
   const toggleDietaryRestriction = (restriction: DietaryRestriction) => {
@@ -600,7 +610,7 @@
 
         // 新增：身体状态相关
         physicalState: currentPhysicalState.value || undefined,
-        activityLevel: currentActivityLevel.value || undefined,
+        postMealFeeling: currentPostMealFeeling.value || undefined,
 
         // 新增：特殊需求
         dietaryRestrictions:
@@ -639,13 +649,13 @@
         // 直接使用选中的推荐结果
         const topRecommendation = recommendations.value[0];
 
-        // 先触发选择事件
+        // 触发选择事件，交由父组件决定如何处理（卡片动画或直接跳转）
         emit('foodSelected', topRecommendation);
 
-        // 延迟关闭弹窗，给动画一些时间开始
-        setTimeout(() => {
-          handleClose();
-        }, 100);
+        // 不再自动关闭弹窗，由父组件的处理逻辑决定何时关闭
+        // setTimeout(() => {
+        //   handleClose();
+        // }, 100);
       }
     } catch (error) {
       console.error('获取推荐失败:', error);
@@ -720,7 +730,7 @@
 
         // 新增：身体状态相关
         physicalState: currentPhysicalState.value || undefined,
-        activityLevel: currentActivityLevel.value || undefined,
+        postMealFeeling: currentPostMealFeeling.value || undefined,
 
         // 新增：特殊需求
         dietaryRestrictions:
@@ -761,13 +771,13 @@
         // 直接使用选中的推荐结果
         const topRecommendation = recommendations.value[0];
 
-        // 先触发选择事件
+        // 触发选择事件，交由父组件决定如何处理（卡片动画或直接跳转）
         emit('foodSelected', topRecommendation);
 
-        // 延迟关闭弹窗，给动画一些时间开始
-        setTimeout(() => {
-          handleClose();
-        }, 100);
+        // 不再自动关闭弹窗，由父组件的处理逻辑决定何时关闭
+        // setTimeout(() => {
+        //   handleClose();
+        // }, 100);
       }
     } catch (error) {
       console.error('获取额外推荐失败:', error);
@@ -987,13 +997,13 @@
 
   /* 新增：身体状态选择器样式 */
   .physical-state-selector,
-  .activity-level-selector,
+  .post-meal-feeling-selector,
   .dietary-restrictions-selector {
     margin-bottom: 20px;
   }
 
   .physical-state-options,
-  .activity-level-options {
+  .post-meal-feeling-options {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: 8px;
@@ -1006,7 +1016,7 @@
   }
 
   .state-btn,
-  .level-btn,
+  .feeling-btn,
   .restriction-btn {
     display: flex;
     flex-direction: column;
@@ -1022,7 +1032,7 @@
   }
 
   .state-btn.active,
-  .level-btn.active,
+  .feeling-btn.active,
   .restriction-btn.active {
     background: rgba(255, 255, 255, 0.3);
     border-color: rgba(255, 255, 255, 0.6);
