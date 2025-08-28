@@ -21,7 +21,25 @@ export interface Theme {
   icon: string;
 }
 
-export type ThemeId = 'default' | 'dark' | 'sunset' | 'ocean' | 'forest' | 'vintage';
+export type ThemeId =
+  | 'default'
+  | 'dark'
+  | 'sunset'
+  | 'ocean'
+  | 'forest'
+  | 'vintage'
+  | 'aurora'
+  | 'desert'
+  | 'autumn'
+  | 'monochrome'
+  | 'pastel'
+  | 'glass'
+  | 'spring'
+  | 'summer'
+  | 'winter'
+  | 'cozy'
+  | 'gradient'
+  | 'candy';
 
 export interface ThemeState {
   currentTheme: ThemeId;
