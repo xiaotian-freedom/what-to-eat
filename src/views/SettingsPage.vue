@@ -93,6 +93,25 @@
               </div>
             </div>
 
+            <!-- 我的收藏 -->
+            <div
+              @click="handleFavoriteClick"
+              class="bg-gradient-to-r from-pink-50 to-red-50 rounded-2xl p-4 border border-pink-100 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-95"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <h3 class="text-lg font-semibold text-gray-800">{{ $t('favorite.title') }}</h3>
+                  <p class="text-sm text-gray-600 mt-1">
+                    {{ $t('favorite.count', { count: favoriteStore.favoriteCount }) }}
+                  </p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-2xl">💖</span>
+                  <span class="text-red-400 text-xl">›</span>
+                </div>
+              </div>
+            </div>
+
             <!-- 关于我们 -->
             <div
               @click="showAboutModal = true"
@@ -133,24 +152,6 @@
               >
                 退出登录
               </van-button>
-            </div>
-
-            <!-- 登录入口 -->
-            <div
-              v-else
-              @click="goToLogin"
-              class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-95"
-            >
-              <div class="flex items-center justify-between">
-                <div class="flex-1">
-                  <h3 class="text-lg font-semibold text-gray-800">用户登录</h3>
-                  <p class="text-sm text-gray-600 mt-1">登录后享受更多功能</p>
-                </div>
-                <div class="flex items-center space-x-2">
-                  <span class="text-2xl">🔐</span>
-                  <span class="text-blue-400 text-xl">›</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -193,13 +194,15 @@
   import { useThemeStore } from '@/stores/theme';
   import { useWheelModeStore } from '@/stores/wheelMode';
   import { useUserStore } from '@/stores/user';
+  import { useFavoriteStore } from '@/stores/favorite';
 
   const devModeStore = useDevModeStore();
   const themeStore = useThemeStore();
   const wheelModeStore = useWheelModeStore();
   const userStore = useUserStore();
+  const favoriteStore = useFavoriteStore();
   const router = useRouter();
-  const { locale } = useI18n();
+  const { locale, t: $t } = useI18n();
 
   // 获取当前语言图标
   const currentLanguageIcon = computed(() => {
@@ -210,6 +213,7 @@
   onMounted(() => {
     devModeStore.loadDevModeState();
     wheelModeStore.loadModeSettings();
+    favoriteStore.loadFavorites();
   });
 
   // 响应式数据
@@ -247,5 +251,14 @@
   // 跳转到登录页
   const goToLogin = () => {
     router.push('/login');
+  };
+
+  // 处理收藏点击
+  const handleFavoriteClick = () => {
+    if (userStore.isAuthenticated) {
+      router.push('/favorite');
+    } else {
+      goToLogin();
+    }
   };
 </script>

@@ -21,6 +21,7 @@ export default {
   'pages.editFood': 'Edit Food',
   'pages.guide': 'User Guide',
   'pages.settings': 'Settings',
+  'pages.favorite': 'My Favorites',
 
   // Button texts
   'buttons.randomFood': 'Random Food',
@@ -308,4 +309,17 @@ export default {
   'mode.card.description': 'Classic card flip, quick selection',
   'mode.wheel.title': 'Wheel Mode',
   'mode.wheel.description': 'Fun wheel selection with ceremony',
+
+  // Favorite related
+  'favorite.title': 'My Favorites',
+  'favorite.count': 'Favorited {count} dishes',
+  'favorite.editNote': 'Edit Note',
+  'favorite.remove': 'Remove from Favorites',
+  'favorite.notePlaceholder': 'Add a note...',
+  'favorite.empty.title': 'No favorite dishes yet',
+  'favorite.empty.desc':
+    'Click the favorite button on dish details to add dishes to your favorites',
+  'favorite.empty.goHome': 'Choose Food',
+  'favorite.loginRequired': 'Please login to use favorites',
+  'favorite.loginRequiredDesc': 'Login to save your favorite dishes for easy access',
 };

@@ -21,6 +21,7 @@ export default {
   'pages.editFood': '修改菜品',
   'pages.guide': '使用指南',
   'pages.settings': '设置',
+  'pages.favorite': '我的收藏',
 
   // 按钮文本
   'buttons.randomFood': '随机选菜',
@@ -325,4 +326,16 @@ export default {
   'mode.card.description': '经典卡片翻转，快速选择',
   'mode.wheel.title': '转盘模式',
   'mode.wheel.description': '趣味转盘选择，增加仪式感',
+
+  // 收藏相关
+  'favorite.title': '我的收藏',
+  'favorite.count': '共收藏了 {count} 道菜',
+  'favorite.editNote': '编辑备注',
+  'favorite.remove': '取消收藏',
+  'favorite.notePlaceholder': '添加备注...',
+  'favorite.empty.title': '还没有收藏任何菜品',
+  'favorite.empty.desc': '在菜品详情页点击收藏按钮，将喜欢的菜品加入收藏',
+  'favorite.empty.goHome': '去选菜',
+  'favorite.loginRequired': '请先登录后再使用收藏功能',
+  'favorite.loginRequiredDesc': '登录后可以收藏喜欢的菜品，方便下次查看',
 };

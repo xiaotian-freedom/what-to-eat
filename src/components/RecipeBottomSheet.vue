@@ -310,7 +310,7 @@
           @click="saveRecipe"
           class="flex-1 py-3 text-white rounded-xl font-medium transition-all duration-200 flex items-center justify-center space-x-2 recipe-save-button"
         >
-          <span>⭐</span>
+          <span>💖</span>
           <span>收藏做法</span>
         </button>
       </div>
@@ -322,6 +322,7 @@
   import { computed } from 'vue';
   import BottomSheet from './BottomSheet.vue';
   import { showSuccessToast } from 'vant';
+  import { useFavoriteStore } from '@/stores/favorite';
 
   // 食材接口
   interface Ingredient {
@@ -362,6 +363,8 @@
     (e: 'close'): void;
     (e: 'retry'): void;
   }>();
+
+  const favoriteStore = useFavoriteStore();
 
   // 计算预计时间
   const estimatedTime = computed(() => {
@@ -425,8 +428,24 @@
 
   // 收藏做法
   const saveRecipe = () => {
-    // TODO: 实现收藏功能，可以保存到本地存储或用户收藏列表
-    showSuccessToast('做法已收藏');
+    if (!props.dishName) return;
+
+    // 创建菜品对象
+    const food = {
+      id: `recipe_${Date.now()}`,
+      name: props.dishName,
+      category: '家常菜',
+      image: '',
+      backgroundColor: '#ec4899',
+    };
+
+    // 添加到收藏
+    const success = favoriteStore.addFavorite(food);
+    if (success) {
+      showSuccessToast('做法已收藏');
+    } else {
+      showSuccessToast('已经收藏过了');
+    }
   };
 
   // 获取生成状态文本
@@ -677,14 +696,14 @@
   }
 
   .recipe-save-button {
-    background: var(--color-accent);
-    box-shadow: 0 4px 12px var(--color-shadow);
+    background: linear-gradient(135deg, #ec4899, #dc2626);
+    box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
     transition: all 0.2s ease;
   }
 
   .recipe-save-button:active {
     transform: scale(0.95);
-    box-shadow: 0 2px 8px var(--color-shadow);
+    box-shadow: 0 2px 8px rgba(236, 72, 153, 0.4);
   }
 
   /* 响应式优化 */

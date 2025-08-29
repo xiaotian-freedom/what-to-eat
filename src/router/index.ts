@@ -5,6 +5,7 @@ import HomePage from '@/views/HomePage.vue';
 import AddFoodPage from '@/views/AddFoodPage.vue';
 import FoodManagementPage from '@/views/FoodManagementPage.vue';
 import SettingsPage from '@/views/SettingsPage.vue';
+import FavoritePage from '@/views/FavoritePage.vue';
 import LoginPage from '@/views/LoginPage.vue';
 import RegisterPage from '@/views/RegisterPage.vue';
 import ForgotPasswordPage from '@/views/ForgotPasswordPage.vue';
@@ -55,6 +56,12 @@ const routes = [
     path: '/settings',
     name: 'Settings',
     component: SettingsPage,
+    meta: { transition: 'fade' },
+  },
+  {
+    path: '/favorite',
+    name: 'Favorite',
+    component: FavoritePage,
     meta: { transition: 'fade' },
   },
 ];
