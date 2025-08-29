@@ -31,16 +31,48 @@
           </div>
           <div class="logo-glow"></div>
         </div>
-        <div class="logo-text">
+        <!-- <div class="logo-text">
           <h1 class="text-xl font-bold">美食推荐</h1>
           <p class="text-sm opacity-70 mt-1">发现你的下一餐</p>
-        </div>
+        </div> -->
       </div>
 
-      <!-- Glassmorphism Login Card -->
+      <!-- Glassmorphism Register Card -->
       <div class="glass-card">
-        <!-- Login Form -->
-        <form @submit.prevent="handleLogin" class="space-y-6">
+        <!-- Register Form -->
+        <form @submit.prevent="handleRegister" class="space-y-6">
+          <!-- Username Field -->
+          <div class="floating-input-group">
+            <div class="input-container">
+              <div class="input-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+              <input
+                v-model="form.username"
+                type="text"
+                placeholder="用户名"
+                class="floating-input"
+                :class="{ 'input-focused': usernameFocused }"
+                @focus="usernameFocused = true"
+                @blur="usernameFocused = false"
+              />
+              <div class="input-line"></div>
+            </div>
+          </div>
+
           <!-- Phone Field -->
           <div class="floating-input-group">
             <div class="input-container">
@@ -146,18 +178,79 @@
             </div>
           </div>
 
-          <!-- Forgot Password Link -->
-          <div class="text-right">
-            <button
-              type="button"
-              @click="handleForgotPassword"
-              class="text-sm hover:underline transition-all duration-300 hover:scale-105"
-            >
-              忘记密码？
-            </button>
+          <!-- Confirm Password Field -->
+          <div class="floating-input-group">
+            <div class="input-container">
+              <div class="input-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <circle cx="12" cy="16" r="1"></circle>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </div>
+              <input
+                v-model="form.confirmPassword"
+                :type="showConfirmPassword ? 'text' : 'password'"
+                placeholder="确认密码"
+                class="floating-input"
+                :class="{ 'input-focused': confirmPasswordFocused }"
+                @focus="confirmPasswordFocused = true"
+                @blur="confirmPasswordFocused = false"
+              />
+              <div class="input-line"></div>
+              <button
+                v-if="form.confirmPassword"
+                type="button"
+                class="password-toggle"
+                @click="toggleConfirmPasswordVisibility"
+              >
+                <svg
+                  v-if="showConfirmPassword"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                  ></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+                <svg
+                  v-else
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
           </div>
 
-          <!-- Login Button -->
+          <!-- Register Button -->
           <button
             type="submit"
             :disabled="loading"
@@ -165,28 +258,28 @@
             :class="{ loading: loading }"
           >
             <span class="button-content">
-              <span v-if="!loading">登录</span>
+              <span v-if="!loading">注册</span>
               <span v-else class="loading-text">
                 <span class="loading-dots">
                   <span></span>
                   <span></span>
                   <span></span>
                 </span>
-                登录中
+                注册中
               </span>
             </span>
             <div class="button-glow"></div>
           </button>
 
-          <!-- Register Link -->
+          <!-- Login Link -->
           <div class="text-center">
-            <span class="text-sm opacity-70">还没有账户？</span>
+            <span class="text-sm opacity-70">已有账户？</span>
             <button
               type="button"
-              @click="handleRegister"
+              @click="handleLogin"
               class="text-sm font-medium ml-1 hover:underline transition-all duration-300 hover:scale-105"
             >
-              立即注册
+              立即登录
             </button>
           </div>
         </form>
@@ -208,38 +301,61 @@
 
   // Form data
   const form = reactive({
+    username: '',
     phone: '',
     password: '',
-    rememberMe: false,
+    confirmPassword: '',
   });
 
   // Form validation errors
   const errors = reactive({
+    username: '',
     phone: '',
     password: '',
+    confirmPassword: '',
   });
 
   // Loading state
   const loading = ref(false);
 
   // Input focus states
+  const usernameFocused = ref(false);
   const phoneFocused = ref(false);
   const passwordFocused = ref(false);
+  const confirmPasswordFocused = ref(false);
 
-  // Password visibility state
+  // Password visibility states
   const showPassword = ref(false);
+  const showConfirmPassword = ref(false);
 
   // Toggle password visibility
   const togglePasswordVisibility = () => {
     showPassword.value = !showPassword.value;
   };
 
+  // Toggle confirm password visibility
+  const toggleConfirmPasswordVisibility = () => {
+    showConfirmPassword.value = !showConfirmPassword.value;
+  };
+
   // Validate form
   const validateForm = () => {
     let isValid = true;
+    errors.username = '';
     errors.phone = '';
     errors.password = '';
+    errors.confirmPassword = '';
 
+    // Username validation
+    if (!form.username.trim()) {
+      errors.username = '请输入用户名';
+      isValid = false;
+    } else if (form.username.length < 3) {
+      errors.username = '用户名长度至少3位';
+      isValid = false;
+    }
+
+    // Phone validation
     if (!form.phone.trim()) {
       errors.phone = '请输入手机号';
       isValid = false;
@@ -248,6 +364,7 @@
       isValid = false;
     }
 
+    // Password validation
     if (!form.password) {
       errors.password = '请输入密码';
       isValid = false;
@@ -256,69 +373,49 @@
       isValid = false;
     }
 
+    // Confirm password validation
+    if (!form.confirmPassword) {
+      errors.confirmPassword = '请确认密码';
+      isValid = false;
+    } else if (form.password !== form.confirmPassword) {
+      errors.confirmPassword = '两次输入的密码不一致';
+      isValid = false;
+    }
+
     return isValid;
   };
 
-  // Handle login
-  const handleLogin = async () => {
+  // Handle register
+  const handleRegister = async () => {
     if (!validateForm()) return;
 
     loading.value = true;
     try {
-      const success = await userStore.login({
+      const success = await userStore.register({
+        username: form.username,
         phone: form.phone,
         password: form.password,
       });
 
       if (success) {
-        showSuccessToast('登录成功');
-
-        // Save remember me preference
-        if (form.rememberMe) {
-          localStorage.setItem('rememberMe', 'true');
-          localStorage.setItem('savedPhone', form.phone);
-        } else {
-          localStorage.removeItem('rememberMe');
-          localStorage.removeItem('savedPhone');
-        }
-
+        showSuccessToast('注册成功');
         // Redirect to home page
         router.replace('/home');
       } else {
-        showFailToast('登录失败，请检查手机号和密码');
+        showFailToast('注册失败，请稍后重试');
       }
     } catch (error) {
-      showFailToast('登录失败，请稍后重试');
-      console.error('Login error:', error);
+      showFailToast('注册失败，请稍后重试');
+      console.error('Register error:', error);
     } finally {
       loading.value = false;
     }
   };
 
-  // Handle forgot password
-  const handleForgotPassword = () => {
-    showFailToast('功能开发中...');
+  // Handle login redirect
+  const handleLogin = () => {
+    router.push('/login');
   };
-
-  // Handle register
-  const handleRegister = () => {
-    router.push('/register');
-  };
-
-  // Load saved credentials on mount
-  const loadSavedCredentials = () => {
-    const rememberMe = localStorage.getItem('rememberMe');
-    if (rememberMe === 'true') {
-      const savedPhone = localStorage.getItem('savedPhone');
-      if (savedPhone) {
-        form.phone = savedPhone;
-        form.rememberMe = true;
-      }
-    }
-  };
-
-  // Load saved credentials when component mounts
-  loadSavedCredentials();
 </script>
 
 <style scoped>

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import AuthService, { type LoginCredentials } from '@/utils/authService';
+import AuthService, { type LoginCredentials, type RegisterData } from '@/utils/authService';
 
 // 用户信息接口
 interface UserInfo {
@@ -66,6 +66,38 @@ export const useUserStore = defineStore('user', {
         }
       } catch (error) {
         console.error('登录失败:', error);
+        return false;
+      }
+    },
+
+    // 注册
+    async register(data: RegisterData) {
+      try {
+        const response = await AuthService.register(data);
+
+        if (response.success && response.data) {
+          const { user, token } = response.data;
+
+          this.setUserInfo({
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            avatar: user.avatar,
+            token,
+            isLoggedIn: true,
+          });
+
+          // 保存 token 到本地存储
+          localStorage.setItem('userToken', token);
+
+          return true;
+        } else {
+          console.error('注册失败:', response.message);
+          return false;
+        }
+      } catch (error) {
+        console.error('注册失败:', error);
         return false;
       }
     },

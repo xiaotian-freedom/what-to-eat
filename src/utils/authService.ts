@@ -7,6 +7,7 @@ const mockUsers = [
     username: 'admin',
     password: 'admin123',
     email: 'admin@example.com',
+    phone: '13800138001',
     role: 'admin',
     avatar: '',
     isLoggedIn: false,
@@ -16,6 +17,7 @@ const mockUsers = [
     username: 'user',
     password: 'user123',
     email: 'user@example.com',
+    phone: '13800138002',
     role: 'user',
     avatar: '',
     isLoggedIn: false,
@@ -25,6 +27,7 @@ const mockUsers = [
     username: 'demo',
     password: 'demo123',
     email: 'demo@example.com',
+    phone: '13800138003',
     role: 'user',
     avatar: '',
     isLoggedIn: false,
@@ -36,7 +39,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Authentication service interface
 export interface LoginCredentials {
-  username: string;
+  phone: string;
   password: string;
 }
 
@@ -65,7 +68,7 @@ export interface UserInfo {
 
 export interface RegisterData {
   username: string;
-  email: string;
+  phone: string;
   password: string;
 }
 
@@ -77,13 +80,13 @@ export class AuthService {
     await delay(1000);
 
     const user = mockUsers.find(
-      u => u.username === credentials.username && u.password === credentials.password
+      u => u.phone === credentials.phone && u.password === credentials.password
     );
 
     if (!user) {
       return {
         success: false,
-        message: '用户名或密码错误',
+        message: '手机号或密码错误',
       };
     }
 
@@ -119,12 +122,12 @@ export class AuthService {
       };
     }
 
-    // Check if email already exists
-    const existingEmail = mockUsers.find(u => u.email === data.email);
-    if (existingEmail) {
+    // Check if phone already exists
+    const existingPhone = mockUsers.find(u => u.phone === data.phone);
+    if (existingPhone) {
       return {
         success: false,
-        message: '邮箱已被注册',
+        message: '手机号已被注册',
       };
     }
 
@@ -133,7 +136,8 @@ export class AuthService {
       id: String(mockUsers.length + 1),
       username: data.username,
       password: data.password,
-      email: data.email,
+      phone: data.phone,
+      email: '', // Keep email field for backward compatibility
       role: 'user',
       avatar: '',
       isLoggedIn: false,

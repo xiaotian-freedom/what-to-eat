@@ -6,6 +6,7 @@ import AddFoodPage from '@/views/AddFoodPage.vue';
 import FoodManagementPage from '@/views/FoodManagementPage.vue';
 import SettingsPage from '@/views/SettingsPage.vue';
 import LoginPage from '@/views/LoginPage.vue';
+import RegisterPage from '@/views/RegisterPage.vue';
 const routes = [
   {
     path: '/',
@@ -17,6 +18,12 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: LoginPage,
+    meta: { transition: 'fade' },
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: RegisterPage,
     meta: { transition: 'fade' },
   },
   {
