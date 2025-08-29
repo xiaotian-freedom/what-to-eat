@@ -94,6 +94,50 @@ npm run deploy:upload
 - 💾 本地数据存储
 - 🎨 现代化 UI 设计
 - ⚡ 快速加载
+- 🔐 用户认证系统
+- 👤 用户管理功能
+
+## 🔐 认证系统
+
+### 功能特性
+
+- **可选登录**: 登录是可选的，用户可以自由使用应用
+- **用户登录**: 支持用户名/密码登录
+- **记住我**: 自动保存登录状态
+- **快速体验**: 提供演示账户快速登录
+- **智能菜单**: 根据登录状态显示不同选项
+- **Mock API**: 完整的模拟后端服务
+
+### 演示账户
+
+| 用户名 | 密码     | 角色     |
+| ------ | -------- | -------- |
+| admin  | admin123 | 管理员   |
+| user   | user123  | 普通用户 |
+| demo   | demo123  | 演示用户 |
+
+### 技术实现
+
+- **认证服务**: `src/utils/authService.ts` - 完整的认证 API 模拟
+- **状态管理**: `src/stores/user.ts` - 用户状态管理
+- **可选路由**: `src/router/index.ts` - 登录为可选功能
+- **智能菜单**: `src/components/MenuPopover.vue` - 根据登录状态显示不同选项
+- **网络请求**: `src/utils/request.ts` - 统一的 HTTP 客户端
+
+### 文件结构
+
+```
+src/
+├── views/
+│   └── LoginPage.vue          # 登录页面
+├── stores/
+│   └── user.ts               # 用户状态管理
+├── utils/
+│   ├── authService.ts        # 认证服务
+│   └── request.ts           # 网络请求工具
+└── router/
+    └── index.ts             # 路由配置（含认证守卫）
+```
 
 ## 🔧 部署脚本
 

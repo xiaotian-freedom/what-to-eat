@@ -108,6 +108,50 @@
                 </div>
               </div>
             </div>
+
+            <!-- 用户信息 -->
+            <div
+              v-if="userStore.isAuthenticated"
+              class="bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl p-4 border border-gray-100"
+            >
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex-1">
+                  <h3 class="text-lg font-semibold text-gray-800">用户信息</h3>
+                  <p class="text-sm text-gray-600 mt-1">{{ userStore.username }}</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-2xl">👤</span>
+                </div>
+              </div>
+
+              <!-- 登出按钮 -->
+              <van-button
+                type="danger"
+                size="small"
+                @click="handleLogout"
+                class="w-full bg-red-500 hover:bg-red-600 border-0"
+              >
+                退出登录
+              </van-button>
+            </div>
+
+            <!-- 登录入口 -->
+            <div
+              v-else
+              @click="goToLogin"
+              class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-95"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <h3 class="text-lg font-semibold text-gray-800">用户登录</h3>
+                  <p class="text-sm text-gray-600 mt-1">登录后享受更多功能</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-2xl">🔐</span>
+                  <span class="text-blue-400 text-xl">›</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -138,6 +182,7 @@
 <script setup lang="ts">
   import { ref, onMounted, computed } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import { useRouter } from 'vue-router';
 
   import HeaderBar from '@/components/HeaderBar.vue';
   import ThemeSelectorBottomSheet from '@/components/ThemeSelectorBottomSheet.vue';
@@ -147,10 +192,13 @@
   import { useDevModeStore } from '@/stores/devMode';
   import { useThemeStore } from '@/stores/theme';
   import { useWheelModeStore } from '@/stores/wheelMode';
+  import { useUserStore } from '@/stores/user';
 
   const devModeStore = useDevModeStore();
   const themeStore = useThemeStore();
   const wheelModeStore = useWheelModeStore();
+  const userStore = useUserStore();
+  const router = useRouter();
   const { locale } = useI18n();
 
   // 获取当前语言图标
@@ -183,5 +231,21 @@
   // 切换开发模式
   const toggleDevMode = () => {
     devModeStore.toggleDevMode();
+  };
+
+  // 处理登出
+  const handleLogout = async () => {
+    try {
+      await userStore.logout();
+      // 登出后跳转到登录页
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('登出失败:', error);
+    }
+  };
+
+  // 跳转到登录页
+  const goToLogin = () => {
+    router.push('/login');
   };
 </script>

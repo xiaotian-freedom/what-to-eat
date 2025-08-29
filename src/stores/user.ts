@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import AuthService, { type LoginCredentials } from '@/utils/authService';
 
 // 用户信息接口
 interface UserInfo {
@@ -38,29 +39,31 @@ export const useUserStore = defineStore('user', {
     },
 
     // 登录
-    async login(credentials: { username: string; password: string }) {
+    async login(credentials: LoginCredentials) {
       try {
-        // 这里应该调用实际的登录 API
-        // const response = await api.login(credentials)
+        const response = await AuthService.login(credentials);
 
-        // 模拟登录成功
-        const mockResponse = {
-          id: '1',
-          username: credentials.username,
-          email: `${credentials.username}@example.com`,
-          role: 'user',
-          token: 'mock-token-xxx',
-        };
+        if (response.success && response.data) {
+          const { user, token } = response.data;
 
-        this.setUserInfo({
-          ...mockResponse,
-          isLoggedIn: true,
-        });
+          this.setUserInfo({
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            avatar: user.avatar,
+            token,
+            isLoggedIn: true,
+          });
 
-        // 保存 token 到本地存储
-        localStorage.setItem('userToken', mockResponse.token);
+          // 保存 token 到本地存储
+          localStorage.setItem('userToken', token);
 
-        return true;
+          return true;
+        } else {
+          console.error('登录失败:', response.message);
+          return false;
+        }
       } catch (error) {
         console.error('登录失败:', error);
         return false;
@@ -68,26 +71,34 @@ export const useUserStore = defineStore('user', {
     },
 
     // 登出
-    logout() {
-      // 清除用户信息
-      this.$reset();
+    async logout() {
+      try {
+        await AuthService.logout();
+      } catch (error) {
+        console.error('退出登录失败:', error);
+      } finally {
+        // 清除用户信息
+        this.$reset();
 
-      // 清除本地存储的 token
-      localStorage.removeItem('userToken');
+        // 清除本地存储的 token
+        localStorage.removeItem('userToken');
+      }
     },
 
     // 更新用户信息
     async updateProfile(profileData: Partial<UserInfo>) {
       try {
-        // 这里应该调用更新用户信息的 API
-        // const updatedInfo = await api.updateProfile(profileData)
+        const response = await AuthService.updateProfile(profileData);
 
-        // 模拟更新成功
-        this.setUserInfo({
-          ...profileData,
-        });
-
-        return true;
+        if (response.success) {
+          this.setUserInfo({
+            ...profileData,
+          });
+          return true;
+        } else {
+          console.error('更新用户信息失败:', response.message);
+          return false;
+        }
       } catch (error) {
         console.error('更新用户信息失败:', error);
         return false;

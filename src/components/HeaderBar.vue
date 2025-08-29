@@ -44,7 +44,7 @@
       <div
         class="text-lg font-bold text-transparent bg-clip-text text-center"
         :style="{
-          backgroundImage: `linear-gradient(to right, var(--color-primary), var(--color-accent))`,
+          color: 'var(--color-primary)',
         }"
       >
         {{ title }}
@@ -56,7 +56,7 @@
       v-else
       class="text-lg font-bold text-transparent bg-clip-text"
       :style="{
-        backgroundImage: `linear-gradient(to right, var(--color-primary), var(--color-accent))`,
+        color: 'var(--color-primary)',
       }"
     >
       {{ title }}

@@ -14,7 +14,7 @@ const request = axios.create({
 // 请求拦截器
 request.interceptors.request.use(
   config => {
-    const accessToken = localStorage.getItem('access_token');
+    const accessToken = localStorage.getItem('userToken');
     // 如果有 token，添加到请求头
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;

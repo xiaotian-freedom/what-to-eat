@@ -129,6 +129,7 @@
   import { useDevModeStore } from '@/stores/devMode';
   import { useWheelModeStore } from '@/stores/wheelMode';
   import { useThemeStore } from '@/stores/theme';
+  import { useUserStore } from '@/stores/user';
   import { showFailToast } from 'vant';
 
   const { t } = useI18n();
@@ -144,6 +145,7 @@
   const devModeStore = useDevModeStore();
   const wheelModeStore = useWheelModeStore();
   const themeStore = useThemeStore();
+  const userStore = useUserStore();
 
   // 优先使用 store 中的数据，如果为空才使用 dishList
   const combinedDishList = computed(() => {
@@ -299,7 +301,13 @@
   const handleMenuClick = (action: string) => {
     switch (action) {
       case 'recommendation':
-        // 智能推荐：切换推荐面板显示状态
+        // 智能推荐：检查登录状态
+        if (!userStore.isAuthenticated) {
+          // 未登录，跳转到登录页面
+          router.push('/login');
+          return;
+        }
+        // 已登录，切换推荐面板显示状态
         toggleRecommendation();
         break;
       case 'challenge':
@@ -312,6 +320,14 @@
         break;
       case 'settings':
         // 系统设置：跳转到设置页面
+        router.push('/settings');
+        break;
+      case 'login':
+        // 用户登录：跳转到登录页面
+        router.push('/login');
+        break;
+      case 'profile':
+        // 用户资料：跳转到设置页面（用户信息部分）
         router.push('/settings');
         break;
     }
