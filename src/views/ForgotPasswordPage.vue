@@ -24,7 +24,7 @@
     <!-- Main Content Container -->
     <div class="relative z-10 w-full max-w-md">
       <!-- Back Button -->
-      <div class="mt-2 mb-4">
+      <div class="mt-6">
         <button @click="handleBack" class="back-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -39,28 +39,44 @@
           >
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
-          返回首页
+          返回登录
         </button>
       </div>
 
       <!-- Floating Logo Section -->
-      <div class="floating-logo-container mb-8">
+      <div class="floating-logo-container mb-4">
         <div class="logo-orb">
           <div class="logo-inner">
-            <img src="@/assets/icons/utensils.svg" alt="Logo" class="w-8 h-8" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <circle cx="12" cy="16" r="1"></circle>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              <path d="M12 4v2"></path>
+              <path d="M12 18v2"></path>
+            </svg>
           </div>
           <div class="logo-glow"></div>
         </div>
-        <div class="logo-text">
-          <h1 class="text-xl font-bold">美食推荐</h1>
-          <p class="text-sm opacity-70 mt-1">发现你的下一餐</p>
-        </div>
+        <!-- <div class="logo-text">
+          <h1 class="text-xl font-bold">重置密码</h1>
+          <p class="text-sm opacity-70 mt-1">请输入手机号获取验证码</p>
+        </div> -->
       </div>
 
-      <!-- Glassmorphism Login Card -->
+      <!-- Glassmorphism Card -->
       <div class="glass-card">
-        <!-- Login Form -->
-        <form @submit.prevent="handleLogin" class="space-y-4">
+        <!-- Forgot Password Form -->
+        <form @submit.prevent="handleResetPassword" class="space-y-4">
           <!-- Phone Field -->
           <div class="floating-input-group">
             <div class="input-container">
@@ -94,7 +110,48 @@
             </div>
           </div>
 
-          <!-- Password Field -->
+          <!-- Verification Code Field -->
+          <div class="floating-input-group">
+            <div class="input-container">
+              <div class="input-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+              </div>
+              <input
+                v-model="form.verificationCode"
+                type="text"
+                placeholder="验证码"
+                class="floating-input"
+                :class="{ 'input-focused': codeFocused }"
+                @focus="codeFocused = true"
+                @blur="codeFocused = false"
+                maxlength="6"
+              />
+              <div class="input-line"></div>
+              <button
+                type="button"
+                @click="handleSendCode"
+                :disabled="codeCountdown > 0 || !form.phone"
+                class="send-code-button"
+                :class="{ disabled: codeCountdown > 0 || !form.phone }"
+              >
+                {{ codeCountdown > 0 ? `${codeCountdown}s` : '发送验证码' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- New Password Field -->
           <div class="floating-input-group">
             <div class="input-container">
               <div class="input-icon">
@@ -115,9 +172,9 @@
                 </svg>
               </div>
               <input
-                v-model="form.password"
+                v-model="form.newPassword"
                 :type="showPassword ? 'text' : 'password'"
-                placeholder="密码"
+                placeholder="新密码"
                 class="floating-input"
                 :class="{ 'input-focused': passwordFocused }"
                 @focus="passwordFocused = true"
@@ -125,7 +182,7 @@
               />
               <div class="input-line"></div>
               <button
-                v-if="form.password"
+                v-if="form.newPassword"
                 type="button"
                 class="password-toggle"
                 @click="togglePasswordVisibility"
@@ -166,18 +223,79 @@
             </div>
           </div>
 
-          <!-- Forgot Password Link -->
-          <div class="text-right">
-            <button
-              type="button"
-              @click="handleForgotPassword"
-              class="text-sm hover:underline transition-all duration-300 hover:scale-105"
-            >
-              忘记密码？
-            </button>
+          <!-- Confirm Password Field -->
+          <div class="floating-input-group">
+            <div class="input-container">
+              <div class="input-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <circle cx="12" cy="16" r="1"></circle>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </div>
+              <input
+                v-model="form.confirmPassword"
+                :type="showConfirmPassword ? 'text' : 'password'"
+                placeholder="确认新密码"
+                class="floating-input"
+                :class="{ 'input-focused': confirmPasswordFocused }"
+                @focus="confirmPasswordFocused = true"
+                @blur="confirmPasswordFocused = false"
+              />
+              <div class="input-line"></div>
+              <button
+                v-if="form.confirmPassword"
+                type="button"
+                class="password-toggle"
+                @click="toggleConfirmPasswordVisibility"
+              >
+                <svg
+                  v-if="showConfirmPassword"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                  ></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+                <svg
+                  v-else
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
           </div>
 
-          <!-- Login Button -->
+          <!-- Reset Password Button -->
           <button
             type="submit"
             :disabled="loading"
@@ -185,28 +303,28 @@
             :class="{ loading: loading }"
           >
             <span class="button-content">
-              <span v-if="!loading">登录</span>
+              <span v-if="!loading">重置密码</span>
               <span v-else class="loading-text">
                 <span class="loading-dots">
                   <span></span>
                   <span></span>
                   <span></span>
                 </span>
-                登录中
+                重置中
               </span>
             </span>
             <div class="button-glow"></div>
           </button>
 
-          <!-- Register Link -->
+          <!-- Back to Login Link -->
           <div class="text-center">
-            <span class="text-sm opacity-70">还没有账户？</span>
+            <span class="text-sm opacity-70">记起密码了？</span>
             <button
               type="button"
-              @click="handleRegister"
+              @click="handleBack"
               class="text-sm font-medium ml-1 hover:underline transition-all duration-300 hover:scale-105"
             >
-              立即注册
+              返回登录
             </button>
           </div>
         </form>
@@ -216,27 +334,20 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, onUnmounted } from 'vue';
   import { useRouter } from 'vue-router';
-  import { useUserStore } from '@/stores/user';
   import { useThemeStore } from '@/stores/theme';
   import { showSuccessToast, showFailToast } from 'vant';
 
   const router = useRouter();
-  const userStore = useUserStore();
   const themeStore = useThemeStore();
 
   // Form data
   const form = reactive({
     phone: '',
-    password: '',
-    rememberMe: false,
-  });
-
-  // Form validation errors
-  const errors = reactive({
-    phone: '',
-    password: '',
+    verificationCode: '',
+    newPassword: '',
+    confirmPassword: '',
   });
 
   // Loading state
@@ -244,106 +355,127 @@
 
   // Input focus states
   const phoneFocused = ref(false);
+  const codeFocused = ref(false);
   const passwordFocused = ref(false);
+  const confirmPasswordFocused = ref(false);
 
-  // Password visibility state
+  // Password visibility states
   const showPassword = ref(false);
+  const showConfirmPassword = ref(false);
+
+  // Verification code countdown
+  const codeCountdown = ref(0);
+  let countdownTimer: number | null = null;
 
   // Toggle password visibility
   const togglePasswordVisibility = () => {
     showPassword.value = !showPassword.value;
   };
 
-  // Validate form
-  const validateForm = () => {
-    let isValid = true;
-    errors.phone = '';
-    errors.password = '';
-
-    if (!form.phone.trim()) {
-      errors.phone = '请输入手机号';
-      isValid = false;
-    } else if (!/^1[3-9]\d{9}$/.test(form.phone)) {
-      errors.phone = '请输入有效的手机号';
-      isValid = false;
-    }
-
-    if (!form.password) {
-      errors.password = '请输入密码';
-      isValid = false;
-    } else if (form.password.length < 6) {
-      errors.password = '密码长度至少6位';
-      isValid = false;
-    }
-
-    return isValid;
+  const toggleConfirmPasswordVisibility = () => {
+    showConfirmPassword.value = !showConfirmPassword.value;
   };
 
-  // Handle login
-  const handleLogin = async () => {
+  // Validate form
+  const validateForm = () => {
+    if (!form.phone.trim()) {
+      showFailToast('请输入手机号');
+      return false;
+    }
+
+    if (!/^1[3-9]\d{9}$/.test(form.phone)) {
+      showFailToast('请输入有效的手机号');
+      return false;
+    }
+
+    if (!form.verificationCode.trim()) {
+      showFailToast('请输入验证码');
+      return false;
+    }
+
+    if (!form.newPassword) {
+      showFailToast('请输入新密码');
+      return false;
+    }
+
+    if (form.newPassword.length < 6) {
+      showFailToast('密码长度至少6位');
+      return false;
+    }
+
+    if (form.newPassword !== form.confirmPassword) {
+      showFailToast('两次输入的密码不一致');
+      return false;
+    }
+
+    return true;
+  };
+
+  // Handle send verification code
+  const handleSendCode = async () => {
+    if (!form.phone.trim()) {
+      showFailToast('请输入手机号');
+      return;
+    }
+
+    if (!/^1[3-9]\d{9}$/.test(form.phone)) {
+      showFailToast('请输入有效的手机号');
+      return;
+    }
+
+    try {
+      // TODO: 调用发送验证码的API
+      showSuccessToast('验证码已发送');
+
+      // Start countdown
+      codeCountdown.value = 60;
+      countdownTimer = setInterval(() => {
+        codeCountdown.value--;
+        if (codeCountdown.value <= 0) {
+          if (countdownTimer) {
+            clearInterval(countdownTimer);
+            countdownTimer = null;
+          }
+        }
+      }, 1000);
+    } catch (error) {
+      showFailToast('发送验证码失败，请稍后重试');
+      console.error('Send code error:', error);
+    }
+  };
+
+  // Handle reset password
+  const handleResetPassword = async () => {
     if (!validateForm()) return;
 
     loading.value = true;
     try {
-      const success = await userStore.login({
-        phone: form.phone,
-        password: form.password,
-      });
+      // TODO: 调用重置密码的API
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 模拟API调用
 
-      if (success) {
-        showSuccessToast('登录成功');
+      showSuccessToast('密码重置成功');
 
-        // Save remember me preference
-        if (form.rememberMe) {
-          localStorage.setItem('rememberMe', 'true');
-          localStorage.setItem('savedPhone', form.phone);
-        } else {
-          localStorage.removeItem('rememberMe');
-          localStorage.removeItem('savedPhone');
-        }
-
-        // Redirect to home page
-        router.replace('/home');
-      } else {
-        showFailToast('登录失败，请检查手机号和密码');
-      }
+      // Redirect to login page
+      router.replace('/login');
     } catch (error) {
-      showFailToast('登录失败，请稍后重试');
-      console.error('Login error:', error);
+      showFailToast('密码重置失败，请稍后重试');
+      console.error('Reset password error:', error);
     } finally {
       loading.value = false;
     }
   };
 
-  // Handle forgot password
-  const handleForgotPassword = () => {
-    router.push('/forgot-password');
-  };
-
-  // Handle back to guide
+  // Handle back to login
   const handleBack = () => {
-    router.push('/home');
+    router.push('/login');
   };
 
-  // Handle register
-  const handleRegister = () => {
-    router.push('/register');
-  };
-
-  // Load saved credentials on mount
-  const loadSavedCredentials = () => {
-    const rememberMe = localStorage.getItem('rememberMe');
-    if (rememberMe === 'true') {
-      const savedPhone = localStorage.getItem('savedPhone');
-      if (savedPhone) {
-        form.phone = savedPhone;
-        form.rememberMe = true;
-      }
+  // Cleanup timer on component unmount
+  onUnmounted(() => {
+    if (countdownTimer) {
+      clearInterval(countdownTimer);
     }
-  };
-
-  // Load saved credentials when component mounts
-  loadSavedCredentials();
+  });
 </script>
 
 <style scoped>
@@ -366,6 +498,33 @@
   .back-button:hover {
     background: rgba(255, 255, 255, 0.2);
     transform: translateX(-4px);
+  }
+
+  /* Send Code Button */
+  .send-code-button {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    border: none;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .send-code-button:hover:not(.disabled) {
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .send-code-button.disabled {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--color-textSecondary);
+    cursor: not-allowed;
   }
 
   /* Animated Background Elements */
@@ -513,9 +672,9 @@
 
   .logo-orb {
     position: relative;
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 20px;
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 12px;
   }
 
   .logo-inner {
@@ -600,21 +759,6 @@
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
     border-radius: 24px;
     z-index: -1;
-  }
-
-  /* Card Header */
-  .card-header {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-
-  .card-header h2 {
-    color: var(--color-text);
-    margin-bottom: 8px;
-  }
-
-  .card-header p {
-    color: var(--color-textSecondary);
   }
 
   /* Floating Input Groups */

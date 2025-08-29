@@ -7,6 +7,7 @@ import FoodManagementPage from '@/views/FoodManagementPage.vue';
 import SettingsPage from '@/views/SettingsPage.vue';
 import LoginPage from '@/views/LoginPage.vue';
 import RegisterPage from '@/views/RegisterPage.vue';
+import ForgotPasswordPage from '@/views/ForgotPasswordPage.vue';
 const routes = [
   {
     path: '/',
@@ -24,6 +25,12 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: RegisterPage,
+    meta: { transition: 'fade' },
+  },
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: ForgotPasswordPage,
     meta: { transition: 'fade' },
   },
   {

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="font-sans flex justify-center items-center px-5 w-full h-screen relative overflow-hidden"
+    class="font-sans flex justify-center items-start px-5 w-full min-h-screen relative overflow-y-auto py-4"
     :class="`theme-gradient-${themeStore.currentTheme}`"
   >
     <!-- Animated Background Elements -->
@@ -23,8 +23,28 @@
 
     <!-- Main Content Container -->
     <div class="relative z-10 w-full max-w-md">
+      <!-- Back Button -->
+      <div class="mt-2 mb-4">
+        <button @click="handleBack" class="back-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          返回登录
+        </button>
+      </div>
+
       <!-- Floating Logo Section -->
-      <div class="floating-logo-container mb-8">
+      <div class="floating-logo-container mb-6">
         <div class="logo-orb">
           <div class="logo-inner">
             <img src="@/assets/icons/utensils.svg" alt="Logo" class="w-8 h-8" />
@@ -40,7 +60,7 @@
       <!-- Glassmorphism Register Card -->
       <div class="glass-card">
         <!-- Register Form -->
-        <form @submit.prevent="handleRegister" class="space-y-6">
+        <form @submit.prevent="handleRegister" class="space-y-4">
           <!-- Username Field -->
           <div class="floating-input-group">
             <div class="input-container">
@@ -103,6 +123,47 @@
                 @blur="phoneFocused = false"
               />
               <div class="input-line"></div>
+            </div>
+          </div>
+
+          <!-- Verification Code Field -->
+          <div class="floating-input-group">
+            <div class="input-container">
+              <div class="input-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+              </div>
+              <input
+                v-model="form.verificationCode"
+                type="text"
+                placeholder="验证码"
+                class="floating-input"
+                :class="{ 'input-focused': codeFocused }"
+                @focus="codeFocused = true"
+                @blur="codeFocused = false"
+                maxlength="6"
+              />
+              <div class="input-line"></div>
+              <button
+                type="button"
+                @click.stop="handleSendCode"
+                :disabled="codeCountdown > 0 || !form.phone"
+                class="send-code-button"
+                :class="{ disabled: codeCountdown > 0 || !form.phone }"
+              >
+                {{ codeCountdown > 0 ? `${codeCountdown}s` : '发送验证码' }}
+              </button>
             </div>
           </div>
 
@@ -289,7 +350,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, onUnmounted } from 'vue';
   import { useRouter } from 'vue-router';
   import { useUserStore } from '@/stores/user';
   import { useThemeStore } from '@/stores/theme';
@@ -303,6 +364,7 @@
   const form = reactive({
     username: '',
     phone: '',
+    verificationCode: '',
     password: '',
     confirmPassword: '',
   });
@@ -321,8 +383,13 @@
   // Input focus states
   const usernameFocused = ref(false);
   const phoneFocused = ref(false);
+  const codeFocused = ref(false);
   const passwordFocused = ref(false);
   const confirmPasswordFocused = ref(false);
+
+  // Verification code countdown
+  const codeCountdown = ref(0);
+  let countdownTimer: number | null = null;
 
   // Password visibility states
   const showPassword = ref(false);
@@ -348,37 +415,43 @@
 
     // Username validation
     if (!form.username.trim()) {
-      errors.username = '请输入用户名';
+      showFailToast('请输入用户名');
       isValid = false;
     } else if (form.username.length < 3) {
-      errors.username = '用户名长度至少3位';
+      showFailToast('用户名长度至少3位');
       isValid = false;
     }
 
     // Phone validation
     if (!form.phone.trim()) {
-      errors.phone = '请输入手机号';
+      showFailToast('请输入手机号');
       isValid = false;
     } else if (!/^1[3-9]\d{9}$/.test(form.phone)) {
-      errors.phone = '请输入有效的手机号';
+      showFailToast('请输入有效的手机号');
+      isValid = false;
+    }
+
+    // Verification code validation
+    if (!form.verificationCode.trim()) {
+      showFailToast('请输入验证码');
       isValid = false;
     }
 
     // Password validation
     if (!form.password) {
-      errors.password = '请输入密码';
+      showFailToast('请输入密码');
       isValid = false;
     } else if (form.password.length < 6) {
-      errors.password = '密码长度至少6位';
+      showFailToast('密码长度至少6位');
       isValid = false;
     }
 
     // Confirm password validation
     if (!form.confirmPassword) {
-      errors.confirmPassword = '请确认密码';
+      showFailToast('请确认密码');
       isValid = false;
     } else if (form.password !== form.confirmPassword) {
-      errors.confirmPassword = '两次输入的密码不一致';
+      showFailToast('两次输入的密码不一致');
       isValid = false;
     }
 
@@ -412,13 +485,106 @@
     }
   };
 
+  // Handle back to login
+  const handleBack = () => {
+    router.push('/login');
+  };
+
+  // Handle send verification code
+  const handleSendCode = async () => {
+    if (!form.phone.trim()) {
+      showFailToast('请输入手机号');
+      return;
+    }
+
+    if (!/^1[3-9]\d{9}$/.test(form.phone)) {
+      showFailToast('请输入有效的手机号');
+      return;
+    }
+
+    try {
+      // TODO: 调用发送验证码的API
+      showSuccessToast('验证码已发送');
+
+      // Start countdown
+      codeCountdown.value = 60;
+      countdownTimer = setInterval(() => {
+        codeCountdown.value--;
+        if (codeCountdown.value <= 0) {
+          if (countdownTimer) {
+            clearInterval(countdownTimer);
+            countdownTimer = null;
+          }
+        }
+      }, 1000);
+    } catch (error) {
+      showFailToast('发送验证码失败，请稍后重试');
+      console.error('Send code error:', error);
+    }
+  };
+
   // Handle login redirect
   const handleLogin = () => {
     router.push('/login');
   };
+
+  // Cleanup timer on component unmount
+  onUnmounted(() => {
+    if (countdownTimer) {
+      clearInterval(countdownTimer);
+    }
+  });
 </script>
 
 <style scoped>
+  /* Back Button */
+  .back-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--color-text);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .back-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-4px);
+  }
+
+  /* Send Code Button */
+  .send-code-button {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    border: none;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .send-code-button:hover:not(.disabled) {
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .send-code-button.disabled {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--color-textSecondary);
+    cursor: not-allowed;
+  }
+
   /* Animated Background Elements */
   .floating-shape {
     position: absolute;
@@ -634,8 +800,8 @@
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 24px;
-    padding: 40px 30px;
+    border-radius: 20px;
+    padding: 32px 24px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
     position: relative;
     overflow: hidden;
@@ -675,12 +841,12 @@
 
   .input-container {
     position: relative;
-    margin-bottom: 20px;
+    margin-bottom: 8px;
   }
 
   .input-icon {
     position: absolute;
-    left: 16px;
+    left: 14px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--color-textSecondary);
@@ -690,12 +856,12 @@
 
   .floating-input {
     width: 100%;
-    padding: 16px 16px 16px 48px;
+    padding: 14px 14px 14px 44px;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
     color: var(--color-text);
-    font-size: 16px;
+    font-size: 15px;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
   }
