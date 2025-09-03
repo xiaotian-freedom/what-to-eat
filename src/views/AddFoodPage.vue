@@ -72,7 +72,7 @@
                 </div>
                 <div class="dish-info">
                   <h3 class="dish-name theme-text">{{ dish.name }}</h3>
-                  <p class="dish-desc theme-text-secondary">{{ dish.desc }}</p>
+                  <p class="dish-desc theme-text-secondary">{{ dish.description }}</p>
                 </div>
               </div>
             </div>
@@ -170,7 +170,6 @@
   import ImgTofu from '@/assets/images/tofu.jpg';
   import HeaderBar from '@/components/HeaderBar.vue';
   import CustomTabs from '@/components/CustomTabs.vue';
-  import { dishList } from '@/data/dishList';
   import { useFoodStore } from '@/stores';
   import { useThemeStore } from '@/stores/theme';
   import type { Food } from '@/types/food';
@@ -181,6 +180,7 @@
   import { computed, onMounted, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';
+  import { enhancedDishList } from '@/data/enhancedDishList';
 
   const { t } = useI18n();
   const route = useRoute();
@@ -211,7 +211,7 @@
   const showRemoveButtons = ref<Set<string>>(new Set());
 
   // 预设菜品数据 - 使用导入的dishList
-  const presetDishes = ref(dishList);
+  const presetDishes = ref(enhancedDishList);
 
   // 标签页配置
   const tabItems = computed(() => [
@@ -234,7 +234,9 @@
     }
     const keyword = searchKeyword.value.toLowerCase();
     return presetDishes.value.filter(
-      dish => dish.name.toLowerCase().includes(keyword) || dish.desc.toLowerCase().includes(keyword)
+      (dish: Food) =>
+        dish.name.toLowerCase().includes(keyword) ||
+        dish.description?.toLowerCase().includes(keyword)
     );
   });
 
