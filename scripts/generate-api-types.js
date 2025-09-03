@@ -34,14 +34,6 @@ try {
     if (fs.existsSync(getOutputFile())) {
         const stats = fs.statSync(getOutputFile());
         console.log(`📊 文件大小: ${(stats.size / 1024).toFixed(2)} KB`);
-
-        if (API_CONFIG.SHOW_FILE_INFO) {
-            // 读取文件头部信息
-            const content = fs.readFileSync(getOutputFile(), 'utf8');
-            const lines = content.split('\n').slice(0, 10);
-            console.log('📝 文件头部内容:');
-            lines.forEach(line => console.log(`   ${line}`));
-        }
     }
 
 } catch (error) {

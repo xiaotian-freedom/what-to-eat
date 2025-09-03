@@ -880,6 +880,226 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/foods/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Food Categories
+         * @description 获取菜品分类列表
+         */
+        get: operations["get_food_categories_api_foods_categories_get"];
+        put?: never;
+        /**
+         * Create Food Category
+         * @description 创建菜品分类（需要管理员权限）
+         */
+        post: operations["create_food_category_api_foods_categories_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/foods/categories/{category_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update Food Category
+         * @description 更新菜品分类（需要管理员权限）
+         */
+        put: operations["update_food_category_api_foods_categories__category_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/foods/cuisines": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Cuisines
+         * @description 获取菜系列表
+         */
+        get: operations["get_cuisines_api_foods_cuisines_get"];
+        put?: never;
+        /**
+         * Create Cuisine
+         * @description 创建菜系（需要管理员权限）
+         */
+        post: operations["create_cuisine_api_foods_cuisines_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/foods/cuisines/{cuisine_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update Cuisine
+         * @description 更新菜系（需要管理员权限）
+         */
+        put: operations["update_cuisine_api_foods_cuisines__cuisine_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/foods/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Foods
+         * @description 获取菜品列表，支持多种筛选条件
+         */
+        get: operations["get_foods_api_foods__get"];
+        put?: never;
+        /**
+         * Create Food
+         * @description 创建菜品（需要管理员权限）
+         */
+        post: operations["create_food_api_foods__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/foods/{food_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Food
+         * @description 根据ID获取菜品详情
+         */
+        get: operations["get_food_api_foods__food_id__get"];
+        /**
+         * Update Food
+         * @description 更新菜品（需要管理员权限）
+         */
+        put: operations["update_food_api_foods__food_id__put"];
+        post?: never;
+        /**
+         * Delete Food
+         * @description 删除菜品（需要管理员权限）
+         */
+        delete: operations["delete_food_api_foods__food_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/foods/recommendations/weather/{weather}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Food Recommendations By Weather
+         * @description 根据天气推荐菜品
+         */
+        get: operations["get_food_recommendations_by_weather_api_foods_recommendations_weather__weather__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/foods/recommendations/mood/{mood}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Food Recommendations By Mood
+         * @description 根据心情推荐菜品
+         */
+        get: operations["get_food_recommendations_by_mood_api_foods_recommendations_mood__mood__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/foods/recommendations/comfort": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Comfort Foods
+         * @description 获取安慰食物推荐
+         */
+        get: operations["get_comfort_foods_api_foods_recommendations_comfort_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/foods/recommendations/popular": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Popular Foods
+         * @description 获取热门菜品推荐
+         */
+        get: operations["get_popular_foods_api_foods_recommendations_popular_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/": {
         parameters: {
             query?: never;
@@ -1024,6 +1244,429 @@ export interface components {
          * @enum {string}
          */
         CodeType: "register" | "reset_password" | "login";
+        /** Cuisine */
+        Cuisine: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Region */
+            region?: string | null;
+            /** Icon */
+            icon?: string | null;
+            /**
+             * Sort Order
+             * @default 0
+             */
+            sort_order: number;
+            /** Id */
+            id: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** CuisineCreate */
+        CuisineCreate: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Region */
+            region?: string | null;
+            /** Icon */
+            icon?: string | null;
+            /**
+             * Sort Order
+             * @default 0
+             */
+            sort_order: number;
+        };
+        /** CuisineList */
+        CuisineList: {
+            /** Items */
+            items: components["schemas"]["Cuisine"][];
+            /** Total */
+            total: number;
+        };
+        /** CuisineUpdate */
+        CuisineUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Region */
+            region?: string | null;
+            /** Icon */
+            icon?: string | null;
+            /** Sort Order */
+            sort_order?: number | null;
+        };
+        /** Food */
+        Food: {
+            /** Name */
+            name: string;
+            /** Image Url */
+            image_url?: string | null;
+            /** Category */
+            category: string;
+            /**
+             * Tags
+             * @default []
+             */
+            tags: string[] | null;
+            /** Description */
+            description?: string | null;
+            /** Origin */
+            origin?: string | null;
+            /** Cuisine */
+            cuisine?: string | null;
+            /** Difficulty */
+            difficulty: number;
+            /** Prep Time */
+            prep_time?: number | null;
+            /** Spicy Level */
+            spicy_level: number;
+            /** Sweet Level */
+            sweet_level: number;
+            /** Background Color */
+            background_color?: string | null;
+            /**
+             * Suitable Weather
+             * @default []
+             */
+            suitable_weather: string[] | null;
+            /**
+             * Suitable Time
+             * @default []
+             */
+            suitable_time: string[] | null;
+            /**
+             * Suitable Mood
+             * @default []
+             */
+            suitable_mood: string[] | null;
+            /**
+             * Suitable Season
+             * @default []
+             */
+            suitable_season: string[] | null;
+            /**
+             * Suitable Physical State
+             * @default []
+             */
+            suitable_physical_state: string[] | null;
+            /**
+             * Is Comfort Food
+             * @default false
+             */
+            is_comfort_food: boolean;
+            /**
+             * Is Popular
+             * @default false
+             */
+            is_popular: boolean;
+            /**
+             * Is Recovery Food
+             * @default false
+             */
+            is_recovery_food: boolean;
+            /**
+             * Is Energy Booster
+             * @default false
+             */
+            is_energy_booster: boolean;
+            /**
+             * Is Anti Inflammatory
+             * @default false
+             */
+            is_anti_inflammatory: boolean;
+            /**
+             * Is Sleep Friendly
+             * @default false
+             */
+            is_sleep_friendly: boolean;
+            /**
+             * Is Detoxifying
+             * @default false
+             */
+            is_detoxifying: boolean;
+            /**
+             * Dietary Restrictions
+             * @default [
+             *       "none"
+             *     ]
+             */
+            dietary_restrictions: string[];
+            /**
+             * Allergens
+             * @default []
+             */
+            allergens: string[] | null;
+            /**
+             * Avoid Ingredients
+             * @default []
+             */
+            avoid_ingredients: string[] | null;
+            /**
+             * Suitable Post Meal Feeling
+             * @default []
+             */
+            suitable_post_meal_feeling: string[] | null;
+            /** Nutrition */
+            nutrition?: Record<string, never> | null;
+            /** Benefits For Physical State */
+            benefits_for_physical_state?: Record<string, never> | null;
+            /** Id */
+            id: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Updated At */
+            updated_at?: string | null;
+        };
+        /** FoodCategory */
+        FoodCategory: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Icon */
+            icon?: string | null;
+            /**
+             * Sort Order
+             * @default 0
+             */
+            sort_order: number;
+            /** Id */
+            id: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** FoodCategoryCreate */
+        FoodCategoryCreate: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Icon */
+            icon?: string | null;
+            /**
+             * Sort Order
+             * @default 0
+             */
+            sort_order: number;
+        };
+        /** FoodCategoryList */
+        FoodCategoryList: {
+            /** Items */
+            items: components["schemas"]["FoodCategory"][];
+            /** Total */
+            total: number;
+        };
+        /** FoodCategoryUpdate */
+        FoodCategoryUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Icon */
+            icon?: string | null;
+            /** Sort Order */
+            sort_order?: number | null;
+        };
+        /** FoodCreate */
+        FoodCreate: {
+            /** Name */
+            name: string;
+            /** Image Url */
+            image_url?: string | null;
+            /** Category */
+            category: string;
+            /**
+             * Tags
+             * @default []
+             */
+            tags: string[] | null;
+            /** Description */
+            description?: string | null;
+            /** Origin */
+            origin?: string | null;
+            /** Cuisine */
+            cuisine?: string | null;
+            /** Difficulty */
+            difficulty: number;
+            /** Prep Time */
+            prep_time?: number | null;
+            /** Spicy Level */
+            spicy_level: number;
+            /** Sweet Level */
+            sweet_level: number;
+            /** Background Color */
+            background_color?: string | null;
+            /**
+             * Suitable Weather
+             * @default []
+             */
+            suitable_weather: string[] | null;
+            /**
+             * Suitable Time
+             * @default []
+             */
+            suitable_time: string[] | null;
+            /**
+             * Suitable Mood
+             * @default []
+             */
+            suitable_mood: string[] | null;
+            /**
+             * Suitable Season
+             * @default []
+             */
+            suitable_season: string[] | null;
+            /**
+             * Suitable Physical State
+             * @default []
+             */
+            suitable_physical_state: string[] | null;
+            /**
+             * Is Comfort Food
+             * @default false
+             */
+            is_comfort_food: boolean;
+            /**
+             * Is Popular
+             * @default false
+             */
+            is_popular: boolean;
+            /**
+             * Is Recovery Food
+             * @default false
+             */
+            is_recovery_food: boolean;
+            /**
+             * Is Energy Booster
+             * @default false
+             */
+            is_energy_booster: boolean;
+            /**
+             * Is Anti Inflammatory
+             * @default false
+             */
+            is_anti_inflammatory: boolean;
+            /**
+             * Is Sleep Friendly
+             * @default false
+             */
+            is_sleep_friendly: boolean;
+            /**
+             * Is Detoxifying
+             * @default false
+             */
+            is_detoxifying: boolean;
+            /**
+             * Dietary Restrictions
+             * @default [
+             *       "none"
+             *     ]
+             */
+            dietary_restrictions: string[];
+            /**
+             * Allergens
+             * @default []
+             */
+            allergens: string[] | null;
+            /**
+             * Avoid Ingredients
+             * @default []
+             */
+            avoid_ingredients: string[] | null;
+            /**
+             * Suitable Post Meal Feeling
+             * @default []
+             */
+            suitable_post_meal_feeling: string[] | null;
+            /** Nutrition */
+            nutrition?: Record<string, never> | null;
+            /** Benefits For Physical State */
+            benefits_for_physical_state?: Record<string, never> | null;
+        };
+        /** FoodList */
+        FoodList: {
+            /** Items */
+            items: components["schemas"]["Food"][];
+            /** Total */
+            total: number;
+        };
+        /** FoodUpdate */
+        FoodUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Image Url */
+            image_url?: string | null;
+            /** Category */
+            category?: string | null;
+            /** Tags */
+            tags?: string[] | null;
+            /** Description */
+            description?: string | null;
+            /** Origin */
+            origin?: string | null;
+            /** Cuisine */
+            cuisine?: string | null;
+            /** Difficulty */
+            difficulty?: number | null;
+            /** Prep Time */
+            prep_time?: number | null;
+            /** Spicy Level */
+            spicy_level?: number | null;
+            /** Sweet Level */
+            sweet_level?: number | null;
+            /** Background Color */
+            background_color?: string | null;
+            /** Suitable Weather */
+            suitable_weather?: string[] | null;
+            /** Suitable Time */
+            suitable_time?: string[] | null;
+            /** Suitable Mood */
+            suitable_mood?: string[] | null;
+            /** Suitable Season */
+            suitable_season?: string[] | null;
+            /** Suitable Physical State */
+            suitable_physical_state?: string[] | null;
+            /** Is Comfort Food */
+            is_comfort_food?: boolean | null;
+            /** Is Popular */
+            is_popular?: boolean | null;
+            /** Is Recovery Food */
+            is_recovery_food?: boolean | null;
+            /** Is Energy Booster */
+            is_energy_booster?: boolean | null;
+            /** Is Anti Inflammatory */
+            is_anti_inflammatory?: boolean | null;
+            /** Is Sleep Friendly */
+            is_sleep_friendly?: boolean | null;
+            /** Is Detoxifying */
+            is_detoxifying?: boolean | null;
+            /** Dietary Restrictions */
+            dietary_restrictions?: string[] | null;
+            /** Allergens */
+            allergens?: string[] | null;
+            /** Avoid Ingredients */
+            avoid_ingredients?: string[] | null;
+            /** Suitable Post Meal Feeling */
+            suitable_post_meal_feeling?: string[] | null;
+            /** Nutrition */
+            nutrition?: Record<string, never> | null;
+            /** Benefits For Physical State */
+            benefits_for_physical_state?: Record<string, never> | null;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -3274,6 +3917,512 @@ export interface operations {
             path: {
                 user_id: number;
             };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_food_categories_api_foods_categories_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FoodCategoryList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_food_category_api_foods_categories_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FoodCategoryCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FoodCategory"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_food_category_api_foods_categories__category_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                category_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FoodCategoryUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FoodCategory"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_cuisines_api_foods_cuisines_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CuisineList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_cuisine_api_foods_cuisines_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CuisineCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Cuisine"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_cuisine_api_foods_cuisines__cuisine_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cuisine_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CuisineUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Cuisine"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_foods_api_foods__get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+                category?: string | null;
+                cuisine?: string | null;
+                difficulty_min?: number | null;
+                difficulty_max?: number | null;
+                spicy_level_min?: number | null;
+                spicy_level_max?: number | null;
+                sweet_level_min?: number | null;
+                sweet_level_max?: number | null;
+                is_popular?: boolean | null;
+                is_comfort_food?: boolean | null;
+                tags?: string[] | null;
+                weather?: string | null;
+                mood?: string | null;
+                season?: string | null;
+                physical_state?: string | null;
+                dietary_restriction?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FoodList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_food_api_foods__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FoodCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Food"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_food_api_foods__food_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                food_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Food"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_food_api_foods__food_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                food_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FoodUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Food"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_food_api_foods__food_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                food_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_food_recommendations_by_weather_api_foods_recommendations_weather__weather__get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                weather: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_food_recommendations_by_mood_api_foods_recommendations_mood__mood__get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                mood: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_comfort_foods_api_foods_recommendations_comfort_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_popular_foods_api_foods_recommendations_popular_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;

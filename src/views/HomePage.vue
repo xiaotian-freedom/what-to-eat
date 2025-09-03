@@ -10,7 +10,7 @@
         v-if="!showResult"
         ref="homeCardRef"
         class="card-face"
-        :dishList="enhancedDishList"
+        :dishList="foodStore.foodItems"
         :showResult="showResult"
         @random-food="randomFood"
         @add-food="addFood"
@@ -38,7 +38,7 @@
   import HomeCard from '@/components/HomeCard.vue';
   import ResultCard from '@/components/ResultCard.vue';
   import type { Food } from '@/types';
-  import { enhancedDishList } from '@/data/enhancedDishList';
+
   import { useRouter } from 'vue-router';
   import { showFailToast, showSuccessToast } from 'vant';
   import { useChallengeStore } from '@/stores/challenge';

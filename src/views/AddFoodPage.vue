@@ -180,7 +180,6 @@
   import { computed, onMounted, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';
-  import { enhancedDishList } from '@/data/enhancedDishList';
 
   const { t } = useI18n();
   const route = useRoute();
@@ -210,8 +209,8 @@
   // 显示移除按钮的菜品集合
   const showRemoveButtons = ref<Set<string>>(new Set());
 
-  // 预设菜品数据 - 使用导入的dishList
-  const presetDishes = ref(enhancedDishList);
+  // 预设菜品数据 - 使用store中的数据
+  const presetDishes = computed(() => foodStore.foodItems);
 
   // 标签页配置
   const tabItems = computed(() => [
@@ -241,9 +240,12 @@
   });
 
   // 在组件挂载时检查是否为编辑模式
-  onMounted(() => {
+  onMounted(async () => {
     // 重置图片加载失败状态
     imageLoadFailed.value = false;
+
+    // 加载菜品数据
+    await foodStore.loadFoodItems();
 
     if (route.query.id) {
       isEdit.value = true;
@@ -263,7 +265,6 @@
         }
       }
     }
-    // 预设菜品已经在computed中处理，无需手动初始化
 
     // 添加点击外部区域关闭移除按钮的事件监听
     const handleClickOutside = (event: Event) => {
