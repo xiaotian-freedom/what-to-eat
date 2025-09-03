@@ -12,6 +12,7 @@
     "deploy:init": "./upload-to-server.sh init",
     "deploy:test": "./upload-to-server.sh test",
     "generate-icons": "node scripts/generate-icons.js",
+    "generate-api-types": "node scripts/generate-api-types.js",
     "clean": "rm -rf dist node_modules/.vite",
     "clean:all": "rm -rf dist node_modules package-lock.json && npm install"
   },
@@ -32,6 +33,7 @@
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/tsconfig": "^0.7.0",
     "autoprefixer": "^10.4.21",
+    "openapi-typescript": "^7.9.1",
     "postcss": "^8.5.3",
     "sharp": "^0.34.3",
     "typescript": "~5.7.2",

@@ -1,3 +1,6 @@
+// 导出 API 相关类型
+export * from './api';
+
 // 导出推荐系统相关类型
 export * from './food';
 export * from './recommendation';
