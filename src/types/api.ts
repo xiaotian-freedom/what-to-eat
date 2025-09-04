@@ -1673,10 +1673,79 @@ export interface components {
             detail?: components["schemas"]["ValidationError"][];
         };
         /**
+         * LoginResponse
+         * @description 登录成功响应数据
+         */
+        LoginResponse: {
+            user: components["schemas"]["User"];
+            /** Access Token */
+            access_token: string;
+        };
+        /**
          * PostMealFeeling
          * @enum {string}
          */
         PostMealFeeling: "satisfying" | "energized" | "relaxed" | "focused" | "sleepy";
+        /**
+         * RegisterResponse
+         * @description 注册成功响应数据
+         */
+        RegisterResponse: {
+            user: components["schemas"]["User"];
+            /** Access Token */
+            access_token: string;
+        };
+        /** ResponseModel[LoginResponse] */
+        ResponseModel_LoginResponse_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["LoginResponse"] | null;
+        };
+        /** ResponseModel[RegisterResponse] */
+        ResponseModel_RegisterResponse_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["RegisterResponse"] | null;
+        };
+        /** ResponseModel[TokenResponse] */
+        ResponseModel_TokenResponse_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["TokenResponse"] | null;
+        };
         /**
          * SelectionMode
          * @enum {string}
@@ -1725,6 +1794,53 @@ export interface components {
             active_count: number;
             /** Expired Count */
             expired_count: number;
+        };
+        /**
+         * TokenResponse
+         * @description Token接口响应数据
+         */
+        TokenResponse: {
+            user: components["schemas"]["User"];
+            /** Access Token */
+            access_token: string;
+            /** Token Type */
+            token_type: string;
+        };
+        /** User */
+        User: {
+            /** Username */
+            username: string;
+            /** Phone */
+            phone: string;
+            /** Avatar Url */
+            avatar_url?: string | null;
+            /**
+             * Language
+             * @default zh-CN
+             */
+            language: string;
+            /**
+             * Theme
+             * @default default
+             */
+            theme: string;
+            /** @default card */
+            selection_mode: components["schemas"]["SelectionMode"];
+            /** Id */
+            id: number;
+            /** @default user */
+            role: components["schemas"]["UserRole"];
+            /** @default active */
+            status: components["schemas"]["UserStatus"];
+            /** Last Login At */
+            last_login_at?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Updated At */
+            updated_at?: string | null;
         };
         /** UserAchievement */
         UserAchievement: {
@@ -2146,6 +2262,11 @@ export interface components {
             /** Avoid Ingredients */
             avoid_ingredients?: string[] | null;
         };
+        /**
+         * UserRole
+         * @enum {string}
+         */
+        UserRole: "user" | "admin" | "guest";
         /** UserSession */
         UserSession: {
             /** Token Hash */
@@ -2183,6 +2304,11 @@ export interface components {
              */
             expires_at: string;
         };
+        /**
+         * UserStatus
+         * @enum {string}
+         */
+        UserStatus: "active" | "inactive" | "banned";
         /** UserUpdate */
         UserUpdate: {
             /** Username */
@@ -2256,7 +2382,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_RegisterResponse_"];
                 };
             };
             /** @description Validation Error */
@@ -2289,7 +2415,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_LoginResponse_"];
                 };
             };
             /** @description Validation Error */
@@ -2322,7 +2448,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_TokenResponse_"];
                 };
             };
             /** @description Validation Error */

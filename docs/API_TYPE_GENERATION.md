@@ -40,10 +40,10 @@ type LoginUser = operations['login_for_access_token_api_auth_login_post'];
 
 ## 配置
 
-配置文件位于 `scripts/api-config.js`，可以修改以下设置：
+配置直接内嵌在 `scripts/generate-api-types.js` 中，可以修改以下设置：
 
 ```javascript
-export const API_CONFIG = {
+const API_CONFIG = {
   // API 服务器地址
   BASE_URL: 'http://localhost:8000',
 
@@ -55,9 +55,6 @@ export const API_CONFIG = {
 
   // 是否启用 Prettier 格式化
   ENABLE_PRETTIER: true,
-
-  // 是否在生成后显示文件信息
-  SHOW_FILE_INFO: true,
 
   // 超时设置（毫秒）
   TIMEOUT: 30000,
@@ -94,7 +91,7 @@ export const API_CONFIG = {
 **解决方案：**
 
 1. 检查 API 服务器是否正在运行
-2. 验证 `scripts/api-config.js` 中的 `BASE_URL` 设置
+2. 验证 `scripts/generate-api-types.js` 中的 `BASE_URL` 设置
 3. 确认防火墙设置允许连接
 
 ### 请求超时
@@ -107,7 +104,7 @@ export const API_CONFIG = {
 **解决方案：**
 
 1. 检查网络连接
-2. 在 `scripts/api-config.js` 中增加 `TIMEOUT` 值
+2. 在 `scripts/generate-api-types.js` 中增加 `TIMEOUT` 值
 3. 检查 API 服务器响应时间
 
 ## 最佳实践
@@ -119,8 +116,7 @@ export const API_CONFIG = {
 
 ## 相关文件
 
-- `scripts/generate-api-types.js` - 主要的生成脚本
-- `scripts/api-config.js` - 配置文件
+- `scripts/generate-api-types.js` - 主要的生成脚本（包含配置）
 - `src/types/api.ts` - 生成的类型定义文件
 - `src/types/index.ts` - 类型导出文件
 - `package.json` - npm 脚本配置

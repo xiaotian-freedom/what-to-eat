@@ -3,7 +3,34 @@
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import { API_CONFIG, getOpenApiUrl, getOutputFile, getCommandArgs } from './api-config.js';
+// API 配置常量
+const API_CONFIG = {
+    BASE_URL: 'http://localhost:8000',
+    OPENAPI_PATH: '/openapi.json',
+    OUTPUT_FILE: 'src/types/api.ts',
+    ENABLE_PRETTIER: true,
+    TIMEOUT: 30000,
+};
+
+// 获取完整的 OpenAPI URL
+const getOpenApiUrl = () => `${API_CONFIG.BASE_URL}${API_CONFIG.OPENAPI_PATH}`;
+
+// 获取输出文件路径
+const getOutputFile = () => API_CONFIG.OUTPUT_FILE;
+
+// 获取 openapi-typescript 命令参数
+const getCommandArgs = () => {
+    const args = [
+        getOpenApiUrl(),
+        '-o', getOutputFile(),
+    ];
+
+    if (API_CONFIG.ENABLE_PRETTIER) {
+        args.push('--prettier');
+    }
+
+    return args;
+};
 
 console.log('🚀 开始生成 API 类型定义...');
 console.log(`📍 API 地址: ${getOpenApiUrl()}`);

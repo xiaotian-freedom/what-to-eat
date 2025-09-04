@@ -1,14 +1,12 @@
 import { defineStore } from 'pinia';
 import AuthService, { type LoginCredentials, type RegisterData } from '@/utils/authService';
+import type { components } from '@/types/api';
 
 // 用户信息接口
-interface UserInfo {
-  id: string;
-  username: string;
-  phone: string;
-  avatar?: string;
-  role: string;
-  token?: string;
+type User = components['schemas']['User'];
+
+interface UserInfo extends User {
+  token: string;
   isLoggedIn: boolean;
 }
 
@@ -16,11 +14,18 @@ interface UserInfo {
 export const useUserStore = defineStore('user', {
   // 状态
   state: (): UserInfo => ({
-    id: '',
+    id: 0,
     username: '',
     phone: '',
-    avatar: '',
-    role: 'guest',
+    avatar_url: null,
+    language: 'zh-CN',
+    theme: 'default',
+    selection_mode: 'card',
+    role: 'user',
+    status: 'active',
+    last_login_at: null,
+    created_at: '',
+    updated_at: null,
     token: '',
     isLoggedIn: false,
   }),
@@ -51,7 +56,14 @@ export const useUserStore = defineStore('user', {
             username: user.username,
             phone: user.phone,
             role: user.role,
-            avatar: user.avatar,
+            avatar_url: user.avatar_url,
+            language: user.language,
+            theme: user.theme,
+            selection_mode: user.selection_mode,
+            status: user.status,
+            last_login_at: user.last_login_at,
+            created_at: user.created_at,
+            updated_at: user.updated_at,
             token,
             isLoggedIn: true,
           });
@@ -84,7 +96,14 @@ export const useUserStore = defineStore('user', {
             username: user.username,
             phone: user.phone,
             role: user.role,
-            avatar: user.avatar,
+            avatar_url: user.avatar_url,
+            language: user.language,
+            theme: user.theme,
+            selection_mode: user.selection_mode,
+            status: user.status,
+            last_login_at: user.last_login_at,
+            created_at: user.created_at,
+            updated_at: user.updated_at,
             token,
             isLoggedIn: true,
           });
@@ -119,7 +138,7 @@ export const useUserStore = defineStore('user', {
     },
 
     // 更新用户信息
-    async updateProfile(profileData: Partial<UserInfo>) {
+    async updateProfile(profileData: Partial<User>) {
       try {
         const response = await AuthService.updateProfile(profileData);
 
@@ -186,7 +205,14 @@ export const useUserStore = defineStore('user', {
             username: user.username,
             phone: user.phone,
             role: user.role,
-            avatar: user.avatar,
+            avatar_url: user.avatar_url,
+            language: user.language,
+            theme: user.theme,
+            selection_mode: user.selection_mode,
+            status: user.status,
+            last_login_at: user.last_login_at,
+            created_at: user.created_at,
+            updated_at: user.updated_at,
             token,
             isLoggedIn: true,
           });

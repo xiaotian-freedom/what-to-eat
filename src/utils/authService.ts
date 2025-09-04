@@ -1,4 +1,7 @@
 import { get, post } from './request';
+import type { components } from '@/types/api';
+
+export type User = components['schemas']['User'];
 
 // Authentication service interface
 export interface LoginCredentials {
@@ -11,23 +14,9 @@ export interface LoginResponse {
   success: boolean;
   message: string;
   data?: {
-    user: {
-      id: string;
-      username: string;
-      phone: string;
-      role: string;
-      avatar?: string;
-    };
+    user: User;
     token: string;
   };
-}
-
-export interface UserInfo {
-  id: string;
-  username: string;
-  phone: string;
-  role: string;
-  avatar?: string;
 }
 
 export interface RegisterData {
@@ -140,13 +129,7 @@ export class AuthService {
           success: true,
           message: '登录成功',
           data: {
-            user: {
-              id: response.data.user_id || '1',
-              username: response.data.username || credentials.identifier || '',
-              phone: credentials.identifier || '',
-              role: 'user',
-              avatar: response.data.avatar_url || '',
-            },
+            user: response.data.user as User,
             token: response.data.access_token,
           },
         };
@@ -197,13 +180,7 @@ export class AuthService {
             success: true,
             message: response.data.msg || '注册成功',
             data: {
-              user: {
-                id: apiData.user.id?.toString() || '1',
-                username: apiData.user.username || data.username,
-                phone: apiData.user.phone || data.phone,
-                role: apiData.user.role || 'user',
-                avatar: apiData.user.avatar_url || '',
-              },
+              user: apiData.user as User,
               token: apiData.access_token,
             },
           };
@@ -240,9 +217,9 @@ export class AuthService {
   }
 
   // Get current user info
-  static async getCurrentUser(): Promise<UserInfo | null> {
+  static async getCurrentUser(): Promise<User | null> {
     try {
-      const response = await get<{ data: UserInfo }>('/api/auth/users/me');
+      const response = await get<{ data: User }>('/api/auth/users/me');
       return response.data;
     } catch (error) {
       return null;
@@ -267,7 +244,7 @@ export class AuthService {
 
   // Update user profile
   static async updateProfile(
-    profileData: Partial<UserInfo>
+    profileData: Partial<User>
   ): Promise<{ success: boolean; message: string }> {
     try {
       await post<{ data: { success: boolean; message: string } }>(
