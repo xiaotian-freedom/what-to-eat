@@ -30,8 +30,8 @@ request.interceptors.response.use(
   response => {
     console.log('response', response);
 
-    // 直接返回响应，让具体的API调用处理响应格式
-    return response;
+    // 统一处理响应数据，直接返回 response.data 中的内容
+    return response.data;
   },
   error => {
     console.log('error', error);

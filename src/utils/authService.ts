@@ -59,13 +59,16 @@ export class AuthService {
   // Send verification code
   static async sendVerificationCode(data: SendCodeRequest): Promise<SendCodeResponse> {
     try {
-      const response = await post<{ data: any }>('/api/verification/send-code', data);
+      const response = await post<components['schemas']['VerificationCodeResponse']>(
+        '/api/verification/send-code',
+        data
+      );
       return {
         success: true,
         message: '验证码发送成功',
         data: {
-          message: response.data?.message || '验证码已发送',
-          expires_in: response.data?.expires_in || 300,
+          message: response.message || '验证码已发送',
+          expires_in: response.expires_in || 300,
         },
       };
     } catch (error: any) {
@@ -79,14 +82,11 @@ export class AuthService {
   // Verify verification code
   static async verifyCode(data: VerifyCodeRequest): Promise<VerifyCodeResponse> {
     try {
-      const response = await post<{ data: VerifyCodeResponse }>(
-        '/api/verification/verify-code',
-        data
-      );
+      const response = await post<unknown>('/api/verification/verify-code', data);
       return {
         success: true,
         message: '验证码验证成功',
-        data: response.data,
+        data: response as any,
       };
     } catch (error: any) {
       return {
@@ -99,7 +99,7 @@ export class AuthService {
   // Check if phone exists
   static async checkPhoneExists(phone: string): Promise<{ exists: boolean; message: string }> {
     try {
-      await get<{ data: any }>(`/api/verification/check-phone/${phone}`);
+      await get<unknown>(`/api/verification/check-phone/${phone}`);
       return {
         exists: false,
         message: '手机号可用',
@@ -121,7 +121,10 @@ export class AuthService {
   // Login
   static async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
-      const response = await post<{ data: any }>('/api/auth/login', credentials);
+      const response = await post<components['schemas']['ResponseModel_LoginResponse_']>(
+        '/api/auth/login',
+        credentials
+      );
 
       // 根据API响应格式调整
       if (response.data && response.data.access_token) {
@@ -135,7 +138,7 @@ export class AuthService {
         };
       } else {
         // 如果接口返回了错误信息，使用接口的错误信息
-        const errorMsg = response.data?.msg || response.data?.message || '登录失败';
+        const errorMsg = response.msg || '登录失败';
         return {
           success: false,
           message: errorMsg,
@@ -169,16 +172,19 @@ export class AuthService {
   // Register
   static async register(data: RegisterData): Promise<LoginResponse> {
     try {
-      const response = await post<{ data: any }>('/api/auth/register', data);
+      const response = await post<components['schemas']['ResponseModel_RegisterResponse_']>(
+        '/api/auth/register',
+        data
+      );
 
       // 根据API响应格式调整 - 支持新的API响应格式
-      if (response.data && response.data.code === 201 && response.data.data) {
-        const apiData = response.data.data;
+      if (response.data && response.code === 201 && response.data) {
+        const apiData = response.data;
 
         if (apiData.access_token && apiData.user) {
           return {
             success: true,
-            message: response.data.msg || '注册成功',
+            message: response.msg || '注册成功',
             data: {
               user: apiData.user as User,
               token: apiData.access_token,
@@ -189,7 +195,7 @@ export class AuthService {
 
       return {
         success: false,
-        message: response.data?.msg || '注册失败',
+        message: response.msg || '注册失败',
       };
     } catch (error: any) {
       // 优先使用接口返回的错误信息
@@ -219,8 +225,8 @@ export class AuthService {
   // Get current user info
   static async getCurrentUser(): Promise<User | null> {
     try {
-      const response = await get<{ data: User }>('/api/auth/users/me');
-      return response.data;
+      const response = await get<unknown>('/api/auth/users/me');
+      return response as User;
     } catch (error) {
       return null;
     }
@@ -229,7 +235,7 @@ export class AuthService {
   // Logout
   static async logout(): Promise<{ success: boolean; message: string }> {
     try {
-      await post<{ data: { success: boolean; message: string } }>('/api/auth/logout');
+      await post<unknown>('/api/auth/logout');
       return {
         success: true,
         message: '退出登录成功',
@@ -247,10 +253,7 @@ export class AuthService {
     profileData: Partial<User>
   ): Promise<{ success: boolean; message: string }> {
     try {
-      await post<{ data: { success: boolean; message: string } }>(
-        '/api/auth/users/me',
-        profileData
-      );
+      await post<unknown>('/api/auth/users/me', profileData);
       return {
         success: true,
         message: '更新成功',
@@ -269,7 +272,7 @@ export class AuthService {
     newPassword: string;
   }): Promise<{ success: boolean; message: string }> {
     try {
-      await post<{ data: { success: boolean; message: string } }>('/api/auth/users/me', {
+      await post<unknown>('/api/auth/users/me', {
         password: data.newPassword,
       });
       return {
@@ -291,10 +294,7 @@ export class AuthService {
     new_password: string;
   }): Promise<{ success: boolean; message: string }> {
     try {
-      await post<{ data: { success: boolean; message: string } }>(
-        '/api/auth/reset-password-verify',
-        data
-      );
+      await post<unknown>('/api/auth/reset-password-verify', data);
       return {
         success: true,
         message: '密码重置成功',
