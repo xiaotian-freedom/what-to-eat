@@ -464,18 +464,21 @@
 
     loading.value = true;
     try {
-      const success = await userStore.register({
+      const result = await userStore.register({
         username: form.username,
         phone: form.phone,
         password: form.password,
+        verification_code: form.verificationCode,
       });
 
-      if (success) {
+      if (result.success) {
         showSuccessToast('注册成功');
         // Redirect to home page
         router.replace('/home');
       } else {
-        showFailToast('注册失败，请稍后重试');
+        // 使用接口返回的具体错误信息
+        const errorMsg = result.message || '注册失败，请稍后重试';
+        showFailToast(errorMsg);
       }
     } catch (error) {
       showFailToast('注册失败，请稍后重试');
@@ -503,20 +506,36 @@
     }
 
     try {
-      // TODO: 调用发送验证码的API
-      showSuccessToast('验证码已发送');
+      // 先检查手机号是否已被注册
+      const phoneCheck = await userStore.checkPhoneExists(form.phone);
+      if (phoneCheck.exists) {
+        showFailToast(phoneCheck.message);
+        return;
+      }
 
-      // Start countdown
-      codeCountdown.value = 60;
-      countdownTimer = setInterval(() => {
-        codeCountdown.value--;
-        if (codeCountdown.value <= 0) {
-          if (countdownTimer) {
-            clearInterval(countdownTimer);
-            countdownTimer = null;
+      // 发送验证码
+      const response = await userStore.sendVerificationCode({
+        phone: form.phone,
+        code_type: 'register',
+      });
+
+      if (response.success) {
+        showSuccessToast('验证码已发送');
+
+        // Start countdown
+        codeCountdown.value = 60;
+        countdownTimer = setInterval(() => {
+          codeCountdown.value--;
+          if (codeCountdown.value <= 0) {
+            if (countdownTimer) {
+              clearInterval(countdownTimer);
+              countdownTimer = null;
+            }
           }
-        }
-      }, 1000);
+        }, 1000);
+      } else {
+        showFailToast(response.message || '发送验证码失败');
+      }
     } catch (error) {
       showFailToast('发送验证码失败，请稍后重试');
       console.error('Send code error:', error);

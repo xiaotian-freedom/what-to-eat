@@ -32,7 +32,7 @@ export async function getFoods(params?: {
   dietary_restriction?: string | null;
 }): Promise<FoodList> {
   try {
-    const response = await get<{ data: FoodList }>('/api/foods/', params);
+    const response = await get<{ data: FoodList }>('/foods/', params);
     return response.data;
   } catch (error) {
     console.error('获取菜品列表失败:', error);
@@ -43,7 +43,7 @@ export async function getFoods(params?: {
 // 获取菜品详情
 export async function getFoodById(foodId: number): Promise<Food> {
   try {
-    const response = await get<{ data: Food }>(`/api/foods/${foodId}`);
+    const response = await get<{ data: Food }>(`/foods/${foodId}`);
     return response.data;
   } catch (error) {
     console.error('获取菜品详情失败:', error);
@@ -54,7 +54,7 @@ export async function getFoodById(foodId: number): Promise<Food> {
 // 获取菜品分类
 export async function getFoodCategories(params?: { skip?: number; limit?: number }) {
   try {
-    const response = await get('/api/foods/categories', params);
+    const response = await get('/foods/categories', params);
     return response.data;
   } catch (error) {
     console.error('获取菜品分类失败:', error);
@@ -65,7 +65,7 @@ export async function getFoodCategories(params?: { skip?: number; limit?: number
 // 获取菜系
 export async function getCuisines(params?: { skip?: number; limit?: number }) {
   try {
-    const response = await get('/api/foods/cuisines', params);
+    const response = await get('/foods/cuisines', params);
     return response.data;
   } catch (error) {
     console.error('获取菜系失败:', error);

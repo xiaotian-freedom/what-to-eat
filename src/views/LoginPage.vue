@@ -61,7 +61,7 @@
       <div class="glass-card">
         <!-- Login Form -->
         <form @submit.prevent="handleLogin" class="space-y-4">
-          <!-- Phone Field -->
+          <!-- Username/Phone Field -->
           <div class="floating-input-group">
             <div class="input-container">
               <div class="input-icon">
@@ -76,19 +76,19 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <path
-                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
-                  ></path>
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
                 </svg>
               </div>
               <input
-                v-model="form.phone"
-                type="tel"
-                placeholder="手机号"
+                v-model="form.identifier"
+                type="text"
+                placeholder="手机号/用户名/邮箱"
                 class="floating-input"
-                :class="{ 'input-focused': phoneFocused }"
-                @focus="phoneFocused = true"
-                @blur="phoneFocused = false"
+                :class="{ 'input-focused': usernameFocused, 'input-error': errors.identifier }"
+                @focus="usernameFocused = true"
+                @blur="handleUsernameBlur"
+                @input="clearUsernameError"
               />
               <div class="input-line"></div>
             </div>
@@ -119,9 +119,10 @@
                 :type="showPassword ? 'text' : 'password'"
                 placeholder="密码"
                 class="floating-input"
-                :class="{ 'input-focused': passwordFocused }"
+                :class="{ 'input-focused': passwordFocused, 'input-error': errors.password }"
                 @focus="passwordFocused = true"
-                @blur="passwordFocused = false"
+                @blur="handlePasswordBlur"
+                @input="clearPasswordError"
               />
               <div class="input-line"></div>
               <button
@@ -166,8 +167,41 @@
             </div>
           </div>
 
-          <!-- Forgot Password Link -->
-          <div class="text-right">
+          <!-- Verification Code Field -->
+          <div class="floating-input-group">
+            <div class="input-container">
+              <div class="input-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+              </div>
+              <input
+                v-model="form.verification_code"
+                type="text"
+                placeholder="验证码（可选）"
+                class="floating-input"
+                maxlength="6"
+              />
+              <div class="input-line"></div>
+            </div>
+          </div>
+
+          <!-- Remember Me and Forgot Password -->
+          <div class="flex justify-between items-center">
+            <label class="remember-me">
+              <input v-model="form.rememberMe" type="checkbox" class="remember-checkbox" />
+              <span class="remember-text">记住我</span>
+            </label>
             <button
               type="button"
               @click="handleForgotPassword"
@@ -228,22 +262,24 @@
 
   // Form data
   const form = reactive({
-    phone: '',
+    identifier: '',
     password: '',
+    verification_code: '',
     rememberMe: false,
   });
 
   // Form validation errors
   const errors = reactive({
-    phone: '',
+    identifier: '',
     password: '',
+    verification_code: '',
   });
 
   // Loading state
   const loading = ref(false);
 
   // Input focus states
-  const phoneFocused = ref(false);
+  const usernameFocused = ref(false);
   const passwordFocused = ref(false);
 
   // Password visibility state
@@ -254,26 +290,70 @@
     showPassword.value = !showPassword.value;
   };
 
+  // Handle username blur validation
+  const handleUsernameBlur = () => {
+    usernameFocused.value = false;
+    if (!form.identifier.trim()) {
+      errors.identifier = '请输入手机号/用户名/邮箱';
+      showFailToast('请输入手机号/用户名/邮箱');
+    } else {
+      errors.identifier = '';
+    }
+  };
+
+  // Handle password blur validation
+  const handlePasswordBlur = () => {
+    passwordFocused.value = false;
+    if (!form.password) {
+      errors.password = '请输入密码';
+      showFailToast('请输入密码');
+    } else if (form.password.length < 6) {
+      errors.password = '密码长度至少6位';
+      showFailToast('密码长度至少6位');
+    } else {
+      errors.password = '';
+    }
+  };
+
+  // Clear username error on input
+  const clearUsernameError = () => {
+    errors.identifier = '';
+  };
+
+  // Clear password error on input
+  const clearPasswordError = () => {
+    errors.password = '';
+  };
+
   // Validate form
   const validateForm = () => {
     let isValid = true;
-    errors.phone = '';
+    errors.identifier = '';
     errors.password = '';
 
-    if (!form.phone.trim()) {
-      errors.phone = '请输入手机号';
-      isValid = false;
-    } else if (!/^1[3-9]\d{9}$/.test(form.phone)) {
-      errors.phone = '请输入有效的手机号';
+    // 检查标识符
+    if (!form.identifier.trim()) {
+      errors.identifier = '请输入手机号/用户名/邮箱';
+      // 只在表单提交时显示错误提示，避免与失焦验证重复
       isValid = false;
     }
 
+    // 检查密码
     if (!form.password) {
       errors.password = '请输入密码';
       isValid = false;
     } else if (form.password.length < 6) {
       errors.password = '密码长度至少6位';
       isValid = false;
+    }
+
+    // 如果有验证错误，显示第一个错误提示
+    if (!isValid) {
+      if (errors.identifier) {
+        showFailToast(errors.identifier);
+      } else if (errors.password) {
+        showFailToast(errors.password);
+      }
     }
 
     return isValid;
@@ -285,30 +365,34 @@
 
     loading.value = true;
     try {
-      const success = await userStore.login({
-        phone: form.phone,
+      const result = await userStore.login({
+        identifier: form.identifier,
         password: form.password,
+        verification_code: form.verification_code || undefined,
       });
 
-      if (success) {
+      if (result.success) {
         showSuccessToast('登录成功');
 
         // Save remember me preference
         if (form.rememberMe) {
           localStorage.setItem('rememberMe', 'true');
-          localStorage.setItem('savedPhone', form.phone);
+          localStorage.setItem('savedIdentifier', form.identifier);
         } else {
           localStorage.removeItem('rememberMe');
-          localStorage.removeItem('savedPhone');
+          localStorage.removeItem('savedIdentifier');
         }
 
         // Redirect to home page
         router.replace('/home');
       } else {
-        showFailToast('登录失败，请检查手机号和密码');
+        // 使用接口返回的具体错误信息
+        const errorMsg = result.message || '手机号或密码错误，请检查后重试';
+        showFailToast(errorMsg);
       }
-    } catch (error) {
-      showFailToast('登录失败，请稍后重试');
+    } catch (error: any) {
+      const errorMsg = error.message || '登录失败，请稍后重试';
+      showFailToast(errorMsg);
       console.error('Login error:', error);
     } finally {
       loading.value = false;
@@ -334,9 +418,9 @@
   const loadSavedCredentials = () => {
     const rememberMe = localStorage.getItem('rememberMe');
     if (rememberMe === 'true') {
-      const savedPhone = localStorage.getItem('savedPhone');
-      if (savedPhone) {
-        form.phone = savedPhone;
+      const savedIdentifier = localStorage.getItem('savedIdentifier');
+      if (savedIdentifier) {
+        form.identifier = savedIdentifier;
         form.rememberMe = true;
       }
     }
@@ -666,6 +750,19 @@
     transform: translateY(-50%) scale(1.1);
   }
 
+  .floating-input.input-error {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+  }
+
+  .floating-input.input-error + .input-icon {
+    color: #ef4444;
+  }
+
+  .floating-input.input-error .input-line {
+    background: #ef4444;
+  }
+
   .input-line {
     position: absolute;
     bottom: 0;
@@ -788,6 +885,32 @@
       transform: scale(1);
       opacity: 1;
     }
+  }
+
+  /* Remember Me */
+  .remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .remember-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+  }
+
+  .remember-text {
+    font-size: 14px;
+    color: var(--color-textSecondary);
+    transition: color 0.3s ease;
+  }
+
+  .remember-me:hover .remember-text {
+    color: var(--color-primary);
   }
 
   /* Responsive Design */

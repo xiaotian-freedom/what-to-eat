@@ -5,7 +5,7 @@ import AuthService, { type LoginCredentials, type RegisterData } from '@/utils/a
 interface UserInfo {
   id: string;
   username: string;
-  email: string;
+  phone: string;
   avatar?: string;
   role: string;
   token?: string;
@@ -18,7 +18,7 @@ export const useUserStore = defineStore('user', {
   state: (): UserInfo => ({
     id: '',
     username: '',
-    email: '',
+    phone: '',
     avatar: '',
     role: 'guest',
     token: '',
@@ -39,7 +39,7 @@ export const useUserStore = defineStore('user', {
     },
 
     // 登录
-    async login(credentials: LoginCredentials) {
+    async login(credentials: LoginCredentials): Promise<{ success: boolean; message?: string }> {
       try {
         const response = await AuthService.login(credentials);
 
@@ -49,7 +49,7 @@ export const useUserStore = defineStore('user', {
           this.setUserInfo({
             id: user.id,
             username: user.username,
-            email: user.email,
+            phone: user.phone,
             role: user.role,
             avatar: user.avatar,
             token,
@@ -59,29 +59,30 @@ export const useUserStore = defineStore('user', {
           // 保存 token 到本地存储
           localStorage.setItem('userToken', token);
 
-          return true;
+          return { success: true };
         } else {
           console.error('登录失败:', response.message);
-          return false;
+          return { success: false, message: response.message };
         }
       } catch (error) {
         console.error('登录失败:', error);
-        return false;
+        return { success: false, message: '登录失败，请稍后重试' };
       }
     },
 
     // 注册
-    async register(data: RegisterData) {
+    async register(data: RegisterData): Promise<{ success: boolean; message?: string }> {
       try {
         const response = await AuthService.register(data);
 
         if (response.success && response.data) {
-          const { user, token } = response.data;
+          const user = response.data.user;
+          const token = response.data.token;
 
           this.setUserInfo({
             id: user.id,
             username: user.username,
-            email: user.email,
+            phone: user.phone,
             role: user.role,
             avatar: user.avatar,
             token,
@@ -91,14 +92,14 @@ export const useUserStore = defineStore('user', {
           // 保存 token 到本地存储
           localStorage.setItem('userToken', token);
 
-          return true;
+          return { success: true };
         } else {
           console.error('注册失败:', response.message);
-          return false;
+          return { success: false, message: response.message };
         }
       } catch (error) {
         console.error('注册失败:', error);
-        return false;
+        return { success: false, message: '注册失败，请稍后重试' };
       }
     },
 
@@ -133,6 +134,73 @@ export const useUserStore = defineStore('user', {
         }
       } catch (error) {
         console.error('更新用户信息失败:', error);
+        return false;
+      }
+    },
+
+    // 检查手机号是否已存在
+    async checkPhoneExists(phone: string) {
+      try {
+        const response = await AuthService.checkPhoneExists(phone);
+        return response;
+      } catch (error) {
+        console.error('检查手机号失败:', error);
+        return {
+          exists: false,
+          message: '检查失败',
+        };
+      }
+    },
+
+    // 发送验证码
+    async sendVerificationCode(data: {
+      phone: string;
+      code_type: 'register' | 'reset_password' | 'login';
+    }) {
+      try {
+        const response = await AuthService.sendVerificationCode(data);
+        return response;
+      } catch (error) {
+        console.error('发送验证码失败:', error);
+        return {
+          success: false,
+          message: '发送验证码失败',
+        };
+      }
+    },
+
+    // 验证码登录
+    async loginWithCode(data: { phone: string; code: string }) {
+      try {
+        const response = await AuthService.login({
+          identifier: data.phone,
+          password: '',
+          verification_code: data.code,
+        });
+
+        if (response.success && response.data) {
+          const { user, token } = response.data;
+
+          this.setUserInfo({
+            id: user.id,
+            username: user.username,
+            phone: user.phone,
+            role: user.role,
+            avatar: user.avatar,
+            token,
+            isLoggedIn: true,
+          });
+
+          // 保存 token 到本地存储
+          localStorage.setItem('userToken', token);
+
+          return true;
+        } else {
+          console.error('验证码登录失败:', response.message);
+          return false;
+        }
+      } catch (error) {
+        console.error('验证码登录失败:', error);
         return false;
       }
     },

@@ -1,6 +1,5 @@
 import { useUserStore } from '@/stores/user';
 import axios, { type AxiosRequestConfig } from 'axios';
-import { showFailToast } from 'vant';
 
 // 创建 axios 实例
 const request = axios.create({
@@ -30,37 +29,23 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   response => {
     console.log('response', response);
-    const { code, msg, status } = response.data;
-    // 请求成功
-    if (code === 200 && status === 0) {
-      return response;
-    }
 
-    // token 过期或无效
-    if (code === 401) {
-      const userStore = useUserStore();
-      userStore.token = '';
-      userStore.setUserInfo({});
-      // 跳转到首页
-      window.location.href = '/home';
-      return Promise.reject(new Error(msg || '登录已过期，请重新登录'));
-    }
-
-    // 其他错误
-    showFailToast(msg || '请求失败');
-    return Promise.reject(new Error(msg || '请求失败'));
+    // 直接返回响应，让具体的API调用处理响应格式
+    return response;
   },
   error => {
     console.log('error', error);
-    if (error.response && error.response.status && error.response.status === 401) {
+
+    // 处理401错误
+    if (error.response?.status === 401) {
       const userStore = useUserStore();
       userStore.token = '';
       userStore.setUserInfo({});
-      // 跳转到闪屏页
-      window.location.href = '/';
+      // 跳转到登录页
+      window.location.href = '/login';
     }
+
     console.log('request error', error);
-    showFailToast(error.message || '网络错误');
     return Promise.reject(error);
   }
 );

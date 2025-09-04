@@ -1,46 +1,10 @@
-import { post, get } from './request';
-
-// Mock user data
-const mockUsers = [
-  {
-    id: '1',
-    username: 'admin',
-    password: 'admin123',
-    email: 'admin@example.com',
-    phone: '13800138001',
-    role: 'admin',
-    avatar: '',
-    isLoggedIn: false,
-  },
-  {
-    id: '2',
-    username: 'user',
-    password: 'user123',
-    email: 'user@example.com',
-    phone: '13800138002',
-    role: 'user',
-    avatar: '',
-    isLoggedIn: false,
-  },
-  {
-    id: '3',
-    username: 'demo',
-    password: 'demo123',
-    email: 'demo@example.com',
-    phone: '13800138003',
-    role: 'user',
-    avatar: '',
-    isLoggedIn: false,
-  },
-];
-
-// Simulate API delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+import { get, post } from './request';
 
 // Authentication service interface
 export interface LoginCredentials {
-  phone: string;
+  identifier: string;
   password: string;
+  verification_code?: string;
 }
 
 export interface LoginResponse {
@@ -50,7 +14,7 @@ export interface LoginResponse {
     user: {
       id: string;
       username: string;
-      email: string;
+      phone: string;
       role: string;
       avatar?: string;
     };
@@ -61,7 +25,7 @@ export interface LoginResponse {
 export interface UserInfo {
   id: string;
   username: string;
-  email: string;
+  phone: string;
   role: string;
   avatar?: string;
 }
@@ -70,176 +34,256 @@ export interface RegisterData {
   username: string;
   phone: string;
   password: string;
+  verification_code: string;
 }
 
-// Mock authentication service
+export interface SendCodeRequest {
+  phone: string;
+  code_type: 'register' | 'reset_password' | 'login';
+}
+
+export interface SendCodeResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    message: string;
+    expires_in: number;
+  };
+}
+
+export interface VerifyCodeRequest {
+  phone: string;
+  code: string;
+  code_type: 'register' | 'reset_password' | 'login';
+}
+
+export interface VerifyCodeResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    message: string;
+  };
+}
+
+// Real API service
 export class AuthService {
-  // Login
-  static async login(credentials: LoginCredentials): Promise<LoginResponse> {
-    // Simulate API delay
-    await delay(1000);
-
-    const user = mockUsers.find(
-      u => u.phone === credentials.phone && u.password === credentials.password
-    );
-
-    if (!user) {
+  // Send verification code
+  static async sendVerificationCode(data: SendCodeRequest): Promise<SendCodeResponse> {
+    try {
+      const response = await post<{ data: any }>('/api/verification/send-code', data);
+      return {
+        success: true,
+        message: '验证码发送成功',
+        data: {
+          message: response.data?.message || '验证码已发送',
+          expires_in: response.data?.expires_in || 300,
+        },
+      };
+    } catch (error: any) {
       return {
         success: false,
-        message: '手机号或密码错误',
+        message: error.message || '发送验证码失败',
       };
     }
+  }
 
-    // Generate mock token
-    const token = `mock-token-${user.id}-${Date.now()}`;
+  // Verify verification code
+  static async verifyCode(data: VerifyCodeRequest): Promise<VerifyCodeResponse> {
+    try {
+      const response = await post<{ data: VerifyCodeResponse }>(
+        '/api/verification/verify-code',
+        data
+      );
+      return {
+        success: true,
+        message: '验证码验证成功',
+        data: response.data,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || '验证码验证失败',
+      };
+    }
+  }
 
-    return {
-      success: true,
-      message: '登录成功',
-      data: {
-        user: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          role: user.role,
-          avatar: user.avatar,
-        },
-        token,
-      },
-    };
+  // Check if phone exists
+  static async checkPhoneExists(phone: string): Promise<{ exists: boolean; message: string }> {
+    try {
+      await get<{ data: any }>(`/api/verification/check-phone/${phone}`);
+      return {
+        exists: false,
+        message: '手机号可用',
+      };
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        return {
+          exists: true,
+          message: '手机号已被注册',
+        };
+      }
+      return {
+        exists: false,
+        message: '手机号可用',
+      };
+    }
+  }
+
+  // Login
+  static async login(credentials: LoginCredentials): Promise<LoginResponse> {
+    try {
+      const response = await post<{ data: any }>('/api/auth/login', credentials);
+
+      // 根据API响应格式调整
+      if (response.data && response.data.access_token) {
+        return {
+          success: true,
+          message: '登录成功',
+          data: {
+            user: {
+              id: response.data.user_id || '1',
+              username: response.data.username || credentials.identifier || '',
+              phone: credentials.identifier || '',
+              role: 'user',
+              avatar: response.data.avatar_url || '',
+            },
+            token: response.data.access_token,
+          },
+        };
+      } else {
+        // 如果接口返回了错误信息，使用接口的错误信息
+        const errorMsg = response.data?.msg || response.data?.message || '登录失败';
+        return {
+          success: false,
+          message: errorMsg,
+        };
+      }
+    } catch (error: any) {
+      // 优先使用接口返回的错误信息
+      let errorMsg = '登录失败';
+
+      if (error.response?.data?.detail && Array.isArray(error.response.data.detail)) {
+        // 处理 ValidationError 格式的错误
+        const validationErrors = error.response.data.detail;
+        if (validationErrors.length > 0) {
+          errorMsg = validationErrors[0].msg || '输入参数验证失败';
+        }
+      } else if (error.response?.data?.msg) {
+        errorMsg = error.response.data.msg;
+      } else if (error.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+
+      return {
+        success: false,
+        message: errorMsg,
+      };
+    }
   }
 
   // Register
   static async register(data: RegisterData): Promise<LoginResponse> {
-    await delay(1000);
+    try {
+      const response = await post<{ data: any }>('/api/auth/register', data);
 
-    // Check if username already exists
-    const existingUser = mockUsers.find(u => u.username === data.username);
-    if (existingUser) {
+      // 根据API响应格式调整 - 支持新的API响应格式
+      if (response.data && response.data.code === 201 && response.data.data) {
+        const apiData = response.data.data;
+
+        if (apiData.access_token && apiData.user) {
+          return {
+            success: true,
+            message: response.data.msg || '注册成功',
+            data: {
+              user: {
+                id: apiData.user.id?.toString() || '1',
+                username: apiData.user.username || data.username,
+                phone: apiData.user.phone || data.phone,
+                role: apiData.user.role || 'user',
+                avatar: apiData.user.avatar_url || '',
+              },
+              token: apiData.access_token,
+            },
+          };
+        }
+      }
+
       return {
         success: false,
-        message: '用户名已存在',
+        message: response.data?.msg || '注册失败',
       };
-    }
+    } catch (error: any) {
+      // 优先使用接口返回的错误信息
+      let errorMsg = '注册失败';
 
-    // Check if phone already exists
-    const existingPhone = mockUsers.find(u => u.phone === data.phone);
-    if (existingPhone) {
+      if (error.response?.data?.detail && Array.isArray(error.response.data.detail)) {
+        // 处理 ValidationError 格式的错误
+        const validationErrors = error.response.data.detail;
+        if (validationErrors.length > 0) {
+          errorMsg = validationErrors[0].msg || '输入参数验证失败';
+        }
+      } else if (error.response?.data?.msg) {
+        errorMsg = error.response.data.msg;
+      } else if (error.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+
       return {
         success: false,
-        message: '手机号已被注册',
+        message: errorMsg,
       };
     }
-
-    // Create new user
-    const newUser = {
-      id: String(mockUsers.length + 1),
-      username: data.username,
-      password: data.password,
-      phone: data.phone,
-      email: '', // Keep email field for backward compatibility
-      role: 'user',
-      avatar: '',
-      isLoggedIn: false,
-    };
-
-    mockUsers.push(newUser);
-
-    // Generate mock token
-    const token = `mock-token-${newUser.id}-${Date.now()}`;
-
-    return {
-      success: true,
-      message: '注册成功',
-      data: {
-        user: {
-          id: newUser.id,
-          username: newUser.username,
-          email: newUser.email,
-          role: newUser.role,
-          avatar: newUser.avatar,
-        },
-        token,
-      },
-    };
   }
 
   // Get current user info
   static async getCurrentUser(): Promise<UserInfo | null> {
-    await delay(500);
-
-    const token = localStorage.getItem('userToken');
-    if (!token) {
+    try {
+      const response = await get<{ data: UserInfo }>('/api/auth/users/me');
+      return response.data;
+    } catch (error) {
       return null;
     }
-
-    // Extract user ID from token (mock implementation)
-    const tokenParts = token.split('-');
-    const userId = tokenParts[2];
-
-    const user = mockUsers.find(u => u.id === userId);
-    if (!user) {
-      return null;
-    }
-
-    return {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      avatar: user.avatar,
-    };
   }
 
   // Logout
   static async logout(): Promise<{ success: boolean; message: string }> {
-    await delay(500);
-
-    // Clear token from localStorage
-    localStorage.removeItem('userToken');
-
-    return {
-      success: true,
-      message: '退出登录成功',
-    };
+    try {
+      await post<{ data: { success: boolean; message: string } }>('/api/auth/logout');
+      return {
+        success: true,
+        message: '退出登录成功',
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || '退出登录失败',
+      };
+    }
   }
 
   // Update user profile
   static async updateProfile(
     profileData: Partial<UserInfo>
   ): Promise<{ success: boolean; message: string }> {
-    await delay(1000);
-
-    const token = localStorage.getItem('userToken');
-    if (!token) {
+    try {
+      await post<{ data: { success: boolean; message: string } }>(
+        '/api/auth/users/me',
+        profileData
+      );
+      return {
+        success: true,
+        message: '更新成功',
+      };
+    } catch (error: any) {
       return {
         success: false,
-        message: '未登录',
+        message: error.message || '更新失败',
       };
     }
-
-    // Extract user ID from token
-    const tokenParts = token.split('-');
-    const userId = tokenParts[2];
-
-    const userIndex = mockUsers.findIndex(u => u.id === userId);
-    if (userIndex === -1) {
-      return {
-        success: false,
-        message: '用户不存在',
-      };
-    }
-
-    // Update user data
-    mockUsers[userIndex] = {
-      ...mockUsers[userIndex],
-      ...profileData,
-    };
-
-    return {
-      success: true,
-      message: '更新成功',
-    };
   }
 
   // Change password
@@ -247,130 +291,45 @@ export class AuthService {
     currentPassword: string;
     newPassword: string;
   }): Promise<{ success: boolean; message: string }> {
-    await delay(1000);
-
-    const token = localStorage.getItem('userToken');
-    if (!token) {
+    try {
+      await post<{ data: { success: boolean; message: string } }>('/api/auth/users/me', {
+        password: data.newPassword,
+      });
+      return {
+        success: true,
+        message: '密码修改成功',
+      };
+    } catch (error: any) {
       return {
         success: false,
-        message: '未登录',
+        message: error.message || '密码修改失败',
       };
     }
-
-    const tokenParts = token.split('-');
-    const userId = tokenParts[2];
-
-    const userIndex = mockUsers.findIndex(u => u.id === userId);
-    if (userIndex === -1) {
-      return {
-        success: false,
-        message: '用户不存在',
-      };
-    }
-
-    const user = mockUsers[userIndex];
-    if (user.password !== data.currentPassword) {
-      return {
-        success: false,
-        message: '当前密码错误',
-      };
-    }
-
-    // Update password
-    mockUsers[userIndex].password = data.newPassword;
-
-    return {
-      success: true,
-      message: '密码修改成功',
-    };
-  }
-
-  // Forgot password
-  static async forgotPassword(email: string): Promise<{ success: boolean; message: string }> {
-    await delay(1000);
-
-    const user = mockUsers.find(u => u.email === email);
-    if (!user) {
-      return {
-        success: false,
-        message: '邮箱不存在',
-      };
-    }
-
-    // In a real app, this would send a reset email
-    return {
-      success: true,
-      message: '重置密码邮件已发送',
-    };
   }
 
   // Reset password
-  static async resetPassword(_data: {
-    token: string;
-    newPassword: string;
+  static async resetPassword(data: {
+    phone: string;
+    verification_code: string;
+    new_password: string;
   }): Promise<{ success: boolean; message: string }> {
-    await delay(1000);
-
-    // Mock implementation - in real app, validate reset token
-    return {
-      success: true,
-      message: '密码重置成功',
-    };
-  }
-}
-
-// Real API service (for future use)
-export class RealAuthService {
-  static async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
-      const response = await post<{ data: LoginResponse }>('/auth/login', credentials);
-      return response.data;
-    } catch (error) {
-      throw new Error('登录失败');
-    }
-  }
-
-  static async register(data: RegisterData): Promise<LoginResponse> {
-    try {
-      const response = await post<{ data: LoginResponse }>('/auth/register', data);
-      return response.data;
-    } catch (error) {
-      throw new Error('注册失败');
-    }
-  }
-
-  static async getCurrentUser(): Promise<UserInfo | null> {
-    try {
-      const response = await get<{ data: UserInfo }>('/auth/me');
-      return response.data;
-    } catch (error) {
-      return null;
-    }
-  }
-
-  static async logout(): Promise<{ success: boolean; message: string }> {
-    try {
-      const response = await post<{ data: { success: boolean; message: string } }>('/auth/logout');
-      return response.data;
-    } catch (error) {
-      throw new Error('退出登录失败');
-    }
-  }
-
-  static async updateProfile(
-    profileData: Partial<UserInfo>
-  ): Promise<{ success: boolean; message: string }> {
-    try {
-      const response = await post<{ data: { success: boolean; message: string } }>(
-        '/auth/profile',
-        profileData
+      await post<{ data: { success: boolean; message: string } }>(
+        '/api/auth/reset-password-verify',
+        data
       );
-      return response.data;
-    } catch (error) {
-      throw new Error('更新失败');
+      return {
+        success: true,
+        message: '密码重置成功',
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || '密码重置失败',
+      };
     }
   }
 }
 
-// Export the service to use (currently using mock)
+// Export the service to use
 export default AuthService;

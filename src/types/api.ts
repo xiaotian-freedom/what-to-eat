@@ -2003,8 +2003,8 @@ export interface components {
         };
         /** UserLogin */
         UserLogin: {
-            /** Phone */
-            phone: string;
+            /** Identifier */
+            identifier: string;
             /** Password */
             password: string;
             /** Verification Code */
