@@ -1,13 +1,23 @@
 import { defineStore } from 'pinia';
 import AuthService, { type LoginCredentials, type RegisterData } from '@/utils/authService';
+import { AIUsageApi } from '@/utils/aiUsageApi';
 import type { components } from '@/types/api';
 
 // 用户信息接口
 type User = components['schemas']['User'];
 
+// AI使用次数信息接口
+interface AIUsageInfo {
+  daily_uses: number;
+  max_daily_uses: number;
+  remaining_uses: number;
+  last_reset_date?: string | null;
+}
+
 interface UserInfo extends User {
   token: string;
   isLoggedIn: boolean;
+  aiUsage?: AIUsageInfo;
 }
 
 // 定义用户 store
@@ -27,14 +37,43 @@ export const useUserStore = defineStore('user', {
     last_login_at: null,
     created_at: '',
     updated_at: null,
+    ai_daily_uses: 0,
+    ai_max_daily_uses: 3,
+    ai_last_reset_date: null,
     token: '',
     isLoggedIn: false,
+    aiUsage: undefined,
   }),
 
   // getters
   getters: {
     getUserInfo: state => state,
-    isAuthenticated: state => state.isLoggedIn && !!state.token,
+    isAuthenticated: () => !!localStorage.getItem('userToken'),
+    // AI使用次数相关getters
+    canUseAI: state => {
+      if (!state.isLoggedIn || !state.aiUsage) {
+        return false;
+      }
+      return state.aiUsage.remaining_uses > 0;
+    },
+    remainingAIUses: state => {
+      if (!state.isLoggedIn || !state.aiUsage) {
+        return 0;
+      }
+      return state.aiUsage.remaining_uses;
+    },
+    dailyAIUses: state => {
+      if (!state.isLoggedIn || !state.aiUsage) {
+        return 0;
+      }
+      return state.aiUsage.daily_uses;
+    },
+    maxDailyAIUses: state => {
+      if (!state.isLoggedIn || !state.aiUsage) {
+        return 0;
+      }
+      return state.aiUsage.max_daily_uses;
+    },
   },
 
   // actions
@@ -72,6 +111,9 @@ export const useUserStore = defineStore('user', {
 
           // 保存 token 到本地存储
           localStorage.setItem('userToken', token);
+
+          // 登录成功后加载AI使用次数信息
+          await this.loadAIUsage();
 
           return { success: true };
         } else {
@@ -113,6 +155,9 @@ export const useUserStore = defineStore('user', {
 
           // 保存 token 到本地存储
           localStorage.setItem('userToken', token);
+
+          // 注册成功后加载AI使用次数信息
+          await this.loadAIUsage();
 
           return { success: true };
         } else {
@@ -255,6 +300,9 @@ export const useUserStore = defineStore('user', {
           // 保存 token 到本地存储
           localStorage.setItem('userToken', token);
 
+          // 验证码登录成功后加载AI使用次数信息
+          await this.loadAIUsage();
+
           return true;
         } else {
           console.error('验证码登录失败:', response.message);
@@ -264,6 +312,73 @@ export const useUserStore = defineStore('user', {
         console.error('验证码登录失败:', error);
         return false;
       }
+    },
+
+    // AI使用次数相关方法
+    /**
+     * 获取AI使用次数信息
+     */
+    async loadAIUsage() {
+      if (!this.isLoggedIn) {
+        return;
+      }
+
+      try {
+        const response = await AIUsageApi.getMyAIUsage();
+        this.aiUsage = response.usage_info;
+      } catch (error) {
+        console.error('获取AI使用次数信息失败:', error);
+        // 如果获取失败，设置默认值
+        this.aiUsage = {
+          daily_uses: 0,
+          max_daily_uses: 5,
+          remaining_uses: 5,
+          last_reset_date: null,
+        };
+      }
+    },
+
+    /**
+     * 检查是否可以继续使用AI功能
+     */
+    async checkAIUsage() {
+      if (!this.isLoggedIn) {
+        return false;
+      }
+
+      try {
+        const response = await AIUsageApi.checkAIUsage();
+        this.aiUsage = response.usage_info;
+        return response.can_use;
+      } catch (error) {
+        console.error('检查AI使用次数失败:', error);
+        return false;
+      }
+    },
+
+    /**
+     * 使用AI功能（增加使用次数）
+     */
+    async useAIFeature() {
+      if (!this.isLoggedIn) {
+        return false;
+      }
+
+      try {
+        const response = await AIUsageApi.useAIFeature();
+        this.aiUsage = response.usage_info;
+        return response.can_use;
+      } catch (error) {
+        console.error('记录AI使用次数失败:', error);
+        return false;
+      }
+    },
+
+    /**
+     * 设置AI使用次数信息（用于从外部更新）
+     */
+    setAIUsage(usageInfo: AIUsageInfo) {
+      this.aiUsage = usageInfo;
     },
   },
 });

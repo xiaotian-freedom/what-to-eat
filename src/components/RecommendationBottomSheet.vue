@@ -152,7 +152,7 @@
             'active loading': isLoading,
             success: showSuccessEffect,
           }"
-          :disabled="isLoading"
+          :disabled="isLoading || !canUseAIRecommendation"
           @click="getRecommendations($event)"
         >
           <!-- 波纹效果容器 -->
@@ -174,7 +174,7 @@
             'active loading': isExtraRecommendationLoading,
             success: showExtraSuccessEffect,
           }"
-          :disabled="isExtraRecommendationLoading"
+          :disabled="isExtraRecommendationLoading || !canUseAIRecommendation"
           @click="getExtraRecommendation($event)"
         >
           <!-- 额外推荐按钮的波纹效果容器 -->
@@ -207,6 +207,7 @@
   import { useFoodStore } from '@/stores/food';
   import { useChallengeStore } from '@/stores/challenge';
   import { useDevModeStore } from '@/stores/devMode';
+  import { useUserStore } from '@/stores/user';
   import { getCurrentWeather } from '@/utils/weatherService';
   import { hybridRecommendationService } from '@/utils/hybridRecommendationService';
   import { deepseekService } from '@/utils/deepseekService';
@@ -293,6 +294,7 @@
   const foodStore = useFoodStore();
   const challengeStore = useChallengeStore();
   const devModeStore = useDevModeStore();
+  const userStore = useUserStore();
   const { t } = useI18n();
 
   // 响应式数据
@@ -311,6 +313,11 @@
   const networkStatus = ref<NetworkStatus>(hybridRecommendationService.getNetworkStatus());
   const usingAI = ref(false);
   const isExtraRecommendationLoading = ref(false); // 额外推荐加载状态
+
+  // AI推荐使用次数管理（已登录用户从API获取，未登录用户使用本地存储）
+  const trialUsage = ref({
+    trialCount: 0, // 未登录用户试用次数
+  });
 
   // DOM 引用
   const rippleContainer = ref<HTMLDivElement | null>(null);
@@ -424,20 +431,93 @@
   // 检查今日是否可以使用智能推荐
   const canUseToday = computed(() => challengeStore.canUseToday);
 
+  // 检查AI推荐使用权限
+  const canUseAIRecommendation = computed(() => {
+    // 开发模式下无限使用
+    if (devModeStore.isUnlimitedUsesEnabled) {
+      return true;
+    }
+
+    const isLoggedIn = userStore.isLoggedIn;
+
+    if (isLoggedIn) {
+      // 已登录用户：从API获取的使用次数信息
+      return userStore.canUseAI;
+    } else {
+      // 未登录用户：总共1次试用机会
+      return trialUsage.value.trialCount < 1;
+    }
+  });
+
+  // 获取剩余使用次数
+  const remainingAIUses = computed(() => {
+    if (devModeStore.isUnlimitedUsesEnabled) {
+      return Infinity;
+    }
+
+    const isLoggedIn = userStore.isLoggedIn;
+
+    if (isLoggedIn) {
+      // 已登录用户：从API获取的剩余使用次数
+      return userStore.remainingAIUses;
+    } else {
+      // 未登录用户：总共1次试用机会
+      return Math.max(0, 1 - trialUsage.value.trialCount);
+    }
+  });
+
   const recommendationButtonText = computed(() => {
     if (isLoading.value) {
       return usingAI.value ? t('recommendation.aiAnalyzing') : t('recommendation.smartAnalyzing');
     }
-    return canUseAI.value
-      ? t('recommendation.aiRecommendation')
-      : t('recommendation.smartRecommendation');
+
+    // 检查是否可以使用AI推荐
+    if (!canUseAIRecommendation.value) {
+      const isLoggedIn = userStore.isLoggedIn;
+      if (isLoggedIn) {
+        return '今日AI推荐次数已用完';
+      } else {
+        return '试用次数已用完，请登录';
+      }
+    }
+
+    // 显示剩余使用次数
+    const remaining = remainingAIUses.value;
+    if (remaining === Infinity) {
+      return canUseAI.value
+        ? t('recommendation.aiRecommendation')
+        : t('recommendation.smartRecommendation');
+    } else {
+      const baseText = canUseAI.value
+        ? t('recommendation.aiRecommendation')
+        : t('recommendation.smartRecommendation');
+      return `${baseText} (剩余${remaining}次)`;
+    }
   });
 
   const extraRecommendationButtonText = computed(() => {
     if (isExtraRecommendationLoading.value) {
       return t('recommendation.extraAnalyzing');
     }
-    return t('recommendation.extraRecommendation');
+
+    // 检查是否可以使用AI推荐
+    if (!canUseAIRecommendation.value) {
+      const isLoggedIn = userStore.isLoggedIn;
+      if (isLoggedIn) {
+        return '今日AI推荐次数已用完';
+      } else {
+        return '试用次数已用完，请登录';
+      }
+    }
+
+    // 显示剩余使用次数
+    const remaining = remainingAIUses.value;
+    if (remaining === Infinity) {
+      return t('recommendation.extraRecommendation');
+    } else {
+      const baseText = t('recommendation.extraRecommendation');
+      return `${baseText} (剩余${remaining}次)`;
+    }
   });
 
   const networkStatusText = computed(() => {
@@ -454,6 +534,50 @@
   });
 
   // 方法
+
+  // 加载AI推荐使用次数数据
+  const loadAIUsageData = async () => {
+    try {
+      const isLoggedIn = userStore.isLoggedIn;
+
+      if (isLoggedIn) {
+        // 已登录用户：从API获取使用次数信息
+        await userStore.loadAIUsage();
+      } else {
+        // 未登录用户：从本地存储获取试用次数
+        const stored = localStorage.getItem('aiRecommendationTrialUsage');
+        if (stored) {
+          const data = JSON.parse(stored);
+          trialUsage.value = { ...trialUsage.value, ...data };
+        }
+      }
+    } catch (error) {
+      console.error('加载AI推荐使用次数数据失败:', error);
+    }
+  };
+
+  // 保存AI推荐使用次数数据（仅用于未登录用户的试用次数）
+  const saveTrialUsageData = () => {
+    try {
+      localStorage.setItem('aiRecommendationTrialUsage', JSON.stringify(trialUsage.value));
+    } catch (error) {
+      console.error('保存试用次数数据失败:', error);
+    }
+  };
+
+  // 使用AI推荐
+  const useAIRecommendation = async () => {
+    const isLoggedIn = userStore.isLoggedIn;
+
+    if (isLoggedIn) {
+      // 已登录用户：通过API记录使用次数
+      await userStore.useAIFeature();
+    } else {
+      // 未登录用户：增加试用次数
+      trialUsage.value.trialCount++;
+      saveTrialUsageData();
+    }
+  };
 
   const loadWeatherData = async () => {
     try {
@@ -611,6 +735,17 @@
       return;
     }
 
+    // 检查AI推荐使用权限
+    if (!canUseAIRecommendation.value) {
+      const isLoggedIn = userStore.isLoggedIn;
+      if (isLoggedIn) {
+        showFailToast('今日AI推荐次数已用完，明天再来吧！');
+      } else {
+        showFailToast('试用次数已用完，登录后可获得更多推荐次数！');
+      }
+      return;
+    }
+
     // 创建点击波纹效果
     if (event) {
       createRippleEffect(event);
@@ -666,6 +801,8 @@
       // 记录智能推荐使用次数（开发模式下不增加使用次数）
       if (!devModeStore.isUnlimitedUsesEnabled) {
         challengeStore.useRandomFood(selectedRec.food.name);
+        // 记录AI推荐使用次数
+        await useAIRecommendation();
       }
 
       emit('recommendationsUpdated', recommendations.value);
@@ -722,6 +859,17 @@
         showFailToast(t('recommendation.devModeUnlimited'));
       } else {
         showFailToast(t('recommendation.dailyLimitReached'));
+      }
+      return;
+    }
+
+    // 检查AI推荐使用权限
+    if (!canUseAIRecommendation.value) {
+      const isLoggedIn = userStore.isLoggedIn;
+      if (isLoggedIn) {
+        showFailToast('今日AI推荐次数已用完，明天再来吧！');
+      } else {
+        showFailToast('试用次数已用完，登录后可获得更多推荐次数！');
       }
       return;
     }
@@ -784,6 +932,8 @@
       // 记录智能推荐使用次数（开发模式下不增加使用次数）
       if (!devModeStore.isUnlimitedUsesEnabled) {
         challengeStore.useRandomFood(selectedRec.food.name);
+        // 记录AI推荐使用次数
+        await useAIRecommendation();
       }
 
       emit('recommendationsUpdated', recommendations.value);
@@ -853,10 +1003,11 @@
     await Promise.allSettled([
       // 加载用户偏好数据
       userPreferenceStore.loadUserPreference(),
-      // 加载菜品数据
-      foodStore.loadFoodItems(),
+      // 移除重复的 loadFoodItems 调用，由父组件统一管理
       // 加载挑战数据
       challengeStore.loadChallengeData(),
+      // 加载AI推荐使用次数数据
+      loadAIUsageData(),
       // 异步加载天气数据（不阻塞其他初始化）
       loadWeatherData().catch(err => console.warn('天气数据加载失败:', err)),
     ]);

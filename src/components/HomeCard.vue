@@ -129,7 +129,6 @@
   import { useDevModeStore } from '@/stores/devMode';
   import { useWheelModeStore } from '@/stores/wheelMode';
   import { useThemeStore } from '@/stores/theme';
-  import { useUserStore } from '@/stores/user';
   import { showFailToast } from 'vant';
 
   const { t } = useI18n();
@@ -145,7 +144,6 @@
   const devModeStore = useDevModeStore();
   const wheelModeStore = useWheelModeStore();
   const themeStore = useThemeStore();
-  const userStore = useUserStore();
 
   // 优先使用 store 中的数据，如果为空才使用 dishList
   const combinedDishList = computed(() => {
@@ -179,7 +177,6 @@
 
   // 页面加载时确保数据已经加载
   onMounted(() => {
-    foodStore.loadFoodItems();
     challengeStore.loadChallengeData();
     wheelModeStore.loadModeSettings();
   });
@@ -301,13 +298,7 @@
   const handleMenuClick = (action: string) => {
     switch (action) {
       case 'recommendation':
-        // 智能推荐：检查登录状态
-        if (!userStore.isAuthenticated) {
-          // 未登录，跳转到登录页面
-          router.push('/login');
-          return;
-        }
-        // 已登录，切换推荐面板显示状态
+        // 切换推荐面板显示状态
         toggleRecommendation();
         break;
       case 'challenge':

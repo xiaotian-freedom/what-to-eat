@@ -1160,6 +1160,146 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/foods/recommendations/ai": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Get Ai Food Recommendations
+         * @description AI智能推荐菜品（消耗AI使用次数）
+         */
+        post: operations["get_ai_food_recommendations_api_foods_recommendations_ai_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ai-usage/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get My Ai Usage
+         * @description 获取当前用户的AI使用次数信息
+         */
+        get: operations["get_my_ai_usage_api_ai_usage_me_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ai-usage/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check Ai Usage
+         * @description 检查是否可以继续使用AI功能
+         */
+        post: operations["check_ai_usage_api_ai_usage_check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ai-usage/use": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Use Ai Feature
+         * @description 使用AI功能（增加使用次数）
+         */
+        post: operations["use_ai_feature_api_ai_usage_use_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ai-usage/admin/reset/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Admin Reset User Ai Usage
+         * @description 管理员重置指定用户的AI使用次数
+         */
+        post: operations["admin_reset_user_ai_usage_api_ai_usage_admin_reset__user_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ai-usage/admin/limit/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Admin Set User Ai Limit
+         * @description 管理员设置指定用户的每日AI使用次数限制
+         */
+        put: operations["admin_set_user_ai_limit_api_ai_usage_admin_limit__user_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ai-usage/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Admin Get All Users Ai Usage
+         * @description 管理员获取所有用户的AI使用次数信息
+         */
+        get: operations["admin_get_all_users_ai_usage_api_ai_usage_admin_users_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/": {
         parameters: {
             query?: never;
@@ -1181,6 +1321,29 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AIUsageInfo
+         * @description AI使用次数信息
+         */
+        AIUsageInfo: {
+            /** Daily Uses */
+            daily_uses: number;
+            /** Max Daily Uses */
+            max_daily_uses: number;
+            /** Remaining Uses */
+            remaining_uses: number;
+            /** Last Reset Date */
+            last_reset_date?: string | null;
+        };
+        /**
+         * AIUsageResponse
+         * @description AI使用次数响应数据
+         */
+        AIUsageResponse: {
+            usage_info: components["schemas"]["AIUsageInfo"];
+            /** Can Use */
+            can_use: boolean;
+        };
         /**
          * AchievementList
          * @description 成就列表
@@ -1801,6 +1964,23 @@ export interface components {
             /** Msg */
             msg: string;
         };
+        /** ResponseModel[AIUsageResponse] */
+        ResponseModel_AIUsageResponse_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["AIUsageResponse"] | null;
+        };
         /** ResponseModel[DeletePreferenceResponse] */
         ResponseModel_DeletePreferenceResponse_: {
             /**
@@ -1888,6 +2068,26 @@ export interface components {
              * @description 响应数据
              */
             data?: components["schemas"]["Food"][] | null;
+        };
+        /** ResponseModel[List[dict]] */
+        ResponseModel_List_dict__: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /**
+             * Data
+             * @description 响应数据
+             */
+            data?: Record<string, never>[] | null;
         };
         /** ResponseModel[LoginResponse] */
         ResponseModel_LoginResponse_: {
@@ -2102,6 +2302,18 @@ export interface components {
             status: components["schemas"]["UserStatus"];
             /** Last Login At */
             last_login_at?: string | null;
+            /**
+             * Ai Daily Uses
+             * @default 0
+             */
+            ai_daily_uses: number;
+            /**
+             * Ai Max Daily Uses
+             * @default 3
+             */
+            ai_max_daily_uses: number;
+            /** Ai Last Reset Date */
+            ai_last_reset_date?: string | null;
             /**
              * Created At
              * Format: date-time
@@ -4949,6 +5161,198 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ResponseModel_List_Food__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_ai_food_recommendations_api_foods_recommendations_ai_post: {
+        parameters: {
+            query?: {
+                weather?: string | null;
+                mood?: string | null;
+                season?: string | null;
+                physical_state?: string | null;
+                dietary_restriction?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_List_Food__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_my_ai_usage_api_ai_usage_me_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_AIUsageResponse_"];
+                };
+            };
+        };
+    };
+    check_ai_usage_api_ai_usage_check_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_AIUsageResponse_"];
+                };
+            };
+        };
+    };
+    use_ai_feature_api_ai_usage_use_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_AIUsageResponse_"];
+                };
+            };
+        };
+    };
+    admin_reset_user_ai_usage_api_ai_usage_admin_reset__user_id__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_AIUsageResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_set_user_ai_limit_api_ai_usage_admin_limit__user_id__put: {
+        parameters: {
+            query: {
+                new_limit: number;
+            };
+            header?: never;
+            path: {
+                user_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_AIUsageResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_get_all_users_ai_usage_api_ai_usage_admin_users_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_List_dict__"];
                 };
             };
             /** @description Validation Error */
