@@ -93,7 +93,7 @@
             </div>
           </div>
 
-          <!-- Phone Field -->
+          <!-- Email Field -->
           <div class="floating-input-group">
             <div class="input-container">
               <div class="input-icon">
@@ -109,18 +109,19 @@
                   stroke-linejoin="round"
                 >
                   <path
-                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
                   ></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
               </div>
               <input
-                v-model="form.phone"
-                type="tel"
-                placeholder="手机号"
+                v-model="form.email"
+                type="email"
+                placeholder="邮箱"
                 class="floating-input"
-                :class="{ 'input-focused': phoneFocused }"
-                @focus="phoneFocused = true"
-                @blur="phoneFocused = false"
+                :class="{ 'input-focused': emailFocused }"
+                @focus="emailFocused = true"
+                @blur="emailFocused = false"
               />
               <div class="input-line"></div>
             </div>
@@ -158,11 +159,24 @@
               <button
                 type="button"
                 @click.stop="handleSendCode"
-                :disabled="codeCountdown > 0 || !form.phone"
+                :disabled="codeCountdown > 0 || !form.email || sendCodeLoading"
                 class="send-code-button"
-                :class="{ disabled: codeCountdown > 0 || !form.phone }"
+                :class="{
+                  disabled: codeCountdown > 0 || !form.email || sendCodeLoading,
+                  loading: sendCodeLoading,
+                }"
               >
-                {{ codeCountdown > 0 ? `${codeCountdown}s` : '发送验证码' }}
+                <span v-if="!sendCodeLoading">
+                  {{ codeCountdown > 0 ? `${codeCountdown}s` : '发送验证码' }}
+                </span>
+                <span v-else class="loading-content">
+                  <span class="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </span>
+                  发送中
+                </span>
               </button>
             </div>
           </div>
@@ -331,18 +345,6 @@
             </span>
             <div class="button-glow"></div>
           </button>
-
-          <!-- Login Link -->
-          <div class="text-center">
-            <span class="text-sm opacity-70">已有账户？</span>
-            <button
-              type="button"
-              @click="handleLogin"
-              class="text-sm font-medium ml-1 hover:underline transition-all duration-300 hover:scale-105"
-            >
-              立即登录
-            </button>
-          </div>
         </form>
       </div>
     </div>
@@ -363,7 +365,7 @@
   // Form data
   const form = reactive({
     username: '',
-    phone: '',
+    email: '',
     verificationCode: '',
     password: '',
     confirmPassword: '',
@@ -372,7 +374,7 @@
   // Form validation errors
   const errors = reactive({
     username: '',
-    phone: '',
+    email: '',
     password: '',
     confirmPassword: '',
   });
@@ -382,7 +384,7 @@
 
   // Input focus states
   const usernameFocused = ref(false);
-  const phoneFocused = ref(false);
+  const emailFocused = ref(false);
   const codeFocused = ref(false);
   const passwordFocused = ref(false);
   const confirmPasswordFocused = ref(false);
@@ -390,6 +392,9 @@
   // Verification code countdown
   const codeCountdown = ref(0);
   let countdownTimer: number | null = null;
+
+  // Send code loading state
+  const sendCodeLoading = ref(false);
 
   // Password visibility states
   const showPassword = ref(false);
@@ -409,7 +414,7 @@
   const validateForm = () => {
     let isValid = true;
     errors.username = '';
-    errors.phone = '';
+    errors.email = '';
     errors.password = '';
     errors.confirmPassword = '';
 
@@ -422,12 +427,12 @@
       isValid = false;
     }
 
-    // Phone validation
-    if (!form.phone.trim()) {
-      showFailToast('请输入手机号');
+    // Email validation
+    if (!form.email.trim()) {
+      showFailToast('请输入邮箱');
       isValid = false;
-    } else if (!/^1[3-9]\d{9}$/.test(form.phone)) {
-      showFailToast('请输入有效的手机号');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      showFailToast('请输入有效的邮箱地址');
       isValid = false;
     }
 
@@ -466,9 +471,9 @@
     try {
       const result = await userStore.register({
         username: form.username,
-        phone: form.phone,
+        email: form.email,
         password: form.password,
-        verification_code: form.verificationCode,
+        email_verification_code: form.verificationCode,
       });
 
       if (result.success) {
@@ -495,27 +500,28 @@
 
   // Handle send verification code
   const handleSendCode = async () => {
-    if (!form.phone.trim()) {
-      showFailToast('请输入手机号');
+    if (!form.email.trim()) {
+      showFailToast('请输入邮箱');
       return;
     }
 
-    if (!/^1[3-9]\d{9}$/.test(form.phone)) {
-      showFailToast('请输入有效的手机号');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      showFailToast('请输入有效的邮箱地址');
       return;
     }
 
+    sendCodeLoading.value = true;
     try {
-      // 先检查手机号是否已被注册
-      const phoneCheck = await userStore.checkPhoneExists(form.phone);
-      if (phoneCheck.exists) {
-        showFailToast(phoneCheck.message);
+      // 先检查邮箱是否已被注册
+      const emailCheck = await userStore.checkEmailExists(form.email);
+      if (emailCheck.exists) {
+        showFailToast(emailCheck.message);
         return;
       }
 
       // 发送验证码
-      const response = await userStore.sendVerificationCode({
-        phone: form.phone,
+      const response = await userStore.sendEmailVerificationCode({
+        email: form.email,
         code_type: 'register',
       });
 
@@ -539,12 +545,9 @@
     } catch (error) {
       showFailToast('发送验证码失败，请稍后重试');
       console.error('Send code error:', error);
+    } finally {
+      sendCodeLoading.value = false;
     }
-  };
-
-  // Handle login redirect
-  const handleLogin = () => {
-    router.push('/login');
   };
 
   // Cleanup timer on component unmount
@@ -602,6 +605,39 @@
     background: rgba(255, 255, 255, 0.2);
     color: var(--color-textSecondary);
     cursor: not-allowed;
+  }
+
+  .send-code-button.loading {
+    pointer-events: none;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    color: white;
+  }
+
+  .loading-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .loading-content .loading-dots {
+    display: flex;
+    gap: 3px;
+  }
+
+  .loading-content .loading-dots span {
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+    animation: loadingDot 1.4s ease-in-out infinite both;
+  }
+
+  .loading-content .loading-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+  }
+  .loading-content .loading-dots span:nth-child(2) {
+    animation-delay: -0.16s;
   }
 
   /* Animated Background Elements */
@@ -950,6 +986,7 @@
     overflow: hidden;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-top: 20px;
   }
 
   .login-button:hover {

@@ -21,13 +21,18 @@ export interface LoginResponse {
 
 export interface RegisterData {
   username: string;
-  phone: string;
+  email: string;
   password: string;
-  verification_code: string;
+  email_verification_code: string;
 }
 
 export interface SendCodeRequest {
   phone: string;
+  code_type: 'register' | 'reset_password' | 'login';
+}
+
+export interface SendEmailCodeRequest {
+  email: string;
   code_type: 'register' | 'reset_password' | 'login';
 }
 
@@ -42,6 +47,12 @@ export interface SendCodeResponse {
 
 export interface VerifyCodeRequest {
   phone: string;
+  code: string;
+  code_type: 'register' | 'reset_password' | 'login';
+}
+
+export interface VerifyEmailCodeRequest {
+  email: string;
   code: string;
   code_type: 'register' | 'reset_password' | 'login';
 }
@@ -72,9 +83,20 @@ export class AuthService {
         },
       };
     } catch (error: any) {
+      // 优先使用接口返回的错误信息
+      let errorMsg = '发送验证码失败';
+
+      if (error.response?.data?.msg) {
+        errorMsg = error.response.data.msg;
+      } else if (error.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+
       return {
         success: false,
-        message: error.message || '发送验证码失败',
+        message: errorMsg,
       };
     }
   }
@@ -114,6 +136,84 @@ export class AuthService {
       return {
         exists: false,
         message: '手机号可用',
+      };
+    }
+  }
+
+  // Send email verification code
+  static async sendEmailVerificationCode(data: SendEmailCodeRequest): Promise<SendCodeResponse> {
+    try {
+      const response = await post<components['schemas']['EmailVerificationCodeResponse']>(
+        '/api/email-verification/send-email-code',
+        data
+      );
+      return {
+        success: true,
+        message: '验证码发送成功',
+        data: {
+          message: response.message || '验证码已发送',
+          expires_in: response.expires_in || 300,
+        },
+      };
+    } catch (error: any) {
+      // 优先使用接口返回的错误信息
+      let errorMsg = '发送验证码失败';
+
+      if (error.response?.data?.msg) {
+        errorMsg = error.response.data.msg;
+      } else if (error.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+
+      return {
+        success: false,
+        message: errorMsg,
+      };
+    }
+  }
+
+  // Verify email verification code
+  static async verifyEmailCode(data: VerifyEmailCodeRequest): Promise<VerifyCodeResponse> {
+    try {
+      const response = await post<components['schemas']['EmailVerificationResult']>(
+        '/api/email-verification/verify-email-code',
+        data
+      );
+      return {
+        success: true,
+        message: '验证码验证成功',
+        data: response as any,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || '验证码验证失败',
+      };
+    }
+  }
+
+  // Check if email exists
+  static async checkEmailExists(email: string): Promise<{ exists: boolean; message: string }> {
+    try {
+      await get<components['schemas']['EmailCheckResult']>(
+        `/api/email-verification/check-email/${email}`
+      );
+      return {
+        exists: false,
+        message: '邮箱可用',
+      };
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        return {
+          exists: true,
+          message: '邮箱已被注册',
+        };
+      }
+      return {
+        exists: false,
+        message: '邮箱可用',
       };
     }
   }
@@ -289,12 +389,16 @@ export class AuthService {
 
   // Reset password
   static async resetPassword(data: {
-    phone: string;
+    email: string;
     verification_code: string;
     new_password: string;
   }): Promise<{ success: boolean; message: string }> {
     try {
-      await post<unknown>('/api/auth/reset-password-verify', data);
+      await post<unknown>('/api/auth/reset-password-verify', {
+        phone: data.email, // API still expects phone parameter, but we'll pass email
+        verification_code: data.verification_code,
+        new_password: data.new_password,
+      });
       return {
         success: true,
         message: '密码重置成功',

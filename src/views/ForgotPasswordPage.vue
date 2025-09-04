@@ -77,7 +77,7 @@
       <div class="glass-card">
         <!-- Forgot Password Form -->
         <form @submit.prevent="handleResetPassword" class="space-y-4">
-          <!-- Phone Field -->
+          <!-- Email Field -->
           <div class="floating-input-group">
             <div class="input-container">
               <div class="input-icon">
@@ -93,18 +93,19 @@
                   stroke-linejoin="round"
                 >
                   <path
-                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
                   ></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
               </div>
               <input
-                v-model="form.phone"
-                type="tel"
-                placeholder="手机号"
+                v-model="form.email"
+                type="email"
+                placeholder="邮箱"
                 class="floating-input"
-                :class="{ 'input-focused': phoneFocused }"
-                @focus="phoneFocused = true"
-                @blur="phoneFocused = false"
+                :class="{ 'input-focused': emailFocused }"
+                @focus="emailFocused = true"
+                @blur="emailFocused = false"
               />
               <div class="input-line"></div>
             </div>
@@ -142,11 +143,24 @@
               <button
                 type="button"
                 @click="handleSendCode"
-                :disabled="codeCountdown > 0 || !form.phone"
+                :disabled="codeCountdown > 0 || !form.email || sendCodeLoading"
                 class="send-code-button"
-                :class="{ disabled: codeCountdown > 0 || !form.phone }"
+                :class="{
+                  disabled: codeCountdown > 0 || !form.email || sendCodeLoading,
+                  loading: sendCodeLoading,
+                }"
               >
-                {{ codeCountdown > 0 ? `${codeCountdown}s` : '发送验证码' }}
+                <span v-if="!sendCodeLoading">
+                  {{ codeCountdown > 0 ? `${codeCountdown}s` : '发送验证码' }}
+                </span>
+                <span v-else class="loading-content">
+                  <span class="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </span>
+                  发送中
+                </span>
               </button>
             </div>
           </div>
@@ -344,7 +358,7 @@
 
   // Form data
   const form = reactive({
-    phone: '',
+    email: '',
     verificationCode: '',
     newPassword: '',
     confirmPassword: '',
@@ -354,7 +368,7 @@
   const loading = ref(false);
 
   // Input focus states
-  const phoneFocused = ref(false);
+  const emailFocused = ref(false);
   const codeFocused = ref(false);
   const passwordFocused = ref(false);
   const confirmPasswordFocused = ref(false);
@@ -367,6 +381,9 @@
   const codeCountdown = ref(0);
   let countdownTimer: number | null = null;
 
+  // Send code loading state
+  const sendCodeLoading = ref(false);
+
   // Toggle password visibility
   const togglePasswordVisibility = () => {
     showPassword.value = !showPassword.value;
@@ -378,13 +395,13 @@
 
   // Validate form
   const validateForm = () => {
-    if (!form.phone.trim()) {
-      showFailToast('请输入手机号');
+    if (!form.email.trim()) {
+      showFailToast('请输入邮箱');
       return false;
     }
 
-    if (!/^1[3-9]\d{9}$/.test(form.phone)) {
-      showFailToast('请输入有效的手机号');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      showFailToast('请输入有效的邮箱地址');
       return false;
     }
 
@@ -413,34 +430,50 @@
 
   // Handle send verification code
   const handleSendCode = async () => {
-    if (!form.phone.trim()) {
-      showFailToast('请输入手机号');
+    if (!form.email.trim()) {
+      showFailToast('请输入邮箱');
       return;
     }
 
-    if (!/^1[3-9]\d{9}$/.test(form.phone)) {
-      showFailToast('请输入有效的手机号');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      showFailToast('请输入有效的邮箱地址');
       return;
     }
 
+    sendCodeLoading.value = true;
     try {
-      // TODO: 调用发送验证码的API
-      showSuccessToast('验证码已发送');
+      // 导入用户store
+      const { useUserStore } = await import('@/stores/user');
+      const userStore = useUserStore();
 
-      // Start countdown
-      codeCountdown.value = 60;
-      countdownTimer = setInterval(() => {
-        codeCountdown.value--;
-        if (codeCountdown.value <= 0) {
-          if (countdownTimer) {
-            clearInterval(countdownTimer);
-            countdownTimer = null;
+      // 发送邮箱验证码
+      const response = await userStore.sendEmailVerificationCode({
+        email: form.email,
+        code_type: 'reset_password',
+      });
+
+      if (response.success) {
+        showSuccessToast('验证码已发送');
+
+        // Start countdown
+        codeCountdown.value = 60;
+        countdownTimer = setInterval(() => {
+          codeCountdown.value--;
+          if (codeCountdown.value <= 0) {
+            if (countdownTimer) {
+              clearInterval(countdownTimer);
+              countdownTimer = null;
+            }
           }
-        }
-      }, 1000);
+        }, 1000);
+      } else {
+        showFailToast(response.message || '发送验证码失败');
+      }
     } catch (error) {
       showFailToast('发送验证码失败，请稍后重试');
       console.error('Send code error:', error);
+    } finally {
+      sendCodeLoading.value = false;
     }
   };
 
@@ -450,13 +483,24 @@
 
     loading.value = true;
     try {
-      // TODO: 调用重置密码的API
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 模拟API调用
+      // 导入AuthService
+      const AuthService = (await import('@/utils/authService')).default;
 
-      showSuccessToast('密码重置成功');
+      // 调用重置密码的API
+      const result = await AuthService.resetPassword({
+        email: form.email,
+        verification_code: form.verificationCode,
+        new_password: form.newPassword,
+      });
 
-      // Redirect to login page
-      router.replace('/login');
+      if (result.success) {
+        showSuccessToast('密码重置成功');
+
+        // Redirect to login page
+        router.replace('/login');
+      } else {
+        showFailToast(result.message || '密码重置失败');
+      }
     } catch (error) {
       showFailToast('密码重置失败，请稍后重试');
       console.error('Reset password error:', error);
@@ -525,6 +569,39 @@
     background: rgba(255, 255, 255, 0.2);
     color: var(--color-textSecondary);
     cursor: not-allowed;
+  }
+
+  .send-code-button.loading {
+    pointer-events: none;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    color: white;
+  }
+
+  .loading-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .loading-content .loading-dots {
+    display: flex;
+    gap: 3px;
+  }
+
+  .loading-content .loading-dots span {
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+    animation: loadingDot 1.4s ease-in-out infinite both;
+  }
+
+  .loading-content .loading-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+  }
+  .loading-content .loading-dots span:nth-child(2) {
+    animation-delay: -0.16s;
   }
 
   /* Animated Background Elements */

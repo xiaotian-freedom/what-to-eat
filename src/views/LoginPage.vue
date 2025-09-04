@@ -83,7 +83,7 @@
               <input
                 v-model="form.identifier"
                 type="text"
-                placeholder="手机号/用户名/邮箱"
+                placeholder="邮箱/用户名"
                 class="floating-input"
                 :class="{ 'input-focused': usernameFocused, 'input-error': errors.identifier }"
                 @focus="usernameFocused = true"
@@ -167,35 +167,6 @@
             </div>
           </div>
 
-          <!-- Verification Code Field -->
-          <div class="floating-input-group">
-            <div class="input-container">
-              <div class="input-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                </svg>
-              </div>
-              <input
-                v-model="form.verification_code"
-                type="text"
-                placeholder="验证码（可选）"
-                class="floating-input"
-                maxlength="6"
-              />
-              <div class="input-line"></div>
-            </div>
-          </div>
-
           <!-- Remember Me and Forgot Password -->
           <div class="flex justify-between items-center">
             <label class="remember-me">
@@ -264,7 +235,6 @@
   const form = reactive({
     identifier: '',
     password: '',
-    verification_code: '',
     rememberMe: false,
   });
 
@@ -272,7 +242,6 @@
   const errors = reactive({
     identifier: '',
     password: '',
-    verification_code: '',
   });
 
   // Loading state
@@ -294,8 +263,8 @@
   const handleUsernameBlur = () => {
     usernameFocused.value = false;
     if (!form.identifier.trim()) {
-      errors.identifier = '请输入手机号/用户名/邮箱';
-      showFailToast('请输入手机号/用户名/邮箱');
+      errors.identifier = '请输入邮箱/用户名';
+      showFailToast('请输入邮箱/用户名');
     } else {
       errors.identifier = '';
     }
@@ -368,7 +337,6 @@
       const result = await userStore.login({
         identifier: form.identifier,
         password: form.password,
-        verification_code: form.verification_code || undefined,
       });
 
       if (result.success) {
@@ -387,7 +355,7 @@
         router.replace('/home');
       } else {
         // 使用接口返回的具体错误信息
-        const errorMsg = result.message || '手机号或密码错误，请检查后重试';
+        const errorMsg = result.message || '邮箱或密码错误，请检查后重试';
         showFailToast(errorMsg);
       }
     } catch (error: any) {

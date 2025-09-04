@@ -184,6 +184,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/email-verification/send-email-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send Email Verification Code
+         * @description 发送邮箱验证码
+         */
+        post: operations["send_email_verification_code_api_email_verification_send_email_code_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/email-verification/verify-email-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verify Email Verification Code
+         * @description 验证邮箱验证码
+         */
+        post: operations["verify_email_verification_code_api_email_verification_verify_email_code_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/email-verification/check-email/{email}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Check Email Exists
+         * @description 检查邮箱是否已注册（用于注册时的邮箱检查）
+         */
+        get: operations["check_email_exists_api_email_verification_check_email__email__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/upload/qiniu-token": {
         parameters: {
             query?: never;
@@ -1303,6 +1363,36 @@ export interface components {
             /** Sort Order */
             sort_order?: number | null;
         };
+        /**
+         * DeletePreferenceResponse
+         * @description 删除偏好设置响应数据
+         */
+        DeletePreferenceResponse: {
+            /** Message */
+            message: string;
+        };
+        /** EmailCheckResult */
+        EmailCheckResult: {
+            /** Exists */
+            exists: boolean;
+        };
+        /**
+         * EmailCodeType
+         * @enum {string}
+         */
+        EmailCodeType: "register" | "reset_password" | "login";
+        /** EmailVerificationCodeResponse */
+        EmailVerificationCodeResponse: {
+            /** Message */
+            message: string;
+            /** Expires In */
+            expires_in: number;
+        };
+        /** EmailVerificationResult */
+        EmailVerificationResult: {
+            /** Message */
+            message: string;
+        };
         /** Food */
         Food: {
             /** Name */
@@ -1682,6 +1772,14 @@ export interface components {
             access_token: string;
         };
         /**
+         * LogoutResponse
+         * @description 登出响应数据
+         */
+        LogoutResponse: {
+            /** Message */
+            message: string;
+        };
+        /**
          * PostMealFeeling
          * @enum {string}
          */
@@ -1694,6 +1792,102 @@ export interface components {
             user: components["schemas"]["User"];
             /** Access Token */
             access_token: string;
+        };
+        /**
+         * ResetPasswordResponse
+         * @description 重置密码响应数据
+         */
+        ResetPasswordResponse: {
+            /** Msg */
+            msg: string;
+        };
+        /** ResponseModel[DeletePreferenceResponse] */
+        ResponseModel_DeletePreferenceResponse_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["DeletePreferenceResponse"] | null;
+        };
+        /** ResponseModel[EmailCheckResult] */
+        ResponseModel_EmailCheckResult_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["EmailCheckResult"] | null;
+        };
+        /** ResponseModel[EmailVerificationCodeResponse] */
+        ResponseModel_EmailVerificationCodeResponse_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["EmailVerificationCodeResponse"] | null;
+        };
+        /** ResponseModel[EmailVerificationResult] */
+        ResponseModel_EmailVerificationResult_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["EmailVerificationResult"] | null;
+        };
+        /** ResponseModel[List[Food]] */
+        ResponseModel_List_Food__: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /**
+             * Data
+             * @description 响应数据
+             */
+            data?: components["schemas"]["Food"][] | null;
         };
         /** ResponseModel[LoginResponse] */
         ResponseModel_LoginResponse_: {
@@ -1712,6 +1906,23 @@ export interface components {
             /** @description 响应数据 */
             data?: components["schemas"]["LoginResponse"] | null;
         };
+        /** ResponseModel[LogoutResponse] */
+        ResponseModel_LogoutResponse_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["LogoutResponse"] | null;
+        };
         /** ResponseModel[RegisterResponse] */
         ResponseModel_RegisterResponse_: {
             /**
@@ -1728,6 +1939,23 @@ export interface components {
             msg: string;
             /** @description 响应数据 */
             data?: components["schemas"]["RegisterResponse"] | null;
+        };
+        /** ResponseModel[ResetPasswordResponse] */
+        ResponseModel_ResetPasswordResponse_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["ResetPasswordResponse"] | null;
         };
         /** ResponseModel[TokenResponse] */
         ResponseModel_TokenResponse_: {
@@ -1746,6 +1974,40 @@ export interface components {
             /** @description 响应数据 */
             data?: components["schemas"]["TokenResponse"] | null;
         };
+        /** ResponseModel[UserInfoResponse] */
+        ResponseModel_UserInfoResponse_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["UserInfoResponse"] | null;
+        };
+        /** ResponseModel[UserPreference] */
+        ResponseModel_UserPreference_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["UserPreference"] | null;
+        };
         /**
          * SelectionMode
          * @enum {string}
@@ -1756,6 +2018,12 @@ export interface components {
             /** Phone */
             phone: string;
             code_type: components["schemas"]["CodeType"];
+        };
+        /** SendEmailCodeRequest */
+        SendEmailCodeRequest: {
+            /** Email */
+            email: string;
+            code_type: components["schemas"]["EmailCodeType"];
         };
         /**
          * SessionInfo
@@ -1803,15 +2071,15 @@ export interface components {
             user: components["schemas"]["User"];
             /** Access Token */
             access_token: string;
-            /** Token Type */
-            token_type: string;
         };
         /** User */
         User: {
             /** Username */
             username: string;
+            /** Email */
+            email: string;
             /** Phone */
-            phone: string;
+            phone?: string | null;
             /** Avatar Url */
             avatar_url?: string | null;
             /**
@@ -2033,8 +2301,10 @@ export interface components {
         UserCreate: {
             /** Username */
             username: string;
+            /** Email */
+            email: string;
             /** Phone */
-            phone: string;
+            phone?: string | null;
             /** Avatar Url */
             avatar_url?: string | null;
             /**
@@ -2051,8 +2321,10 @@ export interface components {
             selection_mode: components["schemas"]["SelectionMode"];
             /** Password */
             password: string;
-            /** Verification Code */
-            verification_code?: string | null;
+            /** Email Verification Code */
+            email_verification_code?: string | null;
+            /** Phone Verification Code */
+            phone_verification_code?: string | null;
         };
         /** UserFavorite */
         UserFavorite: {
@@ -2117,14 +2389,23 @@ export interface components {
             /** Note */
             note?: string | null;
         };
+        /**
+         * UserInfoResponse
+         * @description 用户信息响应数据
+         */
+        UserInfoResponse: {
+            user: components["schemas"]["User"];
+        };
         /** UserLogin */
         UserLogin: {
             /** Identifier */
             identifier: string;
             /** Password */
             password: string;
-            /** Verification Code */
-            verification_code?: string | null;
+            /** Email Verification Code */
+            email_verification_code?: string | null;
+            /** Phone Verification Code */
+            phone_verification_code?: string | null;
         };
         /** UserPreference */
         UserPreference: {
@@ -2313,6 +2594,8 @@ export interface components {
         UserUpdate: {
             /** Username */
             username?: string | null;
+            /** Email */
+            email?: string | null;
             /** Phone */
             phone?: string | null;
             /** Password */
@@ -2348,6 +2631,14 @@ export interface components {
             /** Code */
             code: string;
             code_type: components["schemas"]["CodeType"];
+        };
+        /** VerifyEmailCodeRequest */
+        VerifyEmailCodeRequest: {
+            /** Email */
+            email: string;
+            /** Code */
+            code: string;
+            code_type: components["schemas"]["EmailCodeType"];
         };
         /**
          * WorkType
@@ -2477,7 +2768,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_LogoutResponse_"];
                 };
             };
         };
@@ -2497,7 +2788,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_UserInfoResponse_"];
                 };
             };
         };
@@ -2521,7 +2812,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_UserInfoResponse_"];
                 };
             };
             /** @description Validation Error */
@@ -2537,8 +2828,9 @@ export interface operations {
     };
     reset_password_api_auth_reset_password_post: {
         parameters: {
-            query: {
-                phone: string;
+            query?: {
+                email?: string;
+                phone?: string;
                 verification_code?: string;
                 new_password?: string;
             };
@@ -2554,7 +2846,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_ResetPasswordResponse_"];
                 };
             };
             /** @description Validation Error */
@@ -2587,7 +2879,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_ResetPasswordResponse_"];
                 };
             };
             /** @description Validation Error */
@@ -2698,6 +2990,103 @@ export interface operations {
             };
         };
     };
+    send_email_verification_code_api_email_verification_send_email_code_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendEmailCodeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_EmailVerificationCodeResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    verify_email_verification_code_api_email_verification_verify_email_code_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyEmailCodeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_EmailVerificationResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    check_email_exists_api_email_verification_check_email__email__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                email: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_EmailCheckResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_qiniu_token_api_upload_qiniu_token_get: {
         parameters: {
             query?: never;
@@ -2733,7 +3122,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_UserPreference_"];
                 };
             };
         };
@@ -2757,7 +3146,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_UserPreference_"];
                 };
             };
             /** @description Validation Error */
@@ -2790,7 +3179,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_UserPreference_"];
                 };
             };
             /** @description Validation Error */
@@ -2819,7 +3208,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_DeletePreferenceResponse_"];
                 };
             };
         };
@@ -4464,7 +4853,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_List_Food__"];
                 };
             };
             /** @description Validation Error */
@@ -4497,7 +4886,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_List_Food__"];
                 };
             };
             /** @description Validation Error */
@@ -4528,7 +4917,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_List_Food__"];
                 };
             };
             /** @description Validation Error */
@@ -4559,7 +4948,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_List_Food__"];
                 };
             };
             /** @description Validation Error */

@@ -16,6 +16,7 @@ export const useUserStore = defineStore('user', {
   state: (): UserInfo => ({
     id: 0,
     username: '',
+    email: '',
     phone: '',
     avatar_url: null,
     language: 'zh-CN',
@@ -54,6 +55,7 @@ export const useUserStore = defineStore('user', {
           this.setUserInfo({
             id: user.id,
             username: user.username,
+            email: user.email,
             phone: user.phone,
             role: user.role,
             avatar_url: user.avatar_url,
@@ -94,6 +96,7 @@ export const useUserStore = defineStore('user', {
           this.setUserInfo({
             id: user.id,
             username: user.username,
+            email: user.email,
             phone: user.phone,
             role: user.role,
             avatar_url: user.avatar_url,
@@ -171,6 +174,20 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    // 检查邮箱是否已存在
+    async checkEmailExists(email: string) {
+      try {
+        const response = await AuthService.checkEmailExists(email);
+        return response;
+      } catch (error) {
+        console.error('检查邮箱失败:', error);
+        return {
+          exists: false,
+          message: '检查失败',
+        };
+      }
+    },
+
     // 发送验证码
     async sendVerificationCode(data: {
       phone: string;
@@ -181,6 +198,23 @@ export const useUserStore = defineStore('user', {
         return response;
       } catch (error) {
         console.error('发送验证码失败:', error);
+        return {
+          success: false,
+          message: '发送验证码失败',
+        };
+      }
+    },
+
+    // 发送邮箱验证码
+    async sendEmailVerificationCode(data: {
+      email: string;
+      code_type: 'register' | 'reset_password' | 'login';
+    }) {
+      try {
+        const response = await AuthService.sendEmailVerificationCode(data);
+        return response;
+      } catch (error) {
+        console.error('发送邮箱验证码失败:', error);
         return {
           success: false,
           message: '发送验证码失败',
@@ -203,6 +237,7 @@ export const useUserStore = defineStore('user', {
           this.setUserInfo({
             id: user.id,
             username: user.username,
+            email: user.email,
             phone: user.phone,
             role: user.role,
             avatar_url: user.avatar_url,
