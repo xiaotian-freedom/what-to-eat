@@ -568,7 +568,7 @@ ${foodListStr}${recentChoicesStr}
   /**
    * 获取菜品做法
    */
-  public async getRecipe(dishName: string): Promise<any> {
+  public async getRecipe(dishName: string, abortController?: AbortController): Promise<any> {
     if (!this.canUseAPI()) {
       throw new Error('DeepSeek API 不可用');
     }
@@ -620,7 +620,7 @@ ${foodListStr}${recentChoicesStr}
       stream: false,
     };
 
-    const controller = new AbortController();
+    const controller = abortController || new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000); // 20秒超时，给更多时间生成内容
 
     try {
@@ -661,7 +661,14 @@ ${foodListStr}${recentChoicesStr}
       clearTimeout(timeoutId);
 
       if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error('API 请求超时，请检查网络连接');
+        // 检查是否是用户主动取消（通过传入的 abortController）
+        if (abortController && abortController.signal.aborted) {
+          console.log('用户主动取消了 AI 请求');
+          // 不抛出错误，因为这是用户主动取消
+          return;
+        } else {
+          throw new Error('API 请求超时，请检查网络连接');
+        }
       }
 
       console.error('DeepSeek API 调用失败:', error);
@@ -1068,7 +1075,8 @@ ${foodListStr}${recentChoicesStr}
     onChunk: (chunk: string) => void,
     onPartialRecipe: (partialRecipe: any) => void,
     onComplete: (recipe: any) => void,
-    onError: (error: string) => void
+    onError: (error: string) => void,
+    abortController?: AbortController
   ): Promise<void> {
     if (!this.canUseAPI()) {
       onError('DeepSeek API 不可用');
@@ -1124,7 +1132,7 @@ ${foodListStr}${recentChoicesStr}
       stream: true,
     };
 
-    const controller = new AbortController();
+    const controller = abortController || new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
 
     try {
@@ -1251,7 +1259,14 @@ ${foodListStr}${recentChoicesStr}
       clearTimeout(timeoutId);
 
       if (error instanceof Error && error.name === 'AbortError') {
-        onError('API 请求超时，请检查网络连接');
+        // 检查是否是用户主动取消（通过传入的 abortController）
+        if (abortController && abortController.signal.aborted) {
+          console.log('用户主动取消了 AI 请求');
+          // 不调用 onError，因为这是用户主动取消
+          return;
+        } else {
+          onError('API 请求超时，请检查网络连接');
+        }
       } else {
         console.error('DeepSeek 智能流式 API 调用失败:', error);
         onError(error instanceof Error ? error.message : '获取菜谱失败');

@@ -211,6 +211,9 @@
   const streamingContent = ref('');
   const partialRecipe = ref<any>(null);
 
+  // AI 请求控制器
+  let currentAbortController: AbortController | null = null;
+
   // 处理图片加载失败
   const handleImageError = (): void => {
     imageLoadFailed.value = true;
@@ -314,6 +317,9 @@
     partialRecipe.value = null;
     recipeData.value = null;
 
+    // 创建新的 AbortController
+    currentAbortController = new AbortController();
+
     // 立即显示弹窗，开始流式加载
     showRecipeSheet.value = true;
 
@@ -334,6 +340,7 @@
           recipeData.value = recipe;
           streamingLoading.value = false;
           partialRecipe.value = null;
+          currentAbortController = null; // 清理控制器
           // 弹窗已经在开始时显示了，这里不需要再设置
         },
         // onError: 处理错误
@@ -341,7 +348,9 @@
           console.error('智能流式获取失败，尝试传统方式:', error);
           // 如果智能流式失败，降级到传统方式
           fallbackToTraditionalMethod();
-        }
+        },
+        // 传入 AbortController
+        currentAbortController
       );
     } catch (error) {
       console.error('智能流式API调用失败:', error);
@@ -362,8 +371,12 @@
     }
 
     try {
-      const recipe = await deepseekService.getRecipe(props.selectedDish!.name);
+      const recipe = await deepseekService.getRecipe(
+        props.selectedDish!.name,
+        currentAbortController || undefined
+      );
       recipeData.value = recipe;
+      currentAbortController = null; // 清理控制器
       // 弹窗已经在开始时显示了，这里不需要再设置
     } catch (error) {
       console.error('获取做法失败:', error);
@@ -386,13 +399,30 @@
 
   // 关闭做法抽屉
   const closeRecipeSheet = () => {
+    // 如果正在加载，取消 AI 请求
+    if (currentAbortController && (streamingLoading.value || recipeLoading.value)) {
+      console.log('用户关闭弹窗，取消正在进行的 AI 请求');
+      currentAbortController.abort();
+      currentAbortController = null;
+    }
+
+    // 重置加载状态
+    streamingLoading.value = false;
+    recipeLoading.value = false;
+
     showRecipeSheet.value = false;
   };
 
-  // 组件卸载时清理定时器
+  // 组件卸载时清理定时器和请求
   onUnmounted(() => {
     if (marqueeTimeout) {
       clearTimeout(marqueeTimeout);
+    }
+
+    // 清理正在进行的 AI 请求
+    if (currentAbortController) {
+      currentAbortController.abort();
+      currentAbortController = null;
     }
   });
 
