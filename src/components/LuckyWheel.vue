@@ -189,9 +189,25 @@
 
   // 手动触发转盘（保持与原组件的兼容性）
   const spin = () => {
-    if (luckyWheelRef.value && !isSpinning.value) {
+    if (props.disabled || isSpinning.value) return;
+
+    isSpinning.value = true;
+    console.log('转盘开始转动');
+
+    // 调用 play 方法开始转盘旋转
+    if (luckyWheelRef.value) {
       luckyWheelRef.value.play();
     }
+
+    // 随机选择一个索引
+    const randomIndex = Math.floor(Math.random() * wheelItems.value.length);
+
+    // 延迟停止转盘
+    setTimeout(() => {
+      if (luckyWheelRef.value) {
+        luckyWheelRef.value.stop(randomIndex);
+      }
+    }, Math.random() * 3000 + 2000); // 2-5秒后停止
   };
 
   // 暴露方法给父组件

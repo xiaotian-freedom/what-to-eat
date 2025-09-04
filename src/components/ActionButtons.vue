@@ -6,7 +6,7 @@
           @click="$emit('addFood')"
           class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center transform transition ripple-btn theme-transition"
           :style="{
-            backgroundColor: 'var(--color-primary)',
+            backgroundColor: 'var(--color-accent)',
             color: 'var(--color-text)',
             boxShadow: '0 10px 15px -3px var(--color-shadow)',
           }"
@@ -21,7 +21,7 @@
           :disabled="disabled"
           @click="$emit('randomFood')"
           :style="{
-            backgroundImage: `linear-gradient(to right, var(--color-secondary), var(--color-accent))`,
+            backgroundColor: 'var(--color-primary)',
             boxShadow: '0 10px 15px -3px var(--color-shadow)',
           }"
         >
@@ -48,7 +48,7 @@
           @click="$emit('chooseAgain')"
           class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center transform transition ripple-btn theme-transition"
           :style="{
-            backgroundColor: 'var(--color-primary)',
+            backgroundColor: 'var(--color-accent)',
             color: 'var(--color-text)',
             boxShadow: '0 10px 15px -3px var(--color-shadow)',
           }"
@@ -63,7 +63,7 @@
           class="w-20 h-20 rounded-full text-white font-bold shadow-lg transform transition flex items-center justify-center ripple-btn relative theme-transition"
           :class="{ 'opacity-75': recipeLoading }"
           :style="{
-            backgroundImage: `linear-gradient(to right, var(--color-secondary), var(--color-accent))`,
+            backgroundColor: 'var(--color-primary)',
             boxShadow: '0 10px 15px -3px var(--color-shadow)',
           }"
         >
@@ -71,8 +71,7 @@
             <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
           </div>
           <div v-else class="flex flex-col items-center">
-            <img :src="utensils" class="w-6 h-6 mb-1" />
-            <span class="text-xs">做法</span>
+            <img :src="utensils" class="w-7 h-7" />
           </div>
         </button>
 

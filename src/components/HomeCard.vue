@@ -100,9 +100,20 @@
           <!-- 转盘区域 -->
           <div class="flex-1 flex flex-col items-center justify-center">
             <LuckyWheel
+              ref="luckyWheelRef"
               :foodList="combinedDishList"
               :currentTheme="themeStore.currentTheme"
               @result="handleWheelResult"
+            />
+          </div>
+          <!-- 底部按钮区域 - 固定在底部 -->
+          <div class="mt-auto pt-6 w-full">
+            <ActionButtons
+              :disabled="isAnimating || !canUseToday"
+              :showMainButtons="true"
+              @randomFood="handleRandomFood"
+              @addFood="$emit('add-food')"
+              @showFoodList="$emit('show-food-list')"
             />
           </div>
         </div>
@@ -170,6 +181,7 @@
   const showRecommendation = ref(false);
   const showMenu = ref(false);
   const dishCanvasRef = ref<InstanceType<typeof DishCanvas> | null>(null);
+  const luckyWheelRef = ref<InstanceType<typeof LuckyWheel> | null>(null);
   const canvasContainer = ref<HTMLDivElement | null>(null);
   const recommendedDish = ref<Food | null>(null);
 
@@ -193,8 +205,16 @@
       return;
     }
 
-    // 通知父组件开始随机选菜
-    emit('random-food');
+    // 根据当前模式执行不同逻辑
+    if (wheelModeStore.isWheelMode()) {
+      // 转盘模式：启动转盘
+      if (luckyWheelRef.value) {
+        luckyWheelRef.value.spin();
+      }
+    } else {
+      // 卡片模式：通知父组件开始随机选菜
+      emit('random-food');
+    }
   };
 
   // 启动随机动画
