@@ -146,6 +146,13 @@ export default {
   'settings.devModeDesc': 'Enable unlimited random food selection',
   'settings.devModeEnabled': 'Developer mode enabled',
   'settings.devModeDisabled': 'Developer mode disabled',
+  'settings.member': 'Member',
+  'settings.active': 'Active',
+  'settings.aiUsage': 'AI Usage',
+  'settings.logout': 'Logout',
+  'settings.logoutConfirm': 'Confirm Logout',
+  'settings.logoutConfirmMessage':
+    'Are you sure you want to logout? You will need to login again to use full features.',
   'settings.languageOptions.zh-CN': '简体中文',
   'settings.languageOptions.en-US': 'English',
   'settings.aboutContent.developer': 'Developer',
@@ -322,4 +329,19 @@ export default {
   'favorite.empty.goHome': 'Choose Food',
   'favorite.loginRequired': 'Please login to use favorites',
   'favorite.loginRequiredDesc': 'Login to save your favorite dishes for easy access',
+
+  // Loading related
+  'loading.default': 'Loading...',
+  'loading.data': 'Loading data...',
+  'loading.upload': 'Uploading...',
+  'loading.processing': 'Processing...',
+  'loading.saving': 'Saving...',
+  'loading.network': 'Network request...',
+  'loading.analyzing': 'Analyzing...',
+  'loading.recommending': 'Recommending...',
+  'loading.pleaseWait': 'Please wait...',
+  'loading.almostDone': 'Almost done...',
+  'loading.completed': 'Completed',
+  'loading.failed': 'Loading failed',
+  'loading.retry': 'Retry',
 };

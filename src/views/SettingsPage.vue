@@ -4,7 +4,7 @@
     :class="`theme-gradient-${themeStore.currentTheme}`"
   >
     <!-- 卡片容器 -->
-    <div class="card-container w-full h-[70vh] max-w-md">
+    <div class="card-container w-full h-[80vh] max-w-md">
       <!-- 设置卡片 -->
       <div
         class="card-face bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative flex flex-col w-full h-full"
@@ -15,6 +15,87 @@
         <!-- 内容区域 -->
         <div class="flex-1 flex flex-col p-6 overflow-y-auto">
           <div class="space-y-4">
+            <!-- 用户信息模块 - 移到最上面并突出样式 -->
+            <div
+              v-if="userStore.isAuthenticated"
+              class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-3xl p-6 border-2 border-blue-200 shadow-lg relative overflow-hidden"
+            >
+              <!-- 装饰性背景元素 -->
+              <div
+                class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full -translate-y-10 translate-x-10"
+              ></div>
+              <div
+                class="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-indigo-200/30 to-blue-200/30 rounded-full translate-y-8 -translate-x-8"
+              ></div>
+
+              <div class="relative z-10">
+                <!-- 用户头像和基本信息 -->
+                <div class="flex items-center space-x-4 mb-4">
+                  <div class="relative">
+                    <img
+                      v-if="userStore.avatar_url"
+                      :src="userStore.avatar_url"
+                      :alt="userStore.username"
+                      class="w-16 h-16 rounded-full border-3 border-white shadow-lg object-cover"
+                    />
+                    <div
+                      v-else
+                      class="w-16 h-16 rounded-full border-3 border-white shadow-lg flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100"
+                    >
+                      <img
+                        src="@/assets/icons/default-avatar.svg"
+                        alt="默认头像"
+                        class="w-10 h-10"
+                      />
+                    </div>
+                    <!-- 在线状态指示器 -->
+                    <div
+                      class="absolute bottom-0 right-0 w-5 h-5 bg-green-400 border-2 border-white rounded-full"
+                    ></div>
+                  </div>
+
+                  <div class="flex-1">
+                    <h3 class="text-xl font-bold text-gray-800 mb-1">{{ userStore.username }}</h3>
+                    <p class="text-sm text-gray-600 mb-1">
+                      {{ userStore.email || userStore.phone }}
+                    </p>
+                    <div class="flex items-center space-x-2">
+                      <span
+                        class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium"
+                      >
+                        {{ $t('settings.member') }}
+                      </span>
+                      <span
+                        class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium"
+                      >
+                        {{ $t('settings.active') }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- AI使用情况 -->
+                <div class="bg-white/60 backdrop-blur-sm rounded-2xl p-3">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-700">{{
+                      $t('settings.aiUsage')
+                    }}</span>
+                    <span class="text-sm text-gray-600">
+                      {{ userStore.remainingAIUses }}/{{ userStore.maxDailyAIUses }}
+                    </span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                      :style="{
+                        width: `${(userStore.remainingAIUses / userStore.maxDailyAIUses) * 100}%`,
+                      }"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- 开发模式开关 - 开关可见时显示 -->
             <div
               v-if="devModeStore.isDevModeSwitchVisible"
@@ -128,30 +209,25 @@
               </div>
             </div>
 
-            <!-- 用户信息 -->
+            <!-- 登出按钮 -->
             <div
               v-if="userStore.isAuthenticated"
-              class="bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl p-4 border border-gray-100"
+              class="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl p-4 border border-red-100"
             >
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex-1">
-                  <h3 class="text-lg font-semibold text-gray-800">用户信息</h3>
-                  <p class="text-sm text-gray-600 mt-1">{{ userStore.username }}</p>
-                </div>
-                <div class="flex items-center space-x-2">
-                  <span class="text-2xl">👤</span>
-                </div>
-              </div>
-
-              <!-- 登出按钮 -->
-              <van-button
-                type="danger"
-                size="small"
-                @click="handleLogout"
-                class="w-full bg-red-500 hover:bg-red-600 border-0"
+              <button
+                @click="showLogoutConfirm = true"
+                class="w-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-semibold py-3 px-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 flex items-center justify-center space-x-2"
               >
-                退出登录
-              </van-button>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  ></path>
+                </svg>
+                <span>{{ $t('settings.logout') }}</span>
+              </button>
             </div>
           </div>
         </div>
@@ -177,6 +253,51 @@
 
     <!-- 关于我们 -->
     <AboutBottomSheet :visible="showAboutModal" @close="showAboutModal = false" />
+
+    <!-- 登出确认弹窗 -->
+    <van-dialog
+      v-model:show="showLogoutConfirm"
+      :message="$t('settings.logoutConfirmMessage')"
+      :show-cancel-button="false"
+      :show-confirm-button="false"
+      confirm-button-color="#ef4444"
+      @confirm="handleLogout"
+    >
+      <template #default>
+        <div class="p-6 text-center">
+          <div
+            class="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center"
+          >
+            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">
+            {{ $t('settings.logoutConfirm') }}
+          </h3>
+          <p class="text-gray-600 mb-4">{{ $t('settings.logoutConfirmMessage') }}</p>
+          <div class="flex space-x-3">
+            <button
+              @click="showLogoutConfirm = false"
+              class="flex-1 bg-gray-200 active:bg-gray-300 !text-gray-800 font-semibold py-4 px-6 rounded-2xl transition-all duration-150 active:scale-95 touch-manipulation"
+            >
+              {{ $t('common.cancel') }}
+            </button>
+            <button
+              @click="handleLogout"
+              class="flex-1 bg-gradient-to-r from-red-500 to-pink-500 active:from-red-600 active:to-pink-600 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-150 active:scale-95 touch-manipulation shadow-lg"
+            >
+              {{ $t('settings.logout') }}
+            </button>
+          </div>
+        </div>
+      </template>
+    </van-dialog>
   </div>
 </template>
 
@@ -221,6 +342,7 @@
   const showThemeSelector = ref(false);
   const showAboutModal = ref(false);
   const showModeSelector = ref(false);
+  const showLogoutConfirm = ref(false);
 
   // 处理语言选择
   const handleLanguageSelect = () => {
@@ -240,6 +362,7 @@
   // 处理登出
   const handleLogout = async () => {
     try {
+      showLogoutConfirm.value = false;
       await userStore.logout();
       // 登出后跳转到登录页
       window.location.href = '/login';

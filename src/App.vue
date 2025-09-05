@@ -10,11 +10,43 @@
   <!-- PWA 功能组件 -->
   <PWAInstallPrompt />
   <PWAUpdatePrompt />
+
+  <!-- 全局 Loading 组件 -->
+  <LoadingModal
+    :visible="loadingState.visible"
+    :text="loadingState.text"
+    :type="loadingState.type"
+    :progress="loadingState.progress"
+    :show-progress="loadingState.showProgress"
+    :show-progress-text="loadingState.showProgressText"
+    :progress-text="loadingState.progressText"
+    :closable="loadingState.closable"
+    :backdrop-closable="loadingState.backdropClosable"
+    :spinner-color="loadingState.spinnerColor"
+    :text-color="loadingState.textColor"
+    :modal-background-color="loadingState.modalBackgroundColor"
+    :backdrop-color="loadingState.backdropColor"
+    :border-color="loadingState.borderColor"
+    :shadow-color="loadingState.shadowColor"
+    :progress-color="loadingState.progressColor"
+    :progress-background-color="loadingState.progressBackgroundColor"
+    :text-secondary-color="loadingState.textSecondaryColor"
+    @close="closeLoading"
+  />
 </template>
 
 <script setup lang="ts">
   import PWAUpdatePrompt from '@/components/PWAUpdatePrompt.vue';
   import PWAInstallPrompt from '@/components/PWAInstallPrompt.vue';
+  import LoadingModal from '@/components/LoadingModal.vue';
+  import { useLoading } from '@/composables/useLoading';
+
+  // 使用全局 loading
+  const { loadingState, close } = useLoading();
+
+  const closeLoading = () => {
+    close();
+  };
 </script>
 
 <style>
