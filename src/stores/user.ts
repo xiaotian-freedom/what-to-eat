@@ -49,6 +49,11 @@ export const useUserStore = defineStore('user', {
   getters: {
     getUserInfo: state => state,
     isAuthenticated: () => !!localStorage.getItem('userToken'),
+    // 检查用户是否已登录但AI使用次数信息未加载
+    needsAIUsageLoad: state => {
+      const hasToken = !!localStorage.getItem('userToken');
+      return hasToken && state.isLoggedIn && !state.aiUsage;
+    },
     // AI使用次数相关getters
     canUseAI: state => {
       if (!state.isLoggedIn || !state.aiUsage) {
@@ -171,18 +176,52 @@ export const useUserStore = defineStore('user', {
     },
 
     // 登出
-    async logout() {
+    async logout(): Promise<{ success: boolean; message: string }> {
       try {
-        await AuthService.logout();
+        const response = await AuthService.logout();
+
+        if (response.success) {
+          // 清除用户信息
+          this.$reset();
+
+          // 清除本地存储的 token
+          localStorage.removeItem('userToken');
+
+          // 清除其他相关数据
+          this.clearUserData();
+
+          return {
+            success: true,
+            message: response.message,
+          };
+        } else {
+          return {
+            success: false,
+            message: response.message,
+          };
+        }
       } catch (error) {
         console.error('退出登录失败:', error);
-      } finally {
-        // 清除用户信息
-        this.$reset();
 
-        // 清除本地存储的 token
+        // 即使API调用失败，也要清除本地数据
+        this.$reset();
         localStorage.removeItem('userToken');
+        this.clearUserData();
+
+        return {
+          success: false,
+          message: '退出登录失败，但已清除本地数据',
+        };
       }
+    },
+
+    // 清除用户相关数据
+    clearUserData() {
+      // 清除AI使用次数信息
+      this.aiUsage = undefined;
+
+      // 清除其他可能的用户相关数据
+      // 这里可以根据需要添加更多清理逻辑
     },
 
     // 更新用户信息
@@ -379,6 +418,32 @@ export const useUserStore = defineStore('user', {
      */
     setAIUsage(usageInfo: AIUsageInfo) {
       this.aiUsage = usageInfo;
+    },
+
+    /**
+     * 初始化用户状态（应用启动时调用）
+     */
+    async initializeUserState() {
+      const token = localStorage.getItem('userToken');
+      if (token && !this.isLoggedIn) {
+        // 如果有token但用户状态未设置，尝试恢复用户状态
+        try {
+          // 这里可以调用API获取用户信息，但为了简化，我们只设置基本状态
+          this.token = token;
+          this.isLoggedIn = true;
+
+          // 加载AI使用次数信息
+          await this.loadAIUsage();
+        } catch (error) {
+          console.error('初始化用户状态失败:', error);
+          // 如果初始化失败，清除无效的token
+          localStorage.removeItem('userToken');
+          this.$reset();
+        }
+      } else if (token && this.isLoggedIn && !this.aiUsage) {
+        // 如果用户已登录但AI使用次数信息未加载，则加载它
+        await this.loadAIUsage();
+      }
     },
   },
 });

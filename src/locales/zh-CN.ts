@@ -12,6 +12,7 @@ export default {
   'common.start': '开始',
   'common.share': '分享',
   'common.close': '关闭',
+  'common.loggingOut': '退出中...',
 
   // 页面标题
   'pages.home': '今天吃什么',

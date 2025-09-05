@@ -335,15 +335,37 @@ export class AuthService {
   // Logout
   static async logout(): Promise<{ success: boolean; message: string }> {
     try {
-      await post<unknown>('/api/auth/logout');
-      return {
-        success: true,
-        message: '退出登录成功',
-      };
+      const response = await post<components['schemas']['ResponseModel_LogoutResponse_']>(
+        '/api/auth/logout'
+      );
+
+      // 根据API响应格式处理
+      if (response.code === 200) {
+        return {
+          success: true,
+          message: response.data?.message || response.msg || '退出登录成功',
+        };
+      } else {
+        return {
+          success: false,
+          message: response.msg || '退出登录失败',
+        };
+      }
     } catch (error: any) {
+      // 优先使用接口返回的错误信息
+      let errorMsg = '退出登录失败';
+
+      if (error.response?.data?.msg) {
+        errorMsg = error.response.data.msg;
+      } else if (error.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+
       return {
         success: false,
-        message: error.message || '退出登录失败',
+        message: errorMsg,
       };
     }
   }

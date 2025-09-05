@@ -46,6 +46,7 @@
   import { useThemeStore } from '@/stores/theme';
   import { useWheelModeStore } from '@/stores/wheelMode';
   import { useFoodStore } from '@/stores/food';
+  import { useUserStore } from '@/stores/user';
 
   const { t } = useI18n();
   const router = useRouter();
@@ -54,6 +55,7 @@
   const themeStore = useThemeStore();
   const wheelModeStore = useWheelModeStore();
   const foodStore = useFoodStore();
+  const userStore = useUserStore();
 
   const selectedDish = ref<Food | null>(null);
   const showResult = ref(false);
@@ -162,17 +164,25 @@
     }
   };
 
-  onMounted(() => {
+  onMounted(async () => {
     // 添加GPU加速类
     document.body.classList.add('gpu-accelerated');
-    // 加载开发模式状态
-    devModeStore.loadDevModeState();
-    // 加载挑战数据
-    challengeStore.loadChallengeData();
-    // 加载模式设置
-    wheelModeStore.loadModeSettings();
-    // 加载食物数据
-    foodStore.loadFoodItems();
+
+    // 并行加载所有数据，提升初始化速度
+    await Promise.allSettled([
+      // 加载开发模式状态
+      devModeStore.loadDevModeState(),
+      // 加载挑战数据
+      challengeStore.loadChallengeData(),
+      // 加载模式设置
+      wheelModeStore.loadModeSettings(),
+      // 加载食物数据
+      foodStore.loadFoodItems(),
+      // 初始化用户状态（包括AI使用次数信息）
+      userStore.initializeUserState().catch(error => {
+        console.error('初始化用户状态失败:', error);
+      }),
+    ]);
   });
 </script>
 

@@ -12,6 +12,7 @@ export default {
   'common.start': 'Start',
   'common.share': 'Share',
   'common.close': 'Close',
+  'common.loggingOut': 'Logging out...',
 
   // Page titles
   'pages.home': 'What to Eat Today',
