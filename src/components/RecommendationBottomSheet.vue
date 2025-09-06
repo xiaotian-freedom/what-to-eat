@@ -152,7 +152,7 @@
             'active loading': isLoading,
             success: showSuccessEffect,
           }"
-          :disabled="isLoading || !canUseAIRecommendation"
+          :disabled="isLoading || !canUseSmartRecommendation"
           @click="getRecommendations($event)"
         >
           <!-- 波纹效果容器 -->
@@ -431,7 +431,25 @@
   // 检查今日是否可以使用智能推荐
   const canUseToday = computed(() => challengeStore.canUseToday);
 
-  // 检查AI推荐使用权限
+  // 检查智能推荐使用权限（登录用户无限使用）
+  const canUseSmartRecommendation = computed(() => {
+    // 开发模式下无限使用
+    if (devModeStore.isUnlimitedUsesEnabled) {
+      return true;
+    }
+
+    const isLoggedIn = userStore.isLoggedIn;
+
+    if (isLoggedIn) {
+      // 已登录用户：无限使用智能推荐
+      return true;
+    } else {
+      // 未登录用户：总共1次试用机会
+      return trialUsage.value.trialCount < 1;
+    }
+  });
+
+  // 检查AI额外推荐使用权限
   const canUseAIRecommendation = computed(() => {
     // 开发模式下无限使用
     if (devModeStore.isUnlimitedUsesEnabled) {
@@ -468,31 +486,21 @@
 
   const recommendationButtonText = computed(() => {
     if (isLoading.value) {
-      return usingAI.value ? t('recommendation.aiAnalyzing') : t('recommendation.smartAnalyzing');
+      return t('recommendation.smartAnalyzing');
     }
 
-    // 检查是否可以使用AI推荐
-    if (!canUseAIRecommendation.value) {
+    // 检查是否可以使用智能推荐
+    if (!canUseSmartRecommendation.value) {
       const isLoggedIn = userStore.isLoggedIn;
       if (isLoggedIn) {
-        return '今日AI推荐次数已用完';
+        return '今日推荐次数已用完';
       } else {
         return '试用次数已用完，请登录';
       }
     }
 
-    // 显示剩余使用次数
-    const remaining = remainingAIUses.value;
-    if (remaining === Infinity) {
-      return canUseAI.value
-        ? t('recommendation.aiRecommendation')
-        : t('recommendation.smartRecommendation');
-    } else {
-      const baseText = canUseAI.value
-        ? t('recommendation.aiRecommendation')
-        : t('recommendation.smartRecommendation');
-      return `${baseText} (剩余${remaining}次)`;
-    }
+    // 智能推荐按钮始终显示为智能推荐
+    return t('recommendation.smartRecommendation');
   });
 
   const extraRecommendationButtonText = computed(() => {
@@ -504,7 +512,7 @@
     if (!canUseAIRecommendation.value) {
       const isLoggedIn = userStore.isLoggedIn;
       if (isLoggedIn) {
-        return '今日AI推荐次数已用完';
+        return '今日AI额外推荐次数已用完';
       } else {
         return '试用次数已用完，请登录';
       }
@@ -735,11 +743,11 @@
       return;
     }
 
-    // 检查AI推荐使用权限
-    if (!canUseAIRecommendation.value) {
+    // 检查智能推荐使用权限
+    if (!canUseSmartRecommendation.value) {
       const isLoggedIn = userStore.isLoggedIn;
       if (isLoggedIn) {
-        showFailToast('今日AI推荐次数已用完，明天再来吧！');
+        showFailToast('今日推荐次数已用完，明天再来吧！');
       } else {
         showFailToast('试用次数已用完，登录后可获得更多推荐次数！');
       }
@@ -752,7 +760,7 @@
     }
 
     isLoading.value = true;
-    usingAI.value = canUseAI.value;
+    usingAI.value = false; // 智能推荐使用本地算法
 
     createSparkleEffect();
 
@@ -801,8 +809,11 @@
       // 记录智能推荐使用次数（开发模式下不增加使用次数）
       if (!devModeStore.isUnlimitedUsesEnabled) {
         challengeStore.useRandomFood(selectedRec.food.name);
-        // 记录AI推荐使用次数
-        await useAIRecommendation();
+        // 智能推荐不需要记录AI使用次数，只记录试用次数
+        if (!userStore.isLoggedIn) {
+          trialUsage.value.trialCount++;
+          saveTrialUsageData();
+        }
       }
 
       emit('recommendationsUpdated', recommendations.value);
@@ -867,7 +878,7 @@
     if (!canUseAIRecommendation.value) {
       const isLoggedIn = userStore.isLoggedIn;
       if (isLoggedIn) {
-        showFailToast('今日AI推荐次数已用完，明天再来吧！');
+        showFailToast('今日AI额外推荐次数已用完，明天再来吧！');
       } else {
         showFailToast('试用次数已用完，登录后可获得更多推荐次数！');
       }
