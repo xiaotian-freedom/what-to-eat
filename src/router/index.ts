@@ -71,18 +71,32 @@ const router = createRouter({
   routes,
 });
 
-// Navigation guard for authentication (optional login)
+// Navigation guard for authentication (optional login) and guide completion
 router.beforeEach((to, _from, next) => {
   const userStore = useUserStore();
   const isAuthenticated = userStore.isAuthenticated;
+  const guideCompleted = localStorage.getItem('guideCompleted') === 'true';
 
   // If user is already authenticated and trying to access login, redirect to home
   if (to.path === '/login' && isAuthenticated) {
     next('/home');
-  } else {
-    // Allow access to all routes - login is optional
-    next();
+    return;
   }
+
+  // If accessing root path and guide is not completed, show guide
+  if (to.path === '/' && !guideCompleted) {
+    next();
+    return;
+  }
+
+  // If accessing root path and guide is completed, redirect to home
+  if (to.path === '/' && guideCompleted) {
+    next('/home');
+    return;
+  }
+
+  // Allow access to all other routes
+  next();
 });
 
 export default router;

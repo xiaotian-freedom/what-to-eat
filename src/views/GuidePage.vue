@@ -77,6 +77,9 @@
 
   // 开始使用应用
   const startApp = () => {
+    // 保存引导完成状态到localStorage
+    localStorage.setItem('guideCompleted', 'true');
+
     // 添加飞出动画
     isFlying.value = true;
 
