@@ -345,4 +345,55 @@ export default {
   'loading.completed': 'Completed',
   'loading.failed': 'Loading failed',
   'loading.retry': 'Retry',
+
+  // PWA Install Guide
+  'pwa.installGuide.title': 'Install to Desktop',
+  'pwa.installGuide.subtitle': 'Quick access to "What to Eat Today"',
+  'pwa.installGuide.detectedPlatform': 'Detected device:',
+  'pwa.installGuide.tryInstall': 'Try Install',
+  'pwa.installGuide.afterInstall.title': 'Experience after installation',
+  'pwa.installGuide.afterInstall.description':
+    'After installation, you can launch the app directly from your desktop with faster loading and native app-like experience.',
+
+  // iOS Install Steps
+  'pwa.installGuide.steps.ios.step1.title': 'Tap Share Button',
+  'pwa.installGuide.steps.ios.step1.description':
+    'Find the share button at the bottom of Safari browser',
+  'pwa.installGuide.steps.ios.step1.imageDesc': 'Share button location',
+  'pwa.installGuide.steps.ios.step2.title': 'Swipe Up',
+  'pwa.installGuide.steps.ios.step2.description': 'Swipe up in the share menu to see more options',
+  'pwa.installGuide.steps.ios.step2.imageDesc': 'Swipe up',
+  'pwa.installGuide.steps.ios.step3.title': 'Select "Add to Home Screen"',
+  'pwa.installGuide.steps.ios.step3.description': 'Find and tap "Add to Home Screen" option',
+  'pwa.installGuide.steps.ios.step3.imageDesc': 'Add to Home Screen',
+  'pwa.installGuide.steps.ios.step3.tip':
+    "If you can't find this option, make sure you're using Safari browser",
+
+  // Android Install Steps
+  'pwa.installGuide.steps.android.step1.title': 'Tap Menu Button',
+  'pwa.installGuide.steps.android.step1.description':
+    'Tap the three-dot menu in the top-right corner of Chrome browser',
+  'pwa.installGuide.steps.android.step1.imageDesc': 'Menu button',
+  'pwa.installGuide.steps.android.step2.title': 'Select "Install App"',
+  'pwa.installGuide.steps.android.step2.description':
+    'Find "Install App" or "Add to Home Screen" option in the menu',
+  'pwa.installGuide.steps.android.step2.imageDesc': 'Install App',
+  'pwa.installGuide.steps.android.step3.title': 'Confirm Installation',
+  'pwa.installGuide.steps.android.step3.description':
+    'Tap "Install" button, the app will be added to home screen',
+  'pwa.installGuide.steps.android.step3.imageDesc': 'Confirm installation',
+
+  // Desktop Install Steps
+  'pwa.installGuide.steps.desktop.step1.title': 'Check Address Bar',
+  'pwa.installGuide.steps.desktop.step1.description':
+    'Look for the install icon on the right side of the browser address bar',
+  'pwa.installGuide.steps.desktop.step1.imageDesc': 'Install icon',
+  'pwa.installGuide.steps.desktop.step2.title': 'Click Install Button',
+  'pwa.installGuide.steps.desktop.step2.description':
+    'Click the install icon, browser will show installation prompt',
+  'pwa.installGuide.steps.desktop.step2.imageDesc': 'Click install',
+  'pwa.installGuide.steps.desktop.step3.title': 'Confirm Installation',
+  'pwa.installGuide.steps.desktop.step3.description':
+    'Click "Install" in the popup dialog, app will be added to desktop',
+  'pwa.installGuide.steps.desktop.step3.imageDesc': 'Confirm installation',
 };

@@ -19,8 +19,8 @@
           </div>
         </div>
         <div>
-          <p class="text-sm font-medium text-gray-900">安装到桌面</p>
-          <p class="text-xs text-gray-500">快速访问「今天吃什么」</p>
+          <p class="text-sm font-medium text-gray-900">{{ $t('pwa.installGuide.title') }}</p>
+          <p class="text-xs text-gray-500">{{ $t('pwa.installGuide.subtitle') }}</p>
         </div>
       </div>
       <div class="flex space-x-2">
@@ -28,25 +28,44 @@
           @click="dismiss"
           class="px-3 py-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
         >
-          取消
+          {{ $t('common.cancel') }}
         </button>
         <button
-          @click="install"
+          @click="showInstallGuide"
           class="px-3 py-1 bg-gradient-to-r from-green-500 to-blue-600 text-white text-xs rounded-lg hover:from-green-600 hover:to-blue-700 transition-all"
         >
-          安装
+          {{ $t('pwa.installGuide.tryInstall') }}
         </button>
       </div>
     </div>
   </div>
+
+  <!-- PWA 安装引导组件 -->
+  <PWAInstallGuide :visible="showGuide" @close="closeGuide" @install="handleInstall" />
 </template>
 
 <script setup lang="ts">
   import { ref, onMounted } from 'vue';
   import { showSuccessToast, showFailToast } from 'vant';
+  import PWAInstallGuide from './PWAInstallGuide.vue';
 
   const showInstallPrompt = ref(false);
+  const showGuide = ref(false);
   let deferredPrompt: any = null;
+
+  const showInstallGuide = () => {
+    console.log('PWA Install Prompt: 显示安装引导');
+    showGuide.value = true;
+  };
+
+  const closeGuide = () => {
+    showGuide.value = false;
+  };
+
+  const handleInstall = async () => {
+    console.log('PWA Install Prompt: 用户从引导页面点击安装');
+    await install();
+  };
 
   const install = async () => {
     console.log('PWA Install Prompt: 用户点击安装按钮');
@@ -70,12 +89,14 @@
       } finally {
         deferredPrompt = null;
         showInstallPrompt.value = false;
+        showGuide.value = false;
       }
     } else {
       console.log('PWA Install Prompt: 没有可用的安装提示，尝试手动安装');
       // 如果没有 deferredPrompt，尝试手动安装
       showSuccessToast('请使用浏览器的安装功能');
       showInstallPrompt.value = false;
+      showGuide.value = false;
     }
   };
 

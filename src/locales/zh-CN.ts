@@ -360,4 +360,48 @@ export default {
   'loading.completed': '完成',
   'loading.failed': '加载失败',
   'loading.retry': '重试',
+
+  // PWA 安装引导
+  'pwa.installGuide.title': '安装到桌面',
+  'pwa.installGuide.subtitle': '快速访问「今天吃什么」',
+  'pwa.installGuide.detectedPlatform': '检测到您的设备：',
+  'pwa.installGuide.tryInstall': '尝试安装',
+  'pwa.installGuide.afterInstall.title': '安装完成后的体验',
+  'pwa.installGuide.afterInstall.description':
+    '安装后，您可以从桌面直接启动应用，享受更快的加载速度和原生应用般的体验。',
+
+  // iOS 安装步骤
+  'pwa.installGuide.steps.ios.step1.title': '点击分享按钮',
+  'pwa.installGuide.steps.ios.step1.description': '在 Safari 浏览器底部找到分享按钮',
+  'pwa.installGuide.steps.ios.step1.imageDesc': '分享按钮位置',
+  'pwa.installGuide.steps.ios.step2.title': '向上滑动',
+  'pwa.installGuide.steps.ios.step2.description': '在分享菜单中向上滑动，查看更多选项',
+  'pwa.installGuide.steps.ios.step2.imageDesc': '向上滑动',
+  'pwa.installGuide.steps.ios.step3.title': '选择"添加到主屏幕"',
+  'pwa.installGuide.steps.ios.step3.description': '找到"添加到主屏幕"选项并点击',
+  'pwa.installGuide.steps.ios.step3.imageDesc': '添加到主屏幕',
+  'pwa.installGuide.steps.ios.step3.tip': '如果找不到此选项，请确保您使用的是 Safari 浏览器',
+
+  // Android 安装步骤
+  'pwa.installGuide.steps.android.step1.title': '点击菜单按钮',
+  'pwa.installGuide.steps.android.step1.description': '在 Chrome 浏览器右上角点击三个点菜单',
+  'pwa.installGuide.steps.android.step1.imageDesc': '菜单按钮',
+  'pwa.installGuide.steps.android.step2.title': '选择"安装应用"',
+  'pwa.installGuide.steps.android.step2.description': '在菜单中找到"安装应用"或"添加到主屏幕"选项',
+  'pwa.installGuide.steps.android.step2.imageDesc': '安装应用',
+  'pwa.installGuide.steps.android.step3.title': '确认安装',
+  'pwa.installGuide.steps.android.step3.description': '点击"安装"按钮，应用将添加到主屏幕',
+  'pwa.installGuide.steps.android.step3.imageDesc': '确认安装',
+
+  // 桌面安装步骤
+  'pwa.installGuide.steps.desktop.step1.title': '查看地址栏',
+  'pwa.installGuide.steps.desktop.step1.description': '在浏览器地址栏右侧查找安装图标',
+  'pwa.installGuide.steps.desktop.step1.imageDesc': '安装图标',
+  'pwa.installGuide.steps.desktop.step2.title': '点击安装按钮',
+  'pwa.installGuide.steps.desktop.step2.description': '点击安装图标，浏览器会显示安装提示',
+  'pwa.installGuide.steps.desktop.step2.imageDesc': '点击安装',
+  'pwa.installGuide.steps.desktop.step3.title': '确认安装',
+  'pwa.installGuide.steps.desktop.step3.description':
+    '在弹出的对话框中点击"安装"，应用将添加到桌面',
+  'pwa.installGuide.steps.desktop.step3.imageDesc': '确认安装',
 };
