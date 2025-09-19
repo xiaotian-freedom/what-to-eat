@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-if="visible"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-  >
+  <div v-if="visible" class="fixed inset-0 z-50 flex items-center justify-center bg-black/5">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-[90%] max-h-[80vh] overflow-hidden">
       <!-- 头部 -->
       <div class="bg-gradient-to-r from-green-500 to-blue-600 p-4 text-white">
@@ -132,7 +129,7 @@
 
   const { t } = useI18n();
 
-  const props = defineProps({
+  defineProps({
     visible: {
       type: Boolean,
       default: false,

@@ -13,6 +13,7 @@
       <!-- 右侧菜单按钮 -->
       <template #rightContent>
         <button
+          ref="menuButtonRef"
           @click.stop="toggleMenu"
           class="p-1.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-0"
           :style="{
@@ -86,6 +87,7 @@
           <!-- 底部按钮区域 - 固定在底部 -->
           <div class="mt-auto pt-6 w-full">
             <ActionButtons
+              ref="actionButtonsRef"
               :disabled="isAnimating || !canUseToday"
               :showMainButtons="true"
               @randomFood="handleRandomFood"
@@ -109,6 +111,7 @@
           <!-- 底部按钮区域 - 固定在底部 -->
           <div class="mt-auto pt-6 w-full">
             <ActionButtons
+              ref="actionButtonsRef"
               :disabled="isAnimating || !canUseToday"
               :showMainButtons="true"
               @randomFood="handleRandomFood"
@@ -119,6 +122,14 @@
         </div>
       </div>
     </div>
+
+    <!-- 首次使用引导 -->
+    <FirstUseGuide
+      :showGuide="showFirstUseGuide"
+      :targetElements="targetElements"
+      @complete="handleFirstUseComplete"
+      @skip="handleFirstUseSkip"
+    />
   </div>
 </template>
 
@@ -140,7 +151,9 @@
   import { useDevModeStore } from '@/stores/devMode';
   import { useWheelModeStore } from '@/stores/wheelMode';
   import { useThemeStore } from '@/stores/theme';
+  import { useUserPreferenceStore } from '@/stores/userPreference';
   import { showFailToast } from 'vant';
+  import FirstUseGuide from './FirstUseGuide.vue';
 
   const { t } = useI18n();
   const router = useRouter();
@@ -155,6 +168,7 @@
   const devModeStore = useDevModeStore();
   const wheelModeStore = useWheelModeStore();
   const themeStore = useThemeStore();
+  const userPreferenceStore = useUserPreferenceStore();
 
   // 优先使用 store 中的数据，如果为空才使用 dishList
   const combinedDishList = computed(() => {
@@ -185,16 +199,36 @@
   const canvasContainer = ref<HTMLDivElement | null>(null);
   const recommendedDish = ref<Food | null>(null);
 
+  // 首次使用引导相关
+  const showFirstUseGuide = ref(false);
+  const actionButtonsRef = ref<InstanceType<typeof ActionButtons> | null>(null);
+  const menuButtonRef = ref<HTMLButtonElement | null>(null);
+
   const canUseToday = computed(() => challengeStore.canUseToday);
 
   // 页面加载时确保数据已经加载
   onMounted(() => {
     challengeStore.loadChallengeData();
     wheelModeStore.loadModeSettings();
+    userPreferenceStore.loadUserPreference();
+
+    // 检查是否需要显示首次使用引导
+    if (userPreferenceStore.isFirstTimeUser) {
+      // 延迟显示引导，确保页面完全加载
+      setTimeout(() => {
+        showFirstUseGuide.value = true;
+      }, 1000);
+    }
   });
 
   // 处理随机选菜
   const handleRandomFood = async () => {
+    // 如果是首次使用，先关闭引导
+    if (showFirstUseGuide.value) {
+      userPreferenceStore.markFirstUseGuideAsSeen();
+      showFirstUseGuide.value = false;
+    }
+
     if (!canUseToday.value) {
       // 开发模式下显示不同的提示
       if (devModeStore.isUnlimitedUsesEnabled) {
@@ -359,6 +393,25 @@
     // 显示结果页面
     emit('show-result');
   };
+
+  // 处理首次使用引导
+  const handleFirstUseComplete = () => {
+    userPreferenceStore.markFirstUseGuideAsSeen();
+    showFirstUseGuide.value = false;
+  };
+
+  const handleFirstUseSkip = () => {
+    userPreferenceStore.markFirstUseGuideAsSeen();
+    showFirstUseGuide.value = false;
+  };
+
+  // 计算目标元素
+  const targetElements = computed(() => ({
+    addButton: actionButtonsRef.value?.addButtonRef,
+    randomButton: actionButtonsRef.value?.randomButtonRef,
+    listButton: actionButtonsRef.value?.listButtonRef,
+    menuButton: menuButtonRef.value,
+  }));
 
   // 将方法暴露给父组件
   defineExpose({

@@ -44,6 +44,23 @@ export default {
   'guide.step3.subtitle1': 'Everything is ready, start your food journey!',
   'guide.step3.subtitle2': 'Click start to enjoy the fun of random food selection',
 
+  // First use guide
+  'firstUse.title': 'Welcome!',
+  'firstUse.description': 'Click the random button below to start your food journey',
+  'firstUse.start': 'Start Experience',
+  'firstUse.clickHere': 'Click Here',
+
+  // Bubble guide
+  'bubbleGuide.step1.title': 'Add Dishes',
+  'bubbleGuide.step1.description': 'Click here to add your favorite dishes to the list',
+  'bubbleGuide.step2.title': 'Random Selection',
+  'bubbleGuide.step2.description': 'Click this button to start random food selection',
+  'bubbleGuide.step3.title': 'View List',
+  'bubbleGuide.step3.description': 'Click here to view and manage your dish list',
+  'bubbleGuide.step4.title': 'More Features',
+  'bubbleGuide.step4.description': 'Click the menu button to access more features',
+  'bubbleGuide.gotIt': 'Got it',
+
   // Form related
   'form.dishName': 'Dish Name',
   'form.dishNamePlaceholder': 'Please enter dish name',

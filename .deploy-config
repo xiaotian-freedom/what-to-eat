@@ -1,4 +1,4 @@
 # What To Eat 部署配置
 SERVER="root@47.122.112.197"
-REMOTE_PATH="/opt/what-to-eat"
+REMOTE_PATH="/opt/1panel/www/sites/eatwhat.top/index"
 LOCAL_PATH="."

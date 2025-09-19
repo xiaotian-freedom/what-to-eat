@@ -3,6 +3,7 @@
     <template v-if="showMainButtons">
       <div class="flex justify-between items-center mt-4">
         <button
+          ref="addButtonRef"
           @click="$emit('addFood')"
           class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center transform transition ripple-btn theme-transition"
           :style="{
@@ -16,6 +17,7 @@
 
         <!-- 主随机按钮 -->
         <button
+          ref="randomButtonRef"
           class="w-20 h-20 rounded-full text-white font-bold text-lg shadow-lg transform transition flex items-center justify-center ripple-btn theme-transition"
           :class="{ 'opacity-50': disabled }"
           :disabled="disabled"
@@ -29,6 +31,7 @@
         </button>
 
         <button
+          ref="listButtonRef"
           @click="$emit('showFoodList')"
           class="w-16 h-16 rounded-full backdrop-filter backdrop-blur-2xl shadow-lg flex items-center justify-center transform transition ripple-btn theme-transition"
           :style="{
@@ -92,6 +95,7 @@
 </template>
 
 <script setup lang="ts">
+  import { ref } from 'vue';
   import shuffle from '@/assets/icons/shuffle.svg';
   import plus from '@/assets/icons/plus.svg';
   import list from '@/assets/icons/list.svg';
@@ -112,4 +116,16 @@
     (e: 'shareResult'): void;
     (e: 'viewRecipe'): void;
   }>();
+
+  // 所有按钮的ref
+  const addButtonRef = ref<HTMLButtonElement | null>(null);
+  const randomButtonRef = ref<HTMLButtonElement | null>(null);
+  const listButtonRef = ref<HTMLButtonElement | null>(null);
+
+  // 暴露ref给父组件
+  defineExpose({
+    addButtonRef,
+    randomButtonRef,
+    listButtonRef,
+  });
 </script>

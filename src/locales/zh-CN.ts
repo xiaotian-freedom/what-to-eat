@@ -46,6 +46,23 @@ export default {
   'guide.step3.subtitle1': '一切就绪，开始你的美食之旅吧！',
   'guide.step3.subtitle2': '点击开始，享受随机选菜的乐趣',
 
+  // 首次使用引导
+  'firstUse.title': '欢迎使用！',
+  'firstUse.description': '点击下方的随机按钮开始你的美食之旅',
+  'firstUse.start': '开始体验',
+  'firstUse.clickHere': '点击这里',
+
+  // 气泡引导
+  'bubbleGuide.step1.title': '添加菜品',
+  'bubbleGuide.step1.description': '点击这里可以添加你喜欢的菜品到列表中',
+  'bubbleGuide.step2.title': '随机选菜',
+  'bubbleGuide.step2.description': '点击这个按钮开始随机选择菜品',
+  'bubbleGuide.step3.title': '查看列表',
+  'bubbleGuide.step3.description': '点击这里可以查看和管理你的菜品列表',
+  'bubbleGuide.step4.title': '更多功能',
+  'bubbleGuide.step4.description': '点击菜单按钮可以访问更多功能',
+  'bubbleGuide.gotIt': '知道了',
+
   // 表单相关
   'form.dishName': '菜品名称',
   'form.dishNamePlaceholder': '请输入菜品名称',

@@ -32,11 +32,16 @@ export const useUserPreferenceStore = defineStore('userPreference', () => {
   const choiceHistory = ref<UserChoiceHistory[]>([]);
   const maxHistorySize = 200; // 最多保存200条历史记录
 
+  // 首次使用状态
+  const isFirstTimeUser = ref(true);
+  const hasSeenFirstUseGuide = ref(false);
+
   // 从localStorage加载用户偏好数据
   const loadUserPreference = () => {
     try {
       const storedPreference = localStorage.getItem('userPreference');
       const storedHistory = localStorage.getItem('userChoiceHistory');
+      const storedFirstUse = localStorage.getItem('hasSeenFirstUseGuide');
 
       if (storedPreference) {
         const parsed = JSON.parse(storedPreference);
@@ -54,6 +59,12 @@ export const useUserPreferenceStore = defineStore('userPreference', () => {
           selectedAt: new Date(item.selectedAt),
         }));
       }
+
+      // 加载首次使用状态
+      if (storedFirstUse) {
+        hasSeenFirstUseGuide.value = JSON.parse(storedFirstUse);
+        isFirstTimeUser.value = !hasSeenFirstUseGuide.value;
+      }
     } catch (error) {
       console.error('加载用户偏好数据失败:', error);
     }
@@ -65,6 +76,7 @@ export const useUserPreferenceStore = defineStore('userPreference', () => {
       userPreference.value.lastUpdated = new Date();
       localStorage.setItem('userPreference', JSON.stringify(userPreference.value));
       localStorage.setItem('userChoiceHistory', JSON.stringify(choiceHistory.value));
+      localStorage.setItem('hasSeenFirstUseGuide', JSON.stringify(hasSeenFirstUseGuide.value));
     } catch (error) {
       console.error('保存用户偏好数据失败:', error);
     }
@@ -467,10 +479,26 @@ export const useUserPreferenceStore = defineStore('userPreference', () => {
     saveUserPreference();
   };
 
+  // 标记已看过首次使用引导
+  const markFirstUseGuideAsSeen = () => {
+    hasSeenFirstUseGuide.value = true;
+    isFirstTimeUser.value = false;
+    saveUserPreference();
+  };
+
+  // 重置首次使用状态（用于测试）
+  const resetFirstUseState = () => {
+    hasSeenFirstUseGuide.value = false;
+    isFirstTimeUser.value = true;
+    localStorage.removeItem('hasSeenFirstUseGuide');
+  };
+
   return {
     // 状态
     userPreference,
     choiceHistory,
+    isFirstTimeUser,
+    hasSeenFirstUseGuide,
 
     // 计算属性
     hasPreferenceData,
@@ -487,5 +515,7 @@ export const useUserPreferenceStore = defineStore('userPreference', () => {
     analyzePreferenceTrends,
     updatePreferenceSettings,
     clearHistory,
+    markFirstUseGuideAsSeen,
+    resetFirstUseState,
   };
 });
