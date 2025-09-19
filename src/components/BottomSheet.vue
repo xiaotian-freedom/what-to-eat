@@ -37,13 +37,13 @@
           <div class="w-8 h-8" v-if="showCloseButton && title"></div>
 
           <!-- 标题 -->
-          <h3
+          <h2
             v-if="title"
             class="text-lg font-semibold text-center theme-transition"
             :style="{ color: titleColor || 'var(--color-text)' }"
           >
             {{ title }}
-          </h3>
+          </h2>
 
           <!-- 关闭按钮 -->
           <button

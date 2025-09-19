@@ -17,7 +17,7 @@
     >
       <!-- 选中结果展示 -->
       <div
-        class="w-[180px] h-[180px] rounded-full bg-white backdrop-filter backdrop-blur-lg shadow-xl flex flex-col items-center justify-center"
+        class="w-[160px] h-[160px] rounded-full bg-white backdrop-filter backdrop-blur-lg shadow-xl flex flex-col items-center justify-center"
       >
         <div class="w-full h-full rounded-full overflow-hidden shadow-lg relative">
           <!-- 有图片时显示图片 -->

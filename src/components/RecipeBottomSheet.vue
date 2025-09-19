@@ -8,11 +8,19 @@
     <div class="space-y-4">
       <!-- 标题区域 -->
       <div class="text-center">
-        <h2 class="text-2xl font-bold mb-2 recipe-title">{{ dishName }} 做法</h2>
+        <h2 class="text-2xl font-bold mb-2 recipe-title">
+          {{ t('recipe.detail.title', { dishName }) }}
+        </h2>
         <div class="flex items-center justify-center space-x-2 text-sm recipe-subtitle">
-          <span class="px-2 py-1 rounded-full recipe-tag-primary">🍳 详细步骤</span>
-          <span class="px-2 py-1 rounded-full recipe-tag-secondary">⏱️ {{ estimatedTime }}</span>
-          <span class="px-2 py-1 rounded-full recipe-tag-accent">👨‍🍳 {{ difficulty }}</span>
+          <span class="px-2 py-1 rounded-full recipe-tag-primary">{{
+            t('recipe.detail.detailedSteps')
+          }}</span>
+          <span class="px-2 py-1 rounded-full recipe-tag-secondary">{{
+            t('recipe.detail.estimatedTime', { time: estimatedTime })
+          }}</span>
+          <span class="px-2 py-1 rounded-full recipe-tag-accent">{{
+            t('recipe.detail.difficulty', { difficulty })
+          }}</span>
         </div>
       </div>
 
@@ -20,14 +28,16 @@
       <div v-if="streamingLoading" class="flex flex-col items-center justify-center py-5 space-y-4">
         <div class="flex items-center space-x-2">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 recipe-loading-spinner"></div>
-          <span class="recipe-loading-text">🤖 AI 正在为您生成详细做法...</span>
+          <span class="recipe-loading-text">{{ t('recipe.detail.aiGenerating') }}</span>
         </div>
 
         <!-- 生成状态指示 - 移到顶部 -->
         <div class="w-full">
           <div class="rounded-lg p-4 shadow-sm recipe-status-card">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-sm recipe-status-label">生成状态</span>
+              <span class="text-sm recipe-status-label">{{
+                t('recipe.detail.generationStatus')
+              }}</span>
               <span class="text-xs recipe-status-text">{{ getGenerationStatus() }}</span>
             </div>
             <div class="w-full recipe-progress-bg rounded-full h-2">
@@ -44,7 +54,7 @@
           <!-- 菜品介绍 -->
           <div class="rounded-xl p-4 shadow-sm recipe-content-card">
             <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
-              <span class="mr-2">📖</span> 菜品介绍
+              <span class="mr-2">📖</span> {{ t('recipe.content.introduction') }}
             </h3>
             <div v-if="partialRecipe?.introduction" class="recipe-content-text leading-relaxed">
               {{ partialRecipe.introduction }}
@@ -59,7 +69,7 @@
           <!-- 食材清单 -->
           <div class="rounded-xl p-4 shadow-sm recipe-content-card">
             <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
-              <span class="mr-2">🥬</span> 食材清单
+              <span class="mr-2">🥬</span> {{ t('recipe.content.ingredients') }}
             </h3>
             <div
               v-if="partialRecipe?.ingredients && partialRecipe.ingredients.length > 0"
@@ -101,7 +111,7 @@
           <!-- 制作步骤 -->
           <div class="rounded-xl p-4 shadow-sm recipe-content-card">
             <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
-              <span class="mr-2">👨‍🍳</span> 制作步骤
+              <span class="mr-2">👨‍🍳</span> {{ t('recipe.content.steps') }}
             </h3>
             <div v-if="partialRecipe?.steps && partialRecipe.steps.length > 0" class="space-y-4">
               <div v-for="(step, index) in partialRecipe.steps" :key="index" class="flex space-x-3">
@@ -113,10 +123,12 @@
                 <div class="flex-1">
                   <p class="recipe-step-description leading-relaxed">{{ step.description }}</p>
                   <div v-if="step.tips" class="mt-2 p-2 rounded-lg recipe-step-tips">
-                    <p class="text-sm recipe-step-tips-text">💡 小贴士：{{ step.tips }}</p>
+                    <p class="text-sm recipe-step-tips-text">
+                      {{ t('recipe.content.tip', { tip: step.tips }) }}
+                    </p>
                   </div>
                   <div v-if="step.time" class="mt-1 text-xs recipe-step-time">
-                    ⏱️ 预计时间：{{ step.time }}
+                    {{ t('recipe.content.estimatedTime', { time: step.time }) }}
                   </div>
                 </div>
               </div>
@@ -146,7 +158,7 @@
           <!-- 烹饪小贴士 -->
           <div class="rounded-xl p-4 shadow-sm recipe-content-card">
             <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
-              <span class="mr-2">💡</span> 烹饪小贴士
+              <span class="mr-2">💡</span> {{ t('recipe.content.tips') }}
             </h3>
             <div v-if="partialRecipe?.tips && partialRecipe.tips.length > 0" class="space-y-2">
               <div
@@ -173,7 +185,7 @@
           <!-- 营养价值 -->
           <div class="rounded-xl p-4 shadow-sm recipe-content-card">
             <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
-              <span class="mr-2">🥗</span> 营养价值
+              <span class="mr-2">🥗</span> {{ t('recipe.content.nutrition') }}
             </h3>
             <div
               v-if="partialRecipe?.nutrition"
@@ -193,7 +205,7 @@
       <!-- 传统加载状态 -->
       <div v-else-if="loading" class="flex flex-col items-center justify-center py-12 space-y-4">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 recipe-loading-spinner"></div>
-        <p class="recipe-loading-text">🤖 AI 正在为您生成详细做法...</p>
+        <p class="recipe-loading-text">{{ t('recipe.detail.aiGenerating') }}</p>
       </div>
 
       <!-- 错误状态 -->
@@ -204,7 +216,7 @@
           @click="$emit('retry')"
           class="px-4 py-2 text-white rounded-lg transition-colors recipe-retry-button"
         >
-          重新获取
+          {{ t('recipe.detail.retry') }}
         </button>
       </div>
 
@@ -213,7 +225,7 @@
         <!-- 菜品介绍 -->
         <div v-if="recipe.introduction" class="rounded-xl p-4 shadow-sm recipe-content-card">
           <h3 class="text-lg font-semibold mb-2 flex items-center recipe-content-title">
-            <span class="mr-2">📖</span> 菜品介绍
+            <span class="mr-2">📖</span> {{ t('recipe.content.introduction') }}
           </h3>
           <p class="recipe-content-text leading-relaxed">{{ recipe.introduction }}</p>
         </div>
@@ -224,7 +236,7 @@
           class="rounded-xl p-4 shadow-sm recipe-content-card"
         >
           <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
-            <span class="mr-2">🥬</span> 食材清单
+            <span class="mr-2">🥬</span> {{ t('recipe.content.ingredients') }}
           </h3>
           <div class="grid grid-cols-1 gap-2">
             <div
@@ -246,7 +258,7 @@
           class="rounded-xl p-4 shadow-sm recipe-content-card"
         >
           <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
-            <span class="mr-2">👨‍🍳</span> 制作步骤
+            <span class="mr-2">👨‍🍳</span> {{ t('recipe.content.steps') }}
           </h3>
           <div class="space-y-4">
             <div v-for="(step, index) in recipe.steps" :key="index" class="flex space-x-3">
@@ -258,10 +270,12 @@
               <div class="flex-1">
                 <p class="recipe-step-description leading-relaxed">{{ step.description }}</p>
                 <div v-if="step.tips" class="mt-2 p-2 rounded-lg recipe-step-tips">
-                  <p class="text-sm recipe-step-tips-text">💡 小贴士：{{ step.tips }}</p>
+                  <p class="text-sm recipe-step-tips-text">
+                    {{ t('recipe.content.tip', { tip: step.tips }) }}
+                  </p>
                 </div>
                 <div v-if="step.time" class="mt-1 text-xs recipe-step-time">
-                  ⏱️ 预计时间：{{ step.time }}
+                  {{ t('recipe.content.estimatedTime', { time: step.time }) }}
                 </div>
               </div>
             </div>
@@ -274,7 +288,7 @@
           class="rounded-xl p-4 shadow-sm recipe-content-card"
         >
           <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
-            <span class="mr-2">💡</span> 烹饪小贴士
+            <span class="mr-2">💡</span> {{ t('recipe.content.tips') }}
           </h3>
           <div class="space-y-2">
             <div
@@ -291,7 +305,7 @@
         <!-- 营养价值 -->
         <div v-if="recipe.nutrition" class="rounded-xl p-4 shadow-sm recipe-content-card">
           <h3 class="text-lg font-semibold mb-3 flex items-center recipe-content-title">
-            <span class="mr-2">🥗</span> 营养价值
+            <span class="mr-2">🥗</span> {{ t('recipe.content.nutrition') }}
           </h3>
           <p class="text-sm leading-relaxed recipe-content-text">{{ recipe.nutrition }}</p>
         </div>
@@ -304,14 +318,14 @@
           class="flex-1 py-3 text-white rounded-xl font-medium transition-all duration-200 flex items-center justify-center space-x-2 recipe-share-button"
         >
           <span>📤</span>
-          <span>分享做法</span>
+          <span>{{ t('recipe.detail.shareRecipe') }}</span>
         </button>
         <button
           @click="saveRecipe"
           class="flex-1 py-3 text-white rounded-xl font-medium transition-all duration-200 flex items-center justify-center space-x-2 recipe-save-button"
         >
           <span>💖</span>
-          <span>收藏做法</span>
+          <span>{{ t('recipe.detail.saveRecipe') }}</span>
         </button>
       </div>
     </div>
@@ -320,6 +334,7 @@
 
 <script setup lang="ts">
   import { computed } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import BottomSheet from './BottomSheet.vue';
   import { showSuccessToast } from 'vant';
   import { useFavoriteStore } from '@/stores/favorite';
@@ -364,6 +379,7 @@
     (e: 'retry'): void;
   }>();
 
+  const { t } = useI18n();
   const favoriteStore = useFavoriteStore();
 
   // 计算预计时间
@@ -381,34 +397,37 @@
     if (!props.recipe) return;
 
     // 构建分享文本
-    let shareText = `🍳 ${props.dishName} 的做法\n\n`;
+    let content = '';
 
     if (props.recipe.introduction) {
-      shareText += `📖 介绍：${props.recipe.introduction}\n\n`;
+      content += `${t('recipe.share.introduction', { intro: props.recipe.introduction })}\n\n`;
     }
 
     if (props.recipe.ingredients && props.recipe.ingredients.length > 0) {
-      shareText += `🥬 食材：\n`;
+      content += `${t('recipe.share.ingredients')}\n`;
       props.recipe.ingredients.forEach(ingredient => {
-        shareText += `• ${ingredient.name} ${ingredient.amount}\n`;
+        content += `• ${ingredient.name} ${ingredient.amount}\n`;
       });
-      shareText += '\n';
+      content += '\n';
     }
 
     if (props.recipe.steps && props.recipe.steps.length > 0) {
-      shareText += `👨‍🍳 步骤：\n`;
+      content += `${t('recipe.share.steps')}\n`;
       props.recipe.steps.forEach((step, index) => {
-        shareText += `${index + 1}. ${step.description}\n`;
+        content += `${index + 1}. ${step.description}\n`;
       });
     }
 
-    shareText += '\n✨ 来自"今天吃什么"应用';
+    const shareText = t('recipe.detail.shareText', {
+      dishName: props.dishName,
+      content,
+    });
 
     // 使用 Web Share API 或复制到剪贴板
     if (navigator.share) {
       navigator
         .share({
-          title: `${props.dishName} 的做法`,
+          title: t('recipe.detail.title', { dishName: props.dishName }),
           text: shareText,
         })
         .catch(console.error);
@@ -417,11 +436,11 @@
       navigator.clipboard
         .writeText(shareText)
         .then(() => {
-          showSuccessToast('做法已复制到剪贴板');
+          showSuccessToast(t('recipe.detail.recipeCopied'));
         })
         .catch(() => {
           console.log('分享内容：', shareText);
-          showSuccessToast('做法内容已准备好分享');
+          showSuccessToast(t('recipe.detail.recipeReady'));
         });
     }
   };
@@ -442,9 +461,9 @@
     // 添加到收藏
     const success = favoriteStore.addFavorite(food);
     if (success) {
-      showSuccessToast('做法已收藏');
+      showSuccessToast(t('recipe.detail.recipeSaved'));
     } else {
-      showSuccessToast('已经收藏过了');
+      showSuccessToast(t('recipe.detail.alreadySaved'));
     }
   };
 
@@ -462,20 +481,20 @@
 
       // 根据完成情况返回当前状态
       if (!hasIntro) {
-        return '生成介绍中...';
+        return t('recipe.detail.generatingIntro');
       } else if (!hasIngredients) {
-        return '生成食材清单中...';
+        return t('recipe.detail.generatingIngredients');
       } else if (!hasSteps) {
-        return '生成制作步骤中...';
+        return t('recipe.detail.generatingSteps');
       } else if (!hasTips) {
-        return '生成烹饪小贴士中...';
+        return t('recipe.detail.generatingTips');
       } else if (!hasNutrition) {
-        return '生成营养价值中...';
+        return t('recipe.detail.generatingNutrition');
       } else {
-        return '即将完成...';
+        return t('recipe.detail.almostDone');
       }
     }
-    return '准备中...';
+    return t('recipe.detail.preparing');
   };
 
   // 获取进度条宽度

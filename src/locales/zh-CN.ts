@@ -114,6 +114,54 @@ export default {
   'messages.modeChanged': '模式切换成功',
   'messages.languageChanged': '语言切换成功',
 
+  // 菜品做法相关
+  'recipe.title': '菜品做法',
+  'recipe.searchTitle': '查找菜品做法',
+  'recipe.searchPlaceholder': '请输入菜品名称',
+  'recipe.searchButton': '查看做法',
+  'recipe.searchTip': '输入任意菜品名称，AI将为您生成详细做法',
+  'recipe.popularDishes': '热门菜品',
+  'recipe.recentSearches': '最近搜索',
+  'recipe.clearHistory': '清除历史',
+  'recipe.noRecentSearches': '暂无搜索历史',
+
+  // 菜谱详情页面
+  'recipe.detail.title': '{dishName} 做法',
+  'recipe.detail.detailedSteps': '🍳 详细步骤',
+  'recipe.detail.estimatedTime': '⏱️ {time}',
+  'recipe.detail.difficulty': '👨‍🍳 {difficulty}',
+  'recipe.detail.aiGenerating': '🤖 AI 正在为您生成详细做法...',
+  'recipe.detail.generationStatus': '生成状态',
+  'recipe.detail.generatingIntro': '生成介绍中...',
+  'recipe.detail.generatingIngredients': '生成食材清单中...',
+  'recipe.detail.generatingSteps': '生成制作步骤中...',
+  'recipe.detail.generatingTips': '生成烹饪小贴士中...',
+  'recipe.detail.generatingNutrition': '生成营养价值中...',
+  'recipe.detail.almostDone': '即将完成...',
+  'recipe.detail.preparing': '准备中...',
+  'recipe.detail.retry': '重新获取',
+  'recipe.detail.shareRecipe': '分享做法',
+  'recipe.detail.saveRecipe': '收藏做法',
+  'recipe.detail.recipeSaved': '做法已收藏',
+  'recipe.detail.alreadySaved': '已经收藏过了',
+  'recipe.detail.recipeCopied': '做法已复制到剪贴板',
+  'recipe.detail.recipeReady': '做法内容已准备好分享',
+  'recipe.detail.shareText': '🍳 {dishName} 的做法\n\n{content}\n\n✨ 来自"今天吃什么"应用',
+
+  // 菜谱内容部分
+  'recipe.content.introduction': '📖 菜品介绍',
+  'recipe.content.ingredients': '🥬 食材清单',
+  'recipe.content.steps': '👨‍🍳 制作步骤',
+  'recipe.content.tips': '💡 烹饪小贴士',
+  'recipe.content.nutrition': '🥗 营养价值',
+  'recipe.content.tip': '💡 小贴士：{tip}',
+  'recipe.content.estimatedTime': '⏱️ 预计时间：{time}',
+
+  // 分享内容
+  'recipe.share.introduction': '📖 介绍：{intro}',
+  'recipe.share.ingredients': '🥬 食材：',
+  'recipe.share.steps': '👨‍🍳 步骤：',
+
   // 成就系统
   'achievements.title': '成就',
   'achievements.system': '成就系统',
@@ -339,6 +387,7 @@ export default {
   'menu.smartRecommendation': '智能推荐',
   'menu.dailyChallenge': '每日挑战',
   'menu.achievements': '成就系统',
+  'menu.recipeSearch': '菜品做法',
   'menu.settings': '系统设置',
 
   // 转盘相关

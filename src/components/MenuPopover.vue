@@ -62,6 +62,20 @@
         <span class="text-sm font-medium">{{ $t('menu.achievements') }}</span>
       </button>
 
+      <!-- 菜品做法 -->
+      <button
+        @click.stop="handleMenuClick('recipe')"
+        class="w-full flex items-center px-4 py-3 text-left transition-all duration-150 ease-out focus:outline-none"
+        :style="{
+          color: 'var(--color-text)',
+        }"
+        @mouseenter="handleButtonHover"
+        @mouseleave="handleButtonLeave"
+      >
+        <span class="text-lg mr-3">🍳</span>
+        <span class="text-sm font-medium">{{ $t('menu.recipeSearch') }}</span>
+      </button>
+
       <!-- 分割线 -->
       <div class="h-px mx-2 my-1" :style="{ backgroundColor: 'var(--color-border)' }"></div>
 

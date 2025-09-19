@@ -66,6 +66,27 @@
         @recommendationsUpdated="onRecommendationsUpdated"
       />
 
+      <!-- 菜品做法搜索弹窗 -->
+      <RecipeSearchModal
+        :visible="showRecipeSearch"
+        @close="showRecipeSearch = false"
+        @search="handleRecipeSearch"
+      />
+
+      <!-- 菜品做法展示弹窗 -->
+      <RecipeBottomSheet
+        :visible="showRecipeSheet"
+        :dishName="currentRecipeDish"
+        :recipe="recipeData"
+        :loading="recipeLoading"
+        :error="recipeError"
+        :streamingLoading="streamingLoading"
+        :streamingContent="streamingContent"
+        :partialRecipe="partialRecipe"
+        @close="closeRecipeSheet"
+        @retry="retryGetRecipe"
+      />
+
       <!-- 主内容区域 -->
       <div class="flex-1 flex flex-col items-center justify-center w-full p-6">
         <!-- 卡片模式 -->
@@ -134,7 +155,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, onMounted } from 'vue';
+  import { ref, computed, onMounted, onUnmounted } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
   import DishCanvas from './DishCanvas.vue';
@@ -142,6 +163,8 @@
   import AchievementBottomSheet from './AchievementBottomSheet.vue';
   import ChallengeBottomSheet from './ChallengeBottomSheet.vue';
   import RecommendationBottomSheet from './RecommendationBottomSheet.vue';
+  import RecipeSearchModal from './RecipeSearchModal.vue';
+  import RecipeBottomSheet from './RecipeBottomSheet.vue';
   import MenuPopover from './MenuPopover.vue';
   import LuckyWheel from './LuckyWheel.vue';
   import type { Food, RecommendationResult } from '@/types';
@@ -152,8 +175,9 @@
   import { useWheelModeStore } from '@/stores/wheelMode';
   import { useThemeStore } from '@/stores/theme';
   import { useUserPreferenceStore } from '@/stores/userPreference';
-  import { showFailToast } from 'vant';
+  import { showFailToast, closeToast } from 'vant';
   import FirstUseGuide from './FirstUseGuide.vue';
+  import { deepseekService } from '@/utils/deepseekService';
 
   const { t } = useI18n();
   const router = useRouter();
@@ -193,6 +217,7 @@
   const showAchievements = ref(false);
   const showChallenge = ref(false);
   const showRecommendation = ref(false);
+  const showRecipeSearch = ref(false);
   const showMenu = ref(false);
   const dishCanvasRef = ref<InstanceType<typeof DishCanvas> | null>(null);
   const luckyWheelRef = ref<InstanceType<typeof LuckyWheel> | null>(null);
@@ -202,6 +227,17 @@
   // 首次使用引导相关
   const showFirstUseGuide = ref(false);
   const actionButtonsRef = ref<InstanceType<typeof ActionButtons> | null>(null);
+
+  // 菜品做法相关状态
+  const showRecipeSheet = ref(false);
+  const currentRecipeDish = ref('');
+  const recipeData = ref<any>(null);
+  const recipeLoading = ref(false);
+  const recipeError = ref<string | null>(null);
+  const streamingLoading = ref(false);
+  const streamingContent = ref('');
+  const partialRecipe = ref<any>(null);
+  let currentAbortController: AbortController | null = null;
   const menuButtonRef = ref<HTMLButtonElement | null>(null);
 
   const canUseToday = computed(() => challengeStore.canUseToday);
@@ -363,6 +399,10 @@
         // 成就系统：显示成就面板
         showAchievements.value = true;
         break;
+      case 'recipe':
+        // 菜品做法：显示搜索弹窗
+        showRecipeSearch.value = true;
+        break;
       case 'settings':
         // 系统设置：跳转到设置页面
         router.push('/settings');
@@ -405,6 +445,112 @@
     showFirstUseGuide.value = false;
   };
 
+  // 处理菜品做法搜索
+  const handleRecipeSearch = async (dishName: string) => {
+    currentRecipeDish.value = dishName;
+
+    // 重置状态
+    recipeLoading.value = false;
+    streamingLoading.value = true;
+    recipeError.value = null;
+    streamingContent.value = '';
+    partialRecipe.value = null;
+    recipeData.value = null;
+
+    // 创建新的 AbortController
+    currentAbortController = new AbortController();
+
+    // 立即显示弹窗，开始流式加载
+    showRecipeSheet.value = true;
+
+    try {
+      // 尝试使用智能流式API
+      await deepseekService.getRecipeSmartStream(
+        dishName,
+        // onChunk: 处理每个数据块
+        (chunk: string) => {
+          streamingContent.value += chunk;
+        },
+        // onPartialRecipe: 处理部分菜谱
+        (partial: any) => {
+          partialRecipe.value = partial;
+        },
+        // onComplete: 处理完成
+        (recipe: any) => {
+          recipeData.value = recipe;
+          streamingLoading.value = false;
+          partialRecipe.value = null;
+          currentAbortController = null; // 清理控制器
+        },
+        // onError: 处理错误
+        (error: string) => {
+          console.error('智能流式获取失败，尝试传统方式:', error);
+          // 如果智能流式失败，降级到传统方式
+          fallbackToTraditionalMethod();
+        },
+        // 传入 AbortController
+        currentAbortController
+      );
+    } catch (error) {
+      console.error('智能流式API调用失败:', error);
+      // 如果智能流式API不可用，降级到传统方式
+      fallbackToTraditionalMethod();
+    }
+  };
+
+  // 降级到传统获取方式
+  const fallbackToTraditionalMethod = async () => {
+    streamingLoading.value = false;
+    recipeLoading.value = true;
+    recipeError.value = null;
+
+    // 确保弹窗显示（如果还没有显示的话）
+    if (!showRecipeSheet.value) {
+      showRecipeSheet.value = true;
+    }
+
+    try {
+      const recipe = await deepseekService.getRecipe(
+        currentRecipeDish.value,
+        currentAbortController || undefined
+      );
+      recipeData.value = recipe;
+      currentAbortController = null; // 清理控制器
+    } catch (error) {
+      console.error('获取做法失败:', error);
+      recipeError.value = error instanceof Error ? error.message : '获取做法失败，请稍后重试';
+      showFailToast(recipeError.value);
+    } finally {
+      recipeLoading.value = false;
+      closeToast();
+    }
+  };
+
+  // 重新获取做法
+  const retryGetRecipe = () => {
+    recipeData.value = null;
+    recipeError.value = null;
+    streamingContent.value = '';
+    partialRecipe.value = null;
+    handleRecipeSearch(currentRecipeDish.value);
+  };
+
+  // 关闭做法抽屉
+  const closeRecipeSheet = () => {
+    // 如果正在加载，取消 AI 请求
+    if (currentAbortController && (streamingLoading.value || recipeLoading.value)) {
+      console.log('用户关闭弹窗，取消正在进行的 AI 请求');
+      currentAbortController.abort();
+      currentAbortController = null;
+    }
+
+    // 重置加载状态
+    streamingLoading.value = false;
+    recipeLoading.value = false;
+
+    showRecipeSheet.value = false;
+  };
+
   // 计算目标元素
   const targetElements = computed(() => ({
     addButton: actionButtonsRef.value?.addButtonRef,
@@ -412,6 +558,15 @@
     listButton: actionButtonsRef.value?.listButtonRef,
     menuButton: menuButtonRef.value,
   }));
+
+  // 组件卸载时清理AI请求
+  onUnmounted(() => {
+    // 清理正在进行的 AI 请求
+    if (currentAbortController) {
+      currentAbortController.abort();
+      currentAbortController = null;
+    }
+  });
 
   // 将方法暴露给父组件
   defineExpose({

@@ -106,6 +106,54 @@ export default {
   'messages.modeChanged': 'Mode changed successfully',
   'messages.languageChanged': 'Language changed successfully',
 
+  // Recipe related
+  'recipe.title': 'Recipe Search',
+  'recipe.searchTitle': 'Find Recipe',
+  'recipe.searchPlaceholder': 'Enter dish name',
+  'recipe.searchButton': 'View Recipe',
+  'recipe.searchTip': 'Enter any dish name, AI will generate detailed recipe for you',
+  'recipe.popularDishes': 'Popular Dishes',
+  'recipe.recentSearches': 'Recent Searches',
+  'recipe.clearHistory': 'Clear History',
+  'recipe.noRecentSearches': 'No recent searches',
+
+  // Recipe detail page
+  'recipe.detail.title': '{dishName} Recipe',
+  'recipe.detail.detailedSteps': '🍳 Detailed Steps',
+  'recipe.detail.estimatedTime': '⏱️ {time}',
+  'recipe.detail.difficulty': '👨‍🍳 {difficulty}',
+  'recipe.detail.aiGenerating': '🤖 AI is generating detailed recipe for you...',
+  'recipe.detail.generationStatus': 'Generation Status',
+  'recipe.detail.generatingIntro': 'Generating introduction...',
+  'recipe.detail.generatingIngredients': 'Generating ingredients list...',
+  'recipe.detail.generatingSteps': 'Generating cooking steps...',
+  'recipe.detail.generatingTips': 'Generating cooking tips...',
+  'recipe.detail.generatingNutrition': 'Generating nutrition info...',
+  'recipe.detail.almostDone': 'Almost done...',
+  'recipe.detail.preparing': 'Preparing...',
+  'recipe.detail.retry': 'Retry',
+  'recipe.detail.shareRecipe': 'Share Recipe',
+  'recipe.detail.saveRecipe': 'Save Recipe',
+  'recipe.detail.recipeSaved': 'Recipe saved',
+  'recipe.detail.alreadySaved': 'Already saved',
+  'recipe.detail.recipeCopied': 'Recipe copied to clipboard',
+  'recipe.detail.recipeReady': 'Recipe content ready for sharing',
+  'recipe.detail.shareText': '🍳 {dishName} Recipe\n\n{content}\n\n✨ From "What to Eat Today" app',
+
+  // Recipe content sections
+  'recipe.content.introduction': '📖 Introduction',
+  'recipe.content.ingredients': '🥬 Ingredients',
+  'recipe.content.steps': '👨‍🍳 Cooking Steps',
+  'recipe.content.tips': '💡 Cooking Tips',
+  'recipe.content.nutrition': '🥗 Nutrition',
+  'recipe.content.tip': '💡 Tip: {tip}',
+  'recipe.content.estimatedTime': '⏱️ Estimated time: {time}',
+
+  // Share content
+  'recipe.share.introduction': '📖 Introduction: {intro}',
+  'recipe.share.ingredients': '🥬 Ingredients:',
+  'recipe.share.steps': '👨‍🍳 Steps:',
+
   // Achievement system
   'achievements.title': 'Achievements',
   'achievements.system': 'Achievement System',
@@ -323,6 +371,7 @@ export default {
   'menu.smartRecommendation': 'Smart Recommendation',
   'menu.dailyChallenge': 'Daily Challenge',
   'menu.achievements': 'Achievements',
+  'menu.recipeSearch': 'Recipe Search',
   'menu.settings': 'Settings',
 
   // Wheel related
