@@ -323,12 +323,39 @@ export class AuthService {
   }
 
   // Get current user info
-  static async getCurrentUser(): Promise<User | null> {
+  static async getCurrentUser(): Promise<{ success: boolean; data?: User; message?: string }> {
     try {
-      const response = await get<unknown>('/api/auth/users/me');
-      return response as User;
-    } catch (error) {
-      return null;
+      const response = await get<components['schemas']['ResponseModel_UserInfoResponse_']>(
+        '/api/auth/users/me'
+      );
+
+      if (response.code === 200 && response.data) {
+        return {
+          success: true,
+          data: response.data.user,
+        };
+      } else {
+        return {
+          success: false,
+          message: response.msg || '获取用户信息失败',
+        };
+      }
+    } catch (error: any) {
+      // 优先使用接口返回的错误信息
+      let errorMsg = '获取用户信息失败';
+
+      if (error.response?.data?.msg) {
+        errorMsg = error.response.data.msg;
+      } else if (error.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+
+      return {
+        success: false,
+        message: errorMsg,
+      };
     }
   }
 

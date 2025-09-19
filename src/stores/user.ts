@@ -410,27 +410,84 @@ export const useUserStore = defineStore('user', {
     },
 
     /**
+     * 获取并更新用户信息
+     */
+    async fetchAndUpdateUserInfo() {
+      if (!this.isLoggedIn) {
+        return false;
+      }
+
+      try {
+        const response = await AuthService.getCurrentUser();
+
+        if (response.success && response.data) {
+          const user = response.data;
+
+          // 更新用户信息，但保留token和isLoggedIn状态
+          this.setUserInfo({
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+            avatar_url: user.avatar_url,
+            language: user.language,
+            theme: user.theme,
+            selection_mode: user.selection_mode,
+            status: user.status,
+            last_login_at: user.last_login_at,
+            created_at: user.created_at,
+            updated_at: user.updated_at,
+            ai_daily_uses: user.ai_daily_uses,
+            ai_max_daily_uses: user.ai_max_daily_uses,
+            ai_last_reset_date: user.ai_last_reset_date,
+          });
+
+          return true;
+        } else {
+          console.error('获取用户信息失败:', response.message);
+          return false;
+        }
+      } catch (error) {
+        console.error('获取用户信息失败:', error);
+        return false;
+      }
+    },
+
+    /**
      * 初始化用户状态（应用启动时调用）
      */
     async initializeUserState() {
       const token = localStorage.getItem('userToken');
-      if (token && !this.isLoggedIn) {
+      if (token) {
         // 如果有token但用户状态未设置，尝试恢复用户状态
         try {
-          // 这里可以调用API获取用户信息，但为了简化，我们只设置基本状态
+          // 设置基本状态
           this.token = token;
           this.isLoggedIn = true;
+
+          // 获取最新的用户信息
+          const userInfoUpdated = await this.fetchAndUpdateUserInfo();
+
+          // 如果获取用户信息失败，清除本地数据
+          if (!userInfoUpdated) {
+            console.warn('获取用户信息失败，清除本地数据');
+            this.clearUserInfo();
+            return;
+          }
 
           // 加载AI使用次数信息
           await this.loadAIUsage();
         } catch (error) {
           console.error('初始化用户状态失败:', error);
-
           this.clearUserInfo();
         }
       } else if (token && this.isLoggedIn && !this.aiUsage) {
         // 如果用户已登录但AI使用次数信息未加载，则加载它
         await this.loadAIUsage();
+      } else if (token && this.isLoggedIn) {
+        // 如果用户已登录，也尝试获取最新的用户信息
+        await this.fetchAndUpdateUserInfo();
       }
     },
   },

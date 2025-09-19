@@ -32,7 +32,7 @@ export const useChallengeStore = defineStore('challenge', () => {
   // 挑战数据
   const challengeData = ref<ChallengeData>({
     dailyUses: 0,
-    maxDailyUses: 3,
+    maxDailyUses: 100,
     lastResetDate: '',
     luckyValue: 0,
     totalUses: 0,
@@ -102,6 +102,10 @@ export const useChallengeStore = defineStore('challenge', () => {
     if (devModeStore.isUnlimitedUsesEnabled) {
       return true;
     }
+    // 如果maxDailyUses为-1，则无限使用
+    if (challengeData.value.maxDailyUses === -1) {
+      return true;
+    }
     // 正常模式下检查使用次数
     return challengeData.value.dailyUses < challengeData.value.maxDailyUses;
   });
@@ -111,12 +115,20 @@ export const useChallengeStore = defineStore('challenge', () => {
     if (devModeStore.isUnlimitedUsesEnabled) {
       return Infinity;
     }
+    // 如果maxDailyUses为-1，则显示无限
+    if (challengeData.value.maxDailyUses === -1) {
+      return Infinity;
+    }
     return challengeData.value.maxDailyUses - challengeData.value.dailyUses;
   });
 
   const progressPercentage = computed(() => {
     // 开发模式下显示100%
     if (devModeStore.isUnlimitedUsesEnabled) {
+      return 100;
+    }
+    // 如果maxDailyUses为-1，则显示100%
+    if (challengeData.value.maxDailyUses === -1) {
       return 100;
     }
     return (challengeData.value.dailyUses / challengeData.value.maxDailyUses) * 100;
@@ -277,7 +289,7 @@ export const useChallengeStore = defineStore('challenge', () => {
   const resetChallengeData = (): void => {
     challengeData.value = {
       dailyUses: 0,
-      maxDailyUses: 3,
+      maxDailyUses: 100,
       lastResetDate: '',
       luckyValue: 0,
       totalUses: 0,

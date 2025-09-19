@@ -210,10 +210,7 @@
             </div>
 
             <!-- 登出按钮 -->
-            <div
-              v-if="userStore.isAuthenticated"
-              class="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl p-4 border border-red-100"
-            >
+            <div v-if="userStore.isAuthenticated" class="rounded-2xl p-4">
               <button
                 @click="showLogoutConfirm = true"
                 class="w-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-semibold py-3 px-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 flex items-center justify-center space-x-2"
