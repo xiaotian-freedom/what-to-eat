@@ -33,16 +33,29 @@
     :text-secondary-color="loadingState.textSecondaryColor"
     @close="closeLoading"
   />
+
+  <!-- 全局登录提示弹窗 -->
+  <LoginPromptModal
+    :visible="loginPromptState.showLoginPrompt.value"
+    @close="loginPromptState.hideLoginPromptModal"
+    @cancel="loginPromptState.handleLoginPromptCancel"
+    @login="loginPromptState.handleLoginPromptLogin"
+  />
 </template>
 
 <script setup lang="ts">
   import PWAUpdatePrompt from '@/components/PWAUpdatePrompt.vue';
   import PWAInstallPrompt from '@/components/PWAInstallPrompt.vue';
   import LoadingModal from '@/components/LoadingModal.vue';
+  import LoginPromptModal from '@/components/LoginPromptModal.vue';
   import { useLoading } from '@/composables/useLoading';
+  import { useLoginPrompt } from '@/composables/useLoginPrompt';
 
   // 使用全局 loading
   const { loadingState, close } = useLoading();
+
+  // 使用全局登录提示
+  const loginPromptState = useLoginPrompt();
 
   const closeLoading = () => {
     close();

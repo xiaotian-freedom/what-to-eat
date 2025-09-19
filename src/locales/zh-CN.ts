@@ -427,6 +427,12 @@ export default {
   'loading.failed': '加载失败',
   'loading.retry': '重试',
 
+  // 登录提示
+  'loginPrompt.title': '需要登录',
+  'loginPrompt.description': '此功能需要登录后才能使用，请先登录您的账户',
+  'loginPrompt.login': '立即登录',
+  'loginPrompt.recipeSearchLimit': '菜品做法搜索次数已用完，登录后可无限使用',
+
   // PWA 安装引导
   'pwa.installGuide.title': '安装到桌面',
   'pwa.installGuide.subtitle': '快速访问「今天吃什么」',

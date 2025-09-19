@@ -178,6 +178,8 @@
   import { showFailToast, closeToast } from 'vant';
   import FirstUseGuide from './FirstUseGuide.vue';
   import { deepseekService } from '@/utils/deepseekService';
+  import { useUserStore } from '@/stores/user';
+  import { useLoginPrompt } from '@/composables/useLoginPrompt';
 
   const { t } = useI18n();
   const router = useRouter();
@@ -193,6 +195,7 @@
   const wheelModeStore = useWheelModeStore();
   const themeStore = useThemeStore();
   const userPreferenceStore = useUserPreferenceStore();
+  const userStore = useUserStore();
 
   // 优先使用 store 中的数据，如果为空才使用 dishList
   const combinedDishList = computed(() => {
@@ -239,6 +242,57 @@
   const partialRecipe = ref<any>(null);
   let currentAbortController: AbortController | null = null;
   const menuButtonRef = ref<HTMLButtonElement | null>(null);
+
+  // 使用全局登录提示管理
+  const { showLoginPromptModal } = useLoginPrompt();
+
+  // 未登录用户菜品做法搜索次数限制
+  const RECIPE_SEARCH_STORAGE_KEY = 'recipeSearchTrialUsage';
+  const MAX_TRIAL_SEARCHES = 1; // 未登录用户最多搜索1次
+
+  // 获取未登录用户的搜索次数
+  const getTrialSearchCount = (): number => {
+    try {
+      const stored = localStorage.getItem(RECIPE_SEARCH_STORAGE_KEY);
+      if (stored) {
+        const data = JSON.parse(stored);
+        return data.searchCount || 0;
+      }
+    } catch (error) {
+      console.error('获取搜索次数失败:', error);
+    }
+    return 0;
+  };
+
+  // 增加未登录用户的搜索次数
+  const incrementTrialSearchCount = (): void => {
+    try {
+      const currentCount = getTrialSearchCount();
+      const newData = { searchCount: currentCount + 1 };
+      localStorage.setItem(RECIPE_SEARCH_STORAGE_KEY, JSON.stringify(newData));
+    } catch (error) {
+      console.error('保存搜索次数失败:', error);
+    }
+  };
+
+  // 检查未登录用户是否可以搜索菜品做法
+  const canSearchRecipe = computed(() => {
+    // 开发模式下无限使用
+    if (devModeStore.isUnlimitedUsesEnabled) {
+      return true;
+    }
+
+    const isLoggedIn = userStore.isLoggedIn;
+
+    if (isLoggedIn) {
+      // 已登录用户：无限使用
+      return true;
+    } else {
+      // 未登录用户：检查搜索次数限制
+      const searchCount = getTrialSearchCount();
+      return searchCount < MAX_TRIAL_SEARCHES;
+    }
+  });
 
   const canUseToday = computed(() => challengeStore.canUseToday);
 
@@ -500,7 +554,24 @@
 
   // 处理菜品做法搜索
   const handleRecipeSearch = async (dishName: string) => {
+    // 检查搜索权限
+    if (!canSearchRecipe.value) {
+      const isLoggedIn = userStore.isLoggedIn;
+      if (isLoggedIn) {
+        showFailToast(t('loginPrompt.recipeSearchLimit'));
+      } else {
+        // 未登录用户，显示登录提示弹窗
+        showLoginPromptModal();
+      }
+      return;
+    }
+
     currentRecipeDish.value = dishName;
+
+    // 如果是未登录用户，增加搜索次数
+    if (!userStore.isLoggedIn) {
+      incrementTrialSearchCount();
+    }
 
     // 重置状态
     recipeLoading.value = false;

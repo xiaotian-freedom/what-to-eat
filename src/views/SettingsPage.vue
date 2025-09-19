@@ -123,7 +123,7 @@
 
             <!-- 主题设置 -->
             <div
-              @click="showThemeSelector = true"
+              @click="handleThemeClick"
               class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 border border-purple-100 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-95"
             >
               <div class="flex items-center justify-between">
@@ -175,7 +175,7 @@
             </div>
 
             <!-- 我的收藏 -->
-            <div
+            <!-- <div
               @click="handleFavoriteClick"
               class="bg-gradient-to-r from-pink-50 to-red-50 rounded-2xl p-4 border border-pink-100 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-95"
             >
@@ -191,7 +191,7 @@
                   <span class="text-red-400 text-xl">›</span>
                 </div>
               </div>
-            </div>
+            </div> -->
 
             <!-- 关于我们 -->
             <div
@@ -317,7 +317,6 @@
 <script setup lang="ts">
   import { ref, onMounted, computed } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import { useRouter } from 'vue-router';
   import { showFailToast } from 'vant';
   import HeaderBar from '@/components/HeaderBar.vue';
   import ThemeSelectorBottomSheet from '@/components/ThemeSelectorBottomSheet.vue';
@@ -330,13 +329,13 @@
   import { useUserStore } from '@/stores/user';
   import { useFavoriteStore } from '@/stores/favorite';
   import { useLoading } from '@/composables/useLoading';
+  import { useLoginPrompt } from '@/composables/useLoginPrompt';
 
   const devModeStore = useDevModeStore();
   const themeStore = useThemeStore();
   const wheelModeStore = useWheelModeStore();
   const userStore = useUserStore();
   const favoriteStore = useFavoriteStore();
-  const router = useRouter();
   const { locale, t: $t } = useI18n();
   const { show: showLoading, hide: hideLoading } = useLoading();
 
@@ -360,9 +359,24 @@
   const showLogoutConfirm = ref(false);
   const isLoggingOut = ref(false);
 
+  // 使用全局登录提示管理
+  const { showLoginPromptModal } = useLoginPrompt();
+
   // 处理语言选择
   const handleLanguageSelect = () => {
     showLanguageSelector.value = false;
+  };
+
+  // 处理主题点击
+  const handleThemeClick = () => {
+    // 检查是否已登录
+    if (!userStore.isAuthenticated) {
+      showLoginPromptModal();
+      return;
+    }
+
+    // 已登录，显示主题选择器
+    showThemeSelector.value = true;
   };
 
   // 处理主题选择
@@ -414,17 +428,12 @@
     }
   };
 
-  // 跳转到登录页
-  const goToLogin = () => {
-    router.push('/login');
-  };
-
   // 处理收藏点击
-  const handleFavoriteClick = () => {
-    if (userStore.isAuthenticated) {
-      router.push('/favorite');
-    } else {
-      goToLogin();
-    }
-  };
+  // const handleFavoriteClick = () => {
+  //   if (userStore.isAuthenticated) {
+  //     router.push('/favorite');
+  //   } else {
+  //     goToLogin();
+  //   }
+  // };
 </script>

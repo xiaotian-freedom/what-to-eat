@@ -180,14 +180,6 @@
 
     let tailStyle = {};
 
-    // 计算尾巴应该指向的位置（相对于气泡）
-    const bubbleCenterX = bubbleLeft + 120; // 气泡宽度的一半
-    const bubbleCenterY = bubbleTop + 75; // 气泡高度的一半
-
-    // 计算目标按钮中心相对于气泡的位置（用于调试信息）
-    const relativeX = targetCenterX - bubbleCenterX;
-    const relativeY = targetCenterY - bubbleCenterY;
-
     // 计算尾巴在气泡边缘的精确位置，直接指向目标按钮中心
     // 计算目标按钮中心相对于气泡边缘的位置
     let tailXPercent, tailYPercent;
@@ -206,21 +198,6 @@
       const adjustedXPercent = rawXPercent + fineTuneOffset;
 
       tailXPercent = Math.max(15, Math.min(85, adjustedXPercent));
-
-      console.log('🎯 水平方向尾巴计算:', {
-        targetCenterX,
-        bubbleLeft,
-        bubbleWidth: 240,
-        adjustedTargetX,
-        rawXPercent: rawXPercent.toFixed(2),
-        tailWidth,
-        fineTuneOffset: fineTuneOffset.toFixed(2),
-        fineTuneReason: '尾巴偏右一个尾巴宽度，向左调整',
-        adjustedXPercent: adjustedXPercent.toFixed(2),
-        finalXPercent: tailXPercent.toFixed(2),
-        shouldPointTo: '目标按钮中心X位置',
-        note: '使用translateX(-50%)确保尾巴中心对准目标',
-      });
     } else {
       // 垂直方向的尾巴，需要计算Y位置
       const rawYPercent = ((targetCenterY - bubbleTop) / 150) * 100;
@@ -307,28 +284,6 @@
         break;
     }
 
-    // 调试信息
-    console.log('🔍 尾巴精确指向计算:', {
-      step: step,
-      position: step.position,
-      targetCenter: { x: targetCenterX, y: targetCenterY },
-      bubblePosition: { left: bubbleLeft, top: bubbleTop },
-      bubbleSize: { width: 240, height: 150 },
-      relativePosition: { x: relativeX, y: relativeY },
-      tailPercent: { x: tailXPercent, y: tailYPercent },
-      calculation: {
-        xFormula:
-          step.position === 'top' || step.position === 'bottom'
-            ? `((${targetCenterX} - ${bubbleLeft}) / 240) * 100 = ${tailXPercent}%`
-            : 'N/A',
-        yFormula:
-          step.position === 'left' || step.position === 'right'
-            ? `((${targetCenterY} - ${bubbleTop}) / 150) * 100 = ${tailYPercent}%`
-            : 'N/A',
-      },
-      tailStyle: tailStyle,
-    });
-
     return tailStyle;
   };
 
@@ -353,35 +308,8 @@
     const step = steps[currentStep.value];
     const targetElement = props.targetElements?.[step.target as keyof typeof props.targetElements];
     if (targetElement) {
-      const rect = targetElement.getBoundingClientRect();
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-
-      console.log(`🔍 气泡位置调试 - 步骤${currentStep.value + 1}:`, {
-        target: step.target,
-        position: step.position,
-        viewport: {
-          width: viewportWidth,
-          height: viewportHeight,
-        },
-        targetRect: {
-          left: rect.left,
-          top: rect.top,
-          right: rect.right,
-          bottom: rect.bottom,
-          width: rect.width,
-          height: rect.height,
-        },
-        calculatedPosition: {
-          left: position.left,
-          top: position.top,
-          transform: position.transform,
-        },
-        bubbleSize: {
-          width: 240,
-          height: 120,
-        },
-      });
 
       // 检查是否超出边界
       const bubbleLeft = parseInt(position.left as string) || 0;
@@ -395,20 +323,6 @@
       ) {
         console.warn('⚠️ 气泡可能超出屏幕边界！');
       }
-
-      // 尾巴位置调试信息
-      const tailPosition = calculateTailPosition();
-      console.log('🔍 气泡尾巴调试信息:', {
-        tailStyle: tailPosition,
-        targetCenter: {
-          x: rect.left + rect.width / 2,
-          y: rect.top + rect.height / 2,
-        },
-        bubbleCenter: {
-          x: bubbleLeft + 120,
-          y: bubbleTop + 75,
-        },
-      });
     }
   };
 
@@ -543,8 +457,6 @@
     } else if (!isPositionValid) {
       console.error('🚨 多次重试后位置仍然异常，使用紧急修复');
       emergencyFixPosition();
-    } else {
-      console.log('✅ 气泡位置验证通过');
     }
   };
 

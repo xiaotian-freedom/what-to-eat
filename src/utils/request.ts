@@ -28,7 +28,6 @@ request.interceptors.request.use(
 // 响应拦截器
 request.interceptors.response.use(
   response => {
-    console.log('response', response);
     if (response.data.code === 401) {
       const userStore = useUserStore();
       userStore.clearUserInfo();

@@ -412,6 +412,13 @@ export default {
   'loading.failed': 'Loading failed',
   'loading.retry': 'Retry',
 
+  // Login Prompt
+  'loginPrompt.title': 'Login Required',
+  'loginPrompt.description':
+    'This feature requires login to use, please login to your account first',
+  'loginPrompt.login': 'Login Now',
+  'loginPrompt.recipeSearchLimit': 'Recipe search limit reached. Login for unlimited access',
+
   // PWA Install Guide
   'pwa.installGuide.title': 'Install to Desktop',
   'pwa.installGuide.subtitle': 'Quick access to "What to Eat Today"',
