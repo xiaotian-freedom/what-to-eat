@@ -305,21 +305,34 @@
 
     // 检查是否需要显示首次使用引导
     if (userPreferenceStore.isFirstTimeUser) {
-      // 等待DOM完全渲染和所有数据加载完成
-      await waitForDOMReady();
+      // 等待更长时间确保所有组件和数据都完全加载
+      await waitForCompleteInitialization();
 
-      // 再次检查目标元素是否可用
-      if (isTargetElementsReady()) {
-        showFirstUseGuide.value = true;
-      } else {
-        // 如果目标元素还没准备好，继续等待
-        setTimeout(async () => {
-          await waitForTargetElements();
-          showFirstUseGuide.value = true;
-        }, 500);
-      }
+      // 显示引导
+      showFirstUseGuide.value = true;
     }
   });
+
+  // 等待完全初始化（更可靠的初始化方法）
+  const waitForCompleteInitialization = async (): Promise<void> => {
+    console.log('🎯 开始等待完全初始化...');
+
+    // 1. 等待DOM完全准备好
+    await waitForDOMReady();
+    console.log('✅ DOM已准备好');
+
+    // 2. 等待所有数据加载完成
+    await new Promise(resolve => setTimeout(resolve, 300));
+    console.log('✅ 数据加载等待完成');
+
+    // 3. 等待目标元素准备好
+    await waitForTargetElements();
+    console.log('✅ 目标元素已准备好');
+
+    // 4. 额外等待确保所有渲染完成
+    await new Promise(resolve => setTimeout(resolve, 200));
+    console.log('✅ 完全初始化完成');
+  };
 
   // 等待DOM完全准备好的辅助函数
   const waitForDOMReady = (): Promise<void> => {
@@ -342,19 +355,54 @@
   // 检查目标元素是否准备好
   const isTargetElementsReady = (): boolean => {
     const elements = targetElements.value;
-    return !!(
+    const isReady = !!(
       elements.addButton &&
       elements.randomButton &&
       elements.listButton &&
       elements.menuButton
     );
+
+    if (isReady) {
+      // 进一步检查元素是否有有效的尺寸
+      const addButton = elements.addButton as HTMLElement;
+      const randomButton = elements.randomButton as HTMLElement;
+      const listButton = elements.listButton as HTMLElement;
+      const menuButton = elements.menuButton as HTMLElement;
+
+      const addRect = addButton.getBoundingClientRect();
+      const randomRect = randomButton.getBoundingClientRect();
+      const listRect = listButton.getBoundingClientRect();
+      const menuRect = menuButton.getBoundingClientRect();
+
+      return !!(
+        addRect.width > 0 &&
+        addRect.height > 0 &&
+        randomRect.width > 0 &&
+        randomRect.height > 0 &&
+        listRect.width > 0 &&
+        listRect.height > 0 &&
+        menuRect.width > 0 &&
+        menuRect.height > 0
+      );
+    }
+
+    return false;
   };
 
   // 等待目标元素准备好
   const waitForTargetElements = (): Promise<void> => {
     return new Promise(resolve => {
+      let attempts = 0;
+      const maxAttempts = 20; // 最多等待2秒
+
       const checkElements = () => {
+        attempts++;
+
         if (isTargetElementsReady()) {
+          console.log(`✅ 目标元素在第${attempts}次检查时准备好`);
+          resolve();
+        } else if (attempts >= maxAttempts) {
+          console.warn('⚠️ 等待目标元素超时，强制继续');
           resolve();
         } else {
           setTimeout(checkElements, 100);

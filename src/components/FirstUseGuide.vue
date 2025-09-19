@@ -8,13 +8,13 @@
       <!-- 气泡内容 -->
       <div class="relative">
         <!-- 气泡主体 -->
-        <div class="bg-white rounded-2xl shadow-lg p-4 w-60 h-[150px] bubble-content">
+        <div class="bg-white rounded-2xl shadow-lg py-5 px-4 w-60 h-[150px] bubble-content">
           <!-- 引导文本 -->
           <div class="text-center">
             <h4 class="text-sm font-semibold text-gray-800 mb-1">
               {{ $t(`bubbleGuide.step${currentStep + 1}.title`) }}
             </h4>
-            <p class="text-xs text-gray-600 mb-3">
+            <p class="text-xs text-gray-600 my-4">
               {{ $t(`bubbleGuide.step${currentStep + 1}.description`) }}
             </p>
           </div>
@@ -110,7 +110,7 @@
       case 'bottom':
         // 气泡在按钮下方
         left = rect.left + rect.width / 2 - bubbleWidth / 2;
-        top = rect.bottom - bubbleHeight + 50;
+        top = rect.bottom - bubbleHeight + 60;
         break;
       case 'top':
         // 气泡在按钮上方
@@ -287,6 +287,43 @@
     return tailStyle;
   };
 
+  // 初始化引导位置（更可靠的初始化方法）
+  const initializeGuidePosition = async () => {
+    console.log('🎯 开始初始化引导位置...');
+
+    // 首先检查目标元素是否可用
+    const step = steps[currentStep.value];
+    const targetElement = props.targetElements?.[step.target as keyof typeof props.targetElements];
+
+    if (!targetElement) {
+      console.warn('⚠️ 目标元素不存在，等待元素准备...');
+      // 如果目标元素不存在，等待一段时间后重试
+      setTimeout(() => {
+        initializeGuidePosition();
+      }, 300);
+      return;
+    }
+
+    // 检查元素是否有有效的尺寸和位置
+    const rect = targetElement.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      console.warn('⚠️ 目标元素尺寸为0，等待元素渲染...');
+      setTimeout(() => {
+        initializeGuidePosition();
+      }, 200);
+      return;
+    }
+
+    console.log('✅ 目标元素已准备好，开始计算位置:', {
+      element: step.target,
+      rect: rect,
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+    });
+
+    // 元素准备好后，更新位置
+    await updateBubblePosition();
+  };
+
   // 更新气泡位置
   const updateBubblePosition = async () => {
     await nextTick();
@@ -366,10 +403,10 @@
 
   // 组件挂载时初始化位置
   onMounted(() => {
-    // 延迟初始化，确保父组件完全渲染
+    // 等待更长时间确保所有组件和数据都加载完成
     setTimeout(() => {
-      updateBubblePosition();
-    }, 200);
+      initializeGuidePosition();
+    }, 500);
 
     // 监听窗口大小变化，重新计算位置
     window.addEventListener('resize', handleWindowResize);
@@ -411,12 +448,23 @@
 
   // 验证位置是否正确，如果不正确则重试
   const validateAndRetryPosition = async (retryCount = 0) => {
-    const maxRetries = 3;
+    const maxRetries = 5; // 增加重试次数
     const step = steps[currentStep.value];
     const targetElement = props.targetElements?.[step.target as keyof typeof props.targetElements];
 
     if (!targetElement) {
       console.warn('⚠️ 目标元素不存在，跳过位置验证');
+      return;
+    }
+
+    // 重新获取目标元素的位置信息，确保是最新的
+    const rect = targetElement.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      console.warn('⚠️ 目标元素尺寸为0，等待元素渲染...');
+      if (retryCount < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        await validateAndRetryPosition(retryCount + 1);
+      }
       return;
     }
 
@@ -426,24 +474,24 @@
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
-    // 检查位置是否合理
+    // 检查位置是否合理（更宽松的边界检查）
+    const margin = 20; // 增加边距
     const isPositionValid =
-      bubbleLeft >= 0 &&
-      bubbleTop >= 0 &&
-      bubbleLeft + 240 <= viewportWidth &&
-      bubbleTop + 150 <= viewportHeight &&
-      bubbleLeft < viewportWidth &&
-      bubbleTop < viewportHeight;
+      bubbleLeft >= -margin &&
+      bubbleTop >= -margin &&
+      bubbleLeft + 240 <= viewportWidth + margin &&
+      bubbleTop + 150 <= viewportHeight + margin;
 
     if (!isPositionValid && retryCount < maxRetries) {
       console.warn(`⚠️ 气泡位置异常，第${retryCount + 1}次重试:`, {
         position: { left: bubbleLeft, top: bubbleTop },
         viewport: { width: viewportWidth, height: viewportHeight },
+        targetRect: rect,
         isValid: isPositionValid,
       });
 
-      // 等待一段时间后重试
-      await new Promise(resolve => setTimeout(resolve, 200 * (retryCount + 1)));
+      // 等待更长时间后重试
+      await new Promise(resolve => setTimeout(resolve, 300 * (retryCount + 1)));
 
       // 重新计算位置
       const newPosition = calculateBubblePosition();
@@ -457,6 +505,12 @@
     } else if (!isPositionValid) {
       console.error('🚨 多次重试后位置仍然异常，使用紧急修复');
       emergencyFixPosition();
+    } else {
+      console.log('✅ 气泡位置验证通过:', {
+        position: { left: bubbleLeft, top: bubbleTop },
+        viewport: { width: viewportWidth, height: viewportHeight },
+        targetRect: rect,
+      });
     }
   };
 
