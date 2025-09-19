@@ -1,4 +1,5 @@
 import { get, post } from './request';
+import { useUserStore } from '@/stores/user';
 
 // 定义AI使用次数相关类型
 interface AIUsageInfo {
@@ -25,6 +26,12 @@ export class AIUsageApi {
    * 获取当前用户的AI使用次数信息
    */
   static async getMyAIUsage(): Promise<AIUsageResponse> {
+    // 检查用户是否已登录
+    const userStore = useUserStore();
+    if (!userStore.isAuthenticated) {
+      throw new Error('用户未登录');
+    }
+
     try {
       const response = await get<ResponseModel>('/api/ai-usage/me');
       if (response.data) {
@@ -41,6 +48,12 @@ export class AIUsageApi {
    * 检查是否可以继续使用AI功能
    */
   static async checkAIUsage(): Promise<AIUsageResponse> {
+    // 检查用户是否已登录
+    const userStore = useUserStore();
+    if (!userStore.isLoggedIn) {
+      throw new Error('用户未登录');
+    }
+
     try {
       const response = await post<ResponseModel>('/api/ai-usage/check');
       if (response.data) {
@@ -57,6 +70,12 @@ export class AIUsageApi {
    * 使用AI功能（增加使用次数）
    */
   static async useAIFeature(): Promise<AIUsageResponse> {
+    // 检查用户是否已登录
+    const userStore = useUserStore();
+    if (!userStore.isLoggedIn) {
+      throw new Error('用户未登录');
+    }
+
     try {
       const response = await post<ResponseModel>('/api/ai-usage/use');
       if (response.data) {

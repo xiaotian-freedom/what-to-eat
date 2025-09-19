@@ -88,6 +88,12 @@ export const useUserStore = defineStore('user', {
       Object.assign(this, userInfo);
     },
 
+    // 清除用户所有信息
+    clearUserInfo() {
+      this.$reset();
+      localStorage.removeItem('userToken');
+    },
+
     // 登录
     async login(credentials: LoginCredentials): Promise<{ success: boolean; message?: string }> {
       try {
@@ -182,13 +188,7 @@ export const useUserStore = defineStore('user', {
 
         if (response.success) {
           // 清除用户信息
-          this.$reset();
-
-          // 清除本地存储的 token
-          localStorage.removeItem('userToken');
-
-          // 清除其他相关数据
-          this.clearUserData();
+          this.clearUserInfo();
 
           return {
             success: true,
@@ -204,24 +204,13 @@ export const useUserStore = defineStore('user', {
         console.error('退出登录失败:', error);
 
         // 即使API调用失败，也要清除本地数据
-        this.$reset();
-        localStorage.removeItem('userToken');
-        this.clearUserData();
+        this.clearUserInfo();
 
         return {
           success: false,
           message: '退出登录失败，但已清除本地数据',
         };
       }
-    },
-
-    // 清除用户相关数据
-    clearUserData() {
-      // 清除AI使用次数信息
-      this.aiUsage = undefined;
-
-      // 清除其他可能的用户相关数据
-      // 这里可以根据需要添加更多清理逻辑
     },
 
     // 更新用户信息
@@ -436,9 +425,8 @@ export const useUserStore = defineStore('user', {
           await this.loadAIUsage();
         } catch (error) {
           console.error('初始化用户状态失败:', error);
-          // 如果初始化失败，清除无效的token
-          localStorage.removeItem('userToken');
-          this.$reset();
+
+          this.clearUserInfo();
         }
       } else if (token && this.isLoggedIn && !this.aiUsage) {
         // 如果用户已登录但AI使用次数信息未加载，则加载它

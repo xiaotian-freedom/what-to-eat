@@ -1317,6 +1317,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Health Check
+         * @description 健康检查接口
+         */
+        get: operations["health_check_health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1981,6 +2001,125 @@ export interface components {
             /** @description 响应数据 */
             data?: components["schemas"]["AIUsageResponse"] | null;
         };
+        /** ResponseModel[AchievementList] */
+        ResponseModel_AchievementList_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["AchievementList"] | null;
+        };
+        /** ResponseModel[ChallengeStats] */
+        ResponseModel_ChallengeStats_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["ChallengeStats"] | null;
+        };
+        /** ResponseModel[ChallengeUseResponse] */
+        ResponseModel_ChallengeUseResponse_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["ChallengeUseResponse"] | null;
+        };
+        /** ResponseModel[ChoiceHistoryList] */
+        ResponseModel_ChoiceHistoryList_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["ChoiceHistoryList"] | null;
+        };
+        /** ResponseModel[ChoiceStats] */
+        ResponseModel_ChoiceStats_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["ChoiceStats"] | null;
+        };
+        /** ResponseModel[CuisineList] */
+        ResponseModel_CuisineList_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["CuisineList"] | null;
+        };
+        /** ResponseModel[Cuisine] */
+        ResponseModel_Cuisine_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["Cuisine"] | null;
+        };
         /** ResponseModel[DeletePreferenceResponse] */
         ResponseModel_DeletePreferenceResponse_: {
             /**
@@ -2048,6 +2187,74 @@ export interface components {
             msg: string;
             /** @description 响应数据 */
             data?: components["schemas"]["EmailVerificationResult"] | null;
+        };
+        /** ResponseModel[FoodCategoryList] */
+        ResponseModel_FoodCategoryList_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["FoodCategoryList"] | null;
+        };
+        /** ResponseModel[FoodCategory] */
+        ResponseModel_FoodCategory_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["FoodCategory"] | null;
+        };
+        /** ResponseModel[FoodList] */
+        ResponseModel_FoodList_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["FoodList"] | null;
+        };
+        /** ResponseModel[Food] */
+        ResponseModel_Food_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["Food"] | null;
         };
         /** ResponseModel[List[Food]] */
         ResponseModel_List_Food__: {
@@ -2157,6 +2364,23 @@ export interface components {
             /** @description 响应数据 */
             data?: components["schemas"]["ResetPasswordResponse"] | null;
         };
+        /** ResponseModel[SessionList] */
+        ResponseModel_SessionList_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["SessionList"] | null;
+        };
         /** ResponseModel[TokenResponse] */
         ResponseModel_TokenResponse_: {
             /**
@@ -2173,6 +2397,91 @@ export interface components {
             msg: string;
             /** @description 响应数据 */
             data?: components["schemas"]["TokenResponse"] | null;
+        };
+        /** ResponseModel[UserAchievement] */
+        ResponseModel_UserAchievement_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["UserAchievement"] | null;
+        };
+        /** ResponseModel[UserChallenge] */
+        ResponseModel_UserChallenge_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["UserChallenge"] | null;
+        };
+        /** ResponseModel[UserChoiceHistory] */
+        ResponseModel_UserChoiceHistory_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["UserChoiceHistory"] | null;
+        };
+        /** ResponseModel[UserFavoriteList] */
+        ResponseModel_UserFavoriteList_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["UserFavoriteList"] | null;
+        };
+        /** ResponseModel[UserFavorite] */
+        ResponseModel_UserFavorite_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["UserFavorite"] | null;
         };
         /** ResponseModel[UserInfoResponse] */
         ResponseModel_UserInfoResponse_: {
@@ -2207,6 +2516,60 @@ export interface components {
             msg: string;
             /** @description 响应数据 */
             data?: components["schemas"]["UserPreference"] | null;
+        };
+        /** ResponseModel[UserSession] */
+        ResponseModel_UserSession_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["UserSession"] | null;
+        };
+        /** ResponseModel[VerificationCodeResponse] */
+        ResponseModel_VerificationCodeResponse_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["VerificationCodeResponse"] | null;
+        };
+        /** ResponseModel[dict] */
+        ResponseModel_dict_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /**
+             * Data
+             * @description 响应数据
+             */
+            data?: Record<string, never> | null;
         };
         /**
          * SelectionMode
@@ -3124,7 +3487,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["VerificationCodeResponse"];
+                    "application/json": components["schemas"]["ResponseModel_VerificationCodeResponse_"];
                 };
             };
             /** @description Validation Error */
@@ -3157,7 +3520,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
             /** @description Validation Error */
@@ -3188,7 +3551,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
             /** @description Validation Error */
@@ -3314,7 +3677,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
         };
@@ -3442,7 +3805,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserPreference"];
+                    "application/json": components["schemas"]["ResponseModel_UserPreference_"];
                 };
             };
             /** @description Validation Error */
@@ -3476,7 +3839,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserFavoriteList"];
+                    "application/json": components["schemas"]["ResponseModel_UserFavoriteList_"];
                 };
             };
             /** @description Validation Error */
@@ -3509,7 +3872,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserFavorite"];
+                    "application/json": components["schemas"]["ResponseModel_UserFavorite_"];
                 };
             };
             /** @description Validation Error */
@@ -3540,7 +3903,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserFavorite"];
+                    "application/json": components["schemas"]["ResponseModel_UserFavorite_"];
                 };
             };
             /** @description Validation Error */
@@ -3575,7 +3938,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserFavorite"];
+                    "application/json": components["schemas"]["ResponseModel_UserFavorite_"];
                 };
             };
             /** @description Validation Error */
@@ -3606,7 +3969,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
             /** @description Validation Error */
@@ -3637,7 +4000,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
             /** @description Validation Error */
@@ -3673,7 +4036,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_UserFavoriteList_"];
                 };
             };
             /** @description Validation Error */
@@ -3709,7 +4072,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserFavoriteList"];
+                    "application/json": components["schemas"]["ResponseModel_UserFavoriteList_"];
                 };
             };
             /** @description Validation Error */
@@ -3738,7 +4101,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ChallengeStats"];
+                    "application/json": components["schemas"]["ResponseModel_ChallengeStats_"];
                 };
             };
         };
@@ -3762,7 +4125,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ChallengeUseResponse"];
+                    "application/json": components["schemas"]["ResponseModel_ChallengeUseResponse_"];
                 };
             };
             /** @description Validation Error */
@@ -3791,7 +4154,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
         };
@@ -3811,7 +4174,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
         };
@@ -3835,7 +4198,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserChallenge"];
+                    "application/json": components["schemas"]["ResponseModel_UserChallenge_"];
                 };
             };
             /** @description Validation Error */
@@ -3864,7 +4227,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
         };
@@ -3886,7 +4249,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserChallenge"];
+                    "application/json": components["schemas"]["ResponseModel_UserChallenge_"];
                 };
             };
             /** @description Validation Error */
@@ -3920,7 +4283,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AchievementList"];
+                    "application/json": components["schemas"]["ResponseModel_AchievementList_"];
                 };
             };
             /** @description Validation Error */
@@ -3953,7 +4316,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserAchievement"];
+                    "application/json": components["schemas"]["ResponseModel_UserAchievement_"];
                 };
             };
             /** @description Validation Error */
@@ -3984,7 +4347,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserAchievement"];
+                    "application/json": components["schemas"]["ResponseModel_UserAchievement_"];
                 };
             };
             /** @description Validation Error */
@@ -4019,7 +4382,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserAchievement"];
+                    "application/json": components["schemas"]["ResponseModel_UserAchievement_"];
                 };
             };
             /** @description Validation Error */
@@ -4054,7 +4417,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserAchievement"];
+                    "application/json": components["schemas"]["ResponseModel_UserAchievement_"];
                 };
             };
             /** @description Validation Error */
@@ -4085,7 +4448,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserAchievement"];
+                    "application/json": components["schemas"]["ResponseModel_UserAchievement_"];
                 };
             };
             /** @description Validation Error */
@@ -4114,7 +4477,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
         };
@@ -4141,7 +4504,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AchievementList"];
+                    "application/json": components["schemas"]["ResponseModel_AchievementList_"];
                 };
             };
             /** @description Validation Error */
@@ -4175,7 +4538,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ChoiceHistoryList"];
+                    "application/json": components["schemas"]["ResponseModel_ChoiceHistoryList_"];
                 };
             };
             /** @description Validation Error */
@@ -4208,7 +4571,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserChoiceHistory"];
+                    "application/json": components["schemas"]["ResponseModel_UserChoiceHistory_"];
                 };
             };
             /** @description Validation Error */
@@ -4239,7 +4602,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserChoiceHistory"];
+                    "application/json": components["schemas"]["ResponseModel_UserChoiceHistory_"];
                 };
             };
             /** @description Validation Error */
@@ -4274,7 +4637,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserChoiceHistory"];
+                    "application/json": components["schemas"]["ResponseModel_UserChoiceHistory_"];
                 };
             };
             /** @description Validation Error */
@@ -4303,7 +4666,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ChoiceStats"];
+                    "application/json": components["schemas"]["ResponseModel_ChoiceStats_"];
                 };
             };
         };
@@ -4330,7 +4693,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_ChoiceHistoryList_"];
                 };
             };
             /** @description Validation Error */
@@ -4362,7 +4725,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
             /** @description Validation Error */
@@ -4398,7 +4761,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ChoiceHistoryList"];
+                    "application/json": components["schemas"]["ResponseModel_ChoiceHistoryList_"];
                 };
             };
             /** @description Validation Error */
@@ -4432,7 +4795,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SessionList"];
+                    "application/json": components["schemas"]["ResponseModel_SessionList_"];
                 };
             };
             /** @description Validation Error */
@@ -4465,7 +4828,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserSession"];
+                    "application/json": components["schemas"]["ResponseModel_UserSession_"];
                 };
             };
             /** @description Validation Error */
@@ -4494,7 +4857,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
         };
@@ -4516,7 +4879,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserSession"];
+                    "application/json": components["schemas"]["ResponseModel_UserSession_"];
                 };
             };
             /** @description Validation Error */
@@ -4547,7 +4910,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
             /** @description Validation Error */
@@ -4576,7 +4939,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
         };
@@ -4596,7 +4959,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
         };
@@ -4623,7 +4986,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SessionList"];
+                    "application/json": components["schemas"]["ResponseModel_SessionList_"];
                 };
             };
             /** @description Validation Error */
@@ -4654,7 +5017,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
             /** @description Validation Error */
@@ -4686,7 +5049,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["FoodCategoryList"];
+                    "application/json": components["schemas"]["ResponseModel_FoodCategoryList_"];
                 };
             };
             /** @description Validation Error */
@@ -4719,7 +5082,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["FoodCategory"];
+                    "application/json": components["schemas"]["ResponseModel_FoodCategory_"];
                 };
             };
             /** @description Validation Error */
@@ -4754,7 +5117,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["FoodCategory"];
+                    "application/json": components["schemas"]["ResponseModel_FoodCategory_"];
                 };
             };
             /** @description Validation Error */
@@ -4786,7 +5149,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CuisineList"];
+                    "application/json": components["schemas"]["ResponseModel_CuisineList_"];
                 };
             };
             /** @description Validation Error */
@@ -4819,7 +5182,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Cuisine"];
+                    "application/json": components["schemas"]["ResponseModel_Cuisine_"];
                 };
             };
             /** @description Validation Error */
@@ -4854,7 +5217,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Cuisine"];
+                    "application/json": components["schemas"]["ResponseModel_Cuisine_"];
                 };
             };
             /** @description Validation Error */
@@ -4902,7 +5265,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["FoodList"];
+                    "application/json": components["schemas"]["ResponseModel_FoodList_"];
                 };
             };
             /** @description Validation Error */
@@ -4935,7 +5298,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Food"];
+                    "application/json": components["schemas"]["ResponseModel_Food_"];
                 };
             };
             /** @description Validation Error */
@@ -4966,7 +5329,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Food"];
+                    "application/json": components["schemas"]["ResponseModel_Food_"];
                 };
             };
             /** @description Validation Error */
@@ -5001,7 +5364,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Food"];
+                    "application/json": components["schemas"]["ResponseModel_Food_"];
                 };
             };
             /** @description Validation Error */
@@ -5032,7 +5395,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
                 };
             };
             /** @description Validation Error */
@@ -5367,6 +5730,26 @@ export interface operations {
         };
     };
     read_root__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    health_check_health_get: {
         parameters: {
             query?: never;
             header?: never;
