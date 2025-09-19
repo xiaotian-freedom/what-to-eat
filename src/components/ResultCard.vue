@@ -13,11 +13,11 @@
 
     <!-- 内容区域 -->
     <div
-      class="h-full flex flex-col items-center p-6 relative bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50"
+      class="h-full overflow-y-auto flex flex-col items-center p-6 relative bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50"
     >
       <!-- 选中结果展示 -->
       <div
-        class="w-[160px] h-[160px] rounded-full bg-white backdrop-filter backdrop-blur-lg shadow-xl flex flex-col items-center justify-center"
+        class="w-[160px] h-[160px] rounded-full bg-white backdrop-filter backdrop-blur-lg shadow-xl flex flex-col items-center justify-center flex-shrink-0"
       >
         <div class="w-full h-full rounded-full overflow-hidden shadow-lg relative">
           <!-- 有图片时显示图片 -->
@@ -65,83 +65,87 @@
         </div>
       </div>
 
-      <!-- 菜品介绍区域 -->
-      <div v-if="selectedDish && selectedDish.description" class="w-full max-w-sm mt-6 px-4">
+      <!-- 菜品介绍区域 - 使用flex-1和min-h-0确保正确的滚动行为 -->
+      <div class="w-full flex-1 min-h-0 flex flex-col">
         <div
-          class="backdrop-filter backdrop-blur-lg rounded-2xl p-4 shadow-lg max-h-36 overflow-y-auto overscroll-contain theme-transition"
-          :style="{
-            backgroundColor: 'var(--color-surface)',
-            opacity: 0.8,
-            boxShadow: '0 10px 15px -3px var(--color-shadow)',
-          }"
-          style="-webkit-overflow-scrolling: touch; scrollbar-width: thin"
+          v-if="selectedDish && selectedDish.description"
+          class="w-full max-w-sm mt-6 px-4 max-h-36 flex flex-col"
         >
-          <!-- 菜品详细信息 -->
-          <div class="space-y-3">
-            <!-- 描述信息 -->
-            <div v-if="selectedDish.description" class="text-center">
-              <p class="text-sm leading-relaxed" :style="{ color: 'var(--color-textSecondary)' }">
-                {{ selectedDish.description }}
-              </p>
-            </div>
+          <div
+            class="backdrop-filter backdrop-blur-lg rounded-2xl p-4 shadow-lg flex-1 min-h-0 overflow-y-auto overscroll-contain theme-transition"
+            :style="{
+              backgroundColor: 'var(--color-surface)',
+              opacity: 0.8,
+              boxShadow: '0 10px 15px -3px var(--color-shadow)',
+            }"
+            style="-webkit-overflow-scrolling: touch; scrollbar-width: thin"
+          >
+            <!-- 菜品详细信息 -->
+            <div class="space-y-3">
+              <!-- 描述信息 -->
+              <div v-if="selectedDish.description" class="text-center">
+                <p class="text-sm leading-relaxed" :style="{ color: 'var(--color-textSecondary)' }">
+                  {{ selectedDish.description }}
+                </p>
+              </div>
 
-            <!-- 标签展示 -->
-            <div
-              v-if="selectedDish.tags && selectedDish.tags.length > 0"
-              class="flex flex-wrap justify-center gap-2"
-            >
-              <span
-                v-for="tag in selectedDish.tags"
-                :key="tag"
-                class="px-2 py-1 text-xs rounded-full theme-transition"
-                :style="{
-                  background: getTransparentGradient(),
-                  color: 'var(--color-primary)',
-                }"
+              <!-- 标签展示 -->
+              <div
+                v-if="selectedDish.tags && selectedDish.tags.length > 0"
+                class="flex flex-wrap justify-center gap-2"
               >
-                {{ tag }}
-              </span>
-            </div>
+                <span
+                  v-for="tag in selectedDish.tags"
+                  :key="tag"
+                  class="px-2 py-1 text-xs rounded-full theme-transition"
+                  :style="{
+                    background: getTransparentGradient(),
+                    color: 'var(--color-primary)',
+                  }"
+                >
+                  {{ tag }}
+                </span>
+              </div>
 
-            <!-- 特色标识 -->
-            <div class="flex justify-center space-x-2">
-              <span
-                v-if="selectedDish.isComfortFood"
-                class="text-xs px-2 py-1 rounded-full theme-transition"
-                :style="{
-                  background: getTransparentColor('accent', 0.15),
-                  color: 'var(--color-accent)',
-                }"
-              >
-                🫂 安慰食物
-              </span>
-              <span
-                v-if="selectedDish.isPopular"
-                class="text-xs px-2 py-1 rounded-full theme-transition"
-                :style="{
-                  background: getTransparentColor('primary', 0.15),
-                  color: '#dc2626',
-                }"
-              >
-                🔥 热门菜品
-              </span>
-              <span
-                v-if="selectedDish.nutrition?.isHealthy"
-                class="text-xs px-2 py-1 rounded-full theme-transition"
-                :style="{
-                  background: getTransparentColor('primary', 0.15),
-                  color: '#059669',
-                }"
-              >
-                🥗 健康推荐
-              </span>
+              <!-- 特色标识 -->
+              <div class="flex justify-center space-x-2">
+                <span
+                  v-if="selectedDish.isComfortFood"
+                  class="text-xs px-2 py-1 rounded-full theme-transition"
+                  :style="{
+                    background: getTransparentColor('accent', 0.15),
+                    color: 'var(--color-accent)',
+                  }"
+                >
+                  🫂 安慰食物
+                </span>
+                <span
+                  v-if="selectedDish.isPopular"
+                  class="text-xs px-2 py-1 rounded-full theme-transition"
+                  :style="{
+                    background: getTransparentColor('primary', 0.15),
+                    color: '#dc2626',
+                  }"
+                >
+                  🔥 热门菜品
+                </span>
+                <span
+                  v-if="selectedDish.nutrition?.isHealthy"
+                  class="text-xs px-2 py-1 rounded-full theme-transition"
+                  :style="{
+                    background: getTransparentColor('primary', 0.15),
+                    color: '#059669',
+                  }"
+                >
+                  🥗 健康推荐
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
       <!-- 底部按钮区域 -->
-      <div class="mt-auto pt-6 w-full">
+      <div class="flex-shrink-0 pt-6 w-full">
         <ActionButtons
           :disabled="false"
           :showMainButtons="false"
