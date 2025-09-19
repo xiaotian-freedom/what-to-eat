@@ -193,6 +193,23 @@
               </div>
             </div> -->
 
+            <!-- 问题反馈 -->
+            <div
+              @click="handleFeedbackClick"
+              class="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl p-4 border border-orange-100 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-95"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <h3 class="text-lg font-semibold text-gray-800">{{ $t('settings.feedback') }}</h3>
+                  <p class="text-sm text-gray-600 mt-1">{{ $t('settings.feedbackDesc') }}</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-2xl">💬</span>
+                  <span class="text-orange-400 text-xl">›</span>
+                </div>
+              </div>
+            </div>
+
             <!-- 关于我们 -->
             <div
               @click="showAboutModal = true"
@@ -426,6 +443,17 @@
     } finally {
       isLoggingOut.value = false;
     }
+  };
+
+  // 处理反馈点击
+  const handleFeedbackClick = () => {
+    // 检查是否已登录
+    if (!userStore.isAuthenticated) {
+      showLoginPromptModal();
+      return;
+    }
+    // 跳转到反馈页面
+    window.location.href = '/feedback';
   };
 
   // 处理收藏点击

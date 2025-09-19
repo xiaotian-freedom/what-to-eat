@@ -153,6 +153,7 @@
 
   interface Emits {
     (e: 'close'): void;
+    (e: 'select', language: string): void;
   }
 
   defineProps<Props>();
@@ -174,6 +175,7 @@
     localStorage.setItem('locale', selectedLanguage.value);
 
     showSuccessToast(t('messages.languageChanged'));
+    emit('select', selectedLanguage.value);
     emit('close');
   };
 </script>

@@ -135,6 +135,7 @@
 
   const emit = defineEmits<{
     (e: 'close'): void;
+    (e: 'select', ...args: any[]): void;
   }>();
 
   const handleBackdropClick = () => {

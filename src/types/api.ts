@@ -1300,6 +1300,122 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get My Feedbacks
+         * @description 获取我的反馈列表
+         */
+        get: operations["get_my_feedbacks_api_feedback_get"];
+        put?: never;
+        /**
+         * Create Feedback
+         * @description 创建用户反馈
+         */
+        post: operations["create_feedback_api_feedback_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/feedback/{feedback_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Feedback
+         * @description 获取单个反馈详情
+         */
+        get: operations["get_feedback_api_feedback__feedback_id__get"];
+        /**
+         * Update Feedback
+         * @description 更新我的反馈（仅限待处理状态）
+         */
+        put: operations["update_feedback_api_feedback__feedback_id__put"];
+        post?: never;
+        /**
+         * Delete Feedback
+         * @description 删除我的反馈（仅限待处理状态）
+         */
+        delete: operations["delete_feedback_api_feedback__feedback_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get All Feedbacks Admin
+         * @description 获取所有反馈列表（管理员）
+         */
+        get: operations["get_all_feedbacks_admin_api_admin_feedback_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/feedback/{feedback_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Feedback Admin
+         * @description 获取反馈详情（管理员）
+         */
+        get: operations["get_feedback_admin_api_admin_feedback__feedback_id__get"];
+        /**
+         * Update Feedback Admin
+         * @description 更新反馈（管理员）
+         */
+        put: operations["update_feedback_admin_api_admin_feedback__feedback_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/feedback/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Feedback Stats Admin
+         * @description 获取反馈统计信息（管理员）
+         */
+        get: operations["get_feedback_stats_admin_api_admin_feedback_stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/": {
         parameters: {
             query?: never;
@@ -1385,6 +1501,16 @@ export interface components {
         AchievementProgress: {
             /** Progress */
             progress: number;
+        };
+        /**
+         * AdminFeedbackUpdate
+         * @description 管理员更新反馈模型
+         */
+        AdminFeedbackUpdate: {
+            status?: components["schemas"]["FeedbackStatus"] | null;
+            priority?: components["schemas"]["FeedbackPriority"] | null;
+            /** Admin Notes */
+            admin_notes?: string | null;
         };
         /** Body_login_for_access_token_form_api_auth_token_post */
         Body_login_for_access_token_form_api_auth_token_post: {
@@ -1573,6 +1699,110 @@ export interface components {
         };
         /** EmailVerificationResult */
         EmailVerificationResult: {
+            /** Message */
+            message: string;
+        };
+        /**
+         * FeedbackCreateResponse
+         * @description 创建反馈响应模型
+         */
+        FeedbackCreateResponse: {
+            feedback: components["schemas"]["UserFeedback"];
+            /** Message */
+            message: string;
+        };
+        /**
+         * FeedbackListResponse
+         * @description 反馈列表响应模型
+         */
+        FeedbackListResponse: {
+            /** Feedbacks */
+            feedbacks: components["schemas"]["UserFeedback"][];
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total Pages */
+            total_pages: number;
+        };
+        /**
+         * FeedbackPriority
+         * @description 反馈优先级枚举
+         * @enum {string}
+         */
+        FeedbackPriority: "low" | "medium" | "high" | "urgent";
+        /**
+         * FeedbackStats
+         * @description 反馈统计信息
+         */
+        FeedbackStats: {
+            /**
+             * Total
+             * @default 0
+             */
+            total: number;
+            /**
+             * Pending
+             * @default 0
+             */
+            pending: number;
+            /**
+             * In Progress
+             * @default 0
+             */
+            in_progress: number;
+            /**
+             * Resolved
+             * @default 0
+             */
+            resolved: number;
+            /**
+             * Closed
+             * @default 0
+             */
+            closed: number;
+            /**
+             * By Type
+             * @default {}
+             */
+            by_type: {
+                [key: string]: number;
+            };
+            /**
+             * By Priority
+             * @default {}
+             */
+            by_priority: {
+                [key: string]: number;
+            };
+        };
+        /**
+         * FeedbackStatsResponse
+         * @description 反馈统计响应模型
+         */
+        FeedbackStatsResponse: {
+            stats: components["schemas"]["FeedbackStats"];
+        };
+        /**
+         * FeedbackStatus
+         * @description 反馈状态枚举
+         * @enum {string}
+         */
+        FeedbackStatus: "pending" | "in_progress" | "resolved" | "closed";
+        /**
+         * FeedbackType
+         * @description 反馈类型枚举
+         * @enum {string}
+         */
+        FeedbackType: "suggestion" | "bug_report" | "experience" | "other";
+        /**
+         * FeedbackUpdateResponse
+         * @description 更新反馈响应模型
+         */
+        FeedbackUpdateResponse: {
+            feedback: components["schemas"]["UserFeedback"];
             /** Message */
             message: string;
         };
@@ -1963,6 +2193,12 @@ export interface components {
             message: string;
         };
         /**
+         * Platform
+         * @description 平台枚举
+         * @enum {string}
+         */
+        Platform: "web" | "ios" | "android" | "unknown";
+        /**
          * PostMealFeeling
          * @enum {string}
          */
@@ -2187,6 +2423,74 @@ export interface components {
             msg: string;
             /** @description 响应数据 */
             data?: components["schemas"]["EmailVerificationResult"] | null;
+        };
+        /** ResponseModel[FeedbackCreateResponse] */
+        ResponseModel_FeedbackCreateResponse_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["FeedbackCreateResponse"] | null;
+        };
+        /** ResponseModel[FeedbackListResponse] */
+        ResponseModel_FeedbackListResponse_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["FeedbackListResponse"] | null;
+        };
+        /** ResponseModel[FeedbackStatsResponse] */
+        ResponseModel_FeedbackStatsResponse_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["FeedbackStatsResponse"] | null;
+        };
+        /** ResponseModel[FeedbackUpdateResponse] */
+        ResponseModel_FeedbackUpdateResponse_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["FeedbackUpdateResponse"] | null;
         };
         /** ResponseModel[FoodCategoryList] */
         ResponseModel_FoodCategoryList_: {
@@ -2482,6 +2786,40 @@ export interface components {
             msg: string;
             /** @description 响应数据 */
             data?: components["schemas"]["UserFavorite"] | null;
+        };
+        /** ResponseModel[UserFeedbackWithUser] */
+        ResponseModel_UserFeedbackWithUser_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["UserFeedbackWithUser"] | null;
+        };
+        /** ResponseModel[UserFeedback] */
+        ResponseModel_UserFeedback_: {
+            /**
+             * Code
+             * @description 状态码
+             * @default 200
+             */
+            code: number;
+            /**
+             * Msg
+             * @description 响应消息
+             * @default success
+             */
+            msg: string;
+            /** @description 响应数据 */
+            data?: components["schemas"]["UserFeedback"] | null;
         };
         /** ResponseModel[UserInfoResponse] */
         ResponseModel_UserInfoResponse_: {
@@ -2963,6 +3301,132 @@ export interface components {
             background_color?: string | null;
             /** Note */
             note?: string | null;
+        };
+        /**
+         * UserFeedback
+         * @description 用户反馈响应模型
+         */
+        UserFeedback: {
+            /** Title */
+            title: string;
+            /** Content */
+            content: string;
+            /** @default suggestion */
+            feedback_type: components["schemas"]["FeedbackType"];
+            /** @default medium */
+            priority: components["schemas"]["FeedbackPriority"];
+            /** Contact Email */
+            contact_email?: string | null;
+            /** Contact Phone */
+            contact_phone?: string | null;
+            /** Device Info */
+            device_info?: string | null;
+            /** App Version */
+            app_version?: string | null;
+            /** @default unknown */
+            platform: components["schemas"]["Platform"];
+            /** Id */
+            id: number;
+            /** User Id */
+            user_id: number;
+            /** @default pending */
+            status: components["schemas"]["FeedbackStatus"];
+            /** Admin Notes */
+            admin_notes?: string | null;
+            /** Processed By */
+            processed_by?: number | null;
+            /** Processed At */
+            processed_at?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Updated At */
+            updated_at?: string | null;
+        };
+        /**
+         * UserFeedbackCreate
+         * @description 创建用户反馈模型
+         */
+        UserFeedbackCreate: {
+            /** Title */
+            title: string;
+            /** Content */
+            content: string;
+            /** @default suggestion */
+            feedback_type: components["schemas"]["FeedbackType"];
+            /** @default medium */
+            priority: components["schemas"]["FeedbackPriority"];
+            /** Contact Email */
+            contact_email?: string | null;
+            /** Contact Phone */
+            contact_phone?: string | null;
+            /** Device Info */
+            device_info?: string | null;
+            /** App Version */
+            app_version?: string | null;
+            /** @default unknown */
+            platform: components["schemas"]["Platform"];
+        };
+        /**
+         * UserFeedbackUpdate
+         * @description 更新用户反馈模型（用户只能更新自己的反馈）
+         */
+        UserFeedbackUpdate: {
+            /** Title */
+            title?: string | null;
+            /** Content */
+            content?: string | null;
+            /** Contact Email */
+            contact_email?: string | null;
+            /** Contact Phone */
+            contact_phone?: string | null;
+        };
+        /**
+         * UserFeedbackWithUser
+         * @description 包含用户信息的反馈模型
+         */
+        UserFeedbackWithUser: {
+            /** Title */
+            title: string;
+            /** Content */
+            content: string;
+            /** @default suggestion */
+            feedback_type: components["schemas"]["FeedbackType"];
+            /** @default medium */
+            priority: components["schemas"]["FeedbackPriority"];
+            /** Contact Email */
+            contact_email?: string | null;
+            /** Contact Phone */
+            contact_phone?: string | null;
+            /** Device Info */
+            device_info?: string | null;
+            /** App Version */
+            app_version?: string | null;
+            /** @default unknown */
+            platform: components["schemas"]["Platform"];
+            /** Id */
+            id: number;
+            /** User Id */
+            user_id: number;
+            /** @default pending */
+            status: components["schemas"]["FeedbackStatus"];
+            /** Admin Notes */
+            admin_notes?: string | null;
+            /** Processed By */
+            processed_by?: number | null;
+            /** Processed At */
+            processed_at?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Updated At */
+            updated_at?: string | null;
+            /** User */
+            user?: Record<string, never> | null;
         };
         /**
          * UserInfoResponse
@@ -5725,6 +6189,302 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_my_feedbacks_api_feedback_get: {
+        parameters: {
+            query?: {
+                /** @description 页码 */
+                page?: number;
+                /** @description 每页数量 */
+                page_size?: number;
+                /** @description 状态过滤 */
+                status?: components["schemas"]["FeedbackStatus"] | null;
+                /** @description 类型过滤 */
+                type?: components["schemas"]["FeedbackType"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_FeedbackListResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_feedback_api_feedback_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserFeedbackCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_FeedbackCreateResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_feedback_api_feedback__feedback_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                feedback_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_UserFeedback_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_feedback_api_feedback__feedback_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                feedback_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserFeedbackUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_FeedbackUpdateResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_feedback_api_feedback__feedback_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                feedback_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_dict_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_all_feedbacks_admin_api_admin_feedback_get: {
+        parameters: {
+            query?: {
+                /** @description 页码 */
+                page?: number;
+                /** @description 每页数量 */
+                page_size?: number;
+                /** @description 状态过滤 */
+                status?: components["schemas"]["FeedbackStatus"] | null;
+                /** @description 类型过滤 */
+                type?: components["schemas"]["FeedbackType"] | null;
+                /** @description 优先级过滤 */
+                priority?: components["schemas"]["FeedbackPriority"] | null;
+                /** @description 用户ID过滤 */
+                user_id?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_FeedbackListResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_feedback_admin_api_admin_feedback__feedback_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                feedback_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_UserFeedbackWithUser_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_feedback_admin_api_admin_feedback__feedback_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                feedback_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminFeedbackUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_FeedbackUpdateResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_feedback_stats_admin_api_admin_feedback_stats_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_FeedbackStatsResponse_"];
                 };
             };
         };

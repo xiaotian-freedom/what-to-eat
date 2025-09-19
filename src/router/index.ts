@@ -9,6 +9,7 @@ import FavoritePage from '@/views/FavoritePage.vue';
 import LoginPage from '@/views/LoginPage.vue';
 import RegisterPage from '@/views/RegisterPage.vue';
 import ForgotPasswordPage from '@/views/ForgotPasswordPage.vue';
+import FeedbackPage from '@/views/FeedbackPage.vue';
 const routes = [
   {
     path: '/',
@@ -62,6 +63,12 @@ const routes = [
     path: '/favorite',
     name: 'Favorite',
     component: FavoritePage,
+    meta: { transition: 'fade' },
+  },
+  {
+    path: '/feedback',
+    name: 'Feedback',
+    component: FeedbackPage,
     meta: { transition: 'fade' },
   },
 ];
