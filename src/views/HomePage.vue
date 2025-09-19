@@ -168,21 +168,31 @@
     // 添加GPU加速类
     document.body.classList.add('gpu-accelerated');
 
-    // 并行加载所有数据，提升初始化速度
+    // 分阶段加载数据，避免影响页面布局
+    // 第一阶段：加载关键数据（影响页面布局的数据）
     await Promise.allSettled([
+      // 加载模式设置（影响页面布局）
+      wheelModeStore.loadModeSettings(),
+      // 加载挑战数据（影响按钮状态）
+      challengeStore.loadChallengeData(),
+    ]);
+
+    // 等待DOM更新完成
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // 第二阶段：加载非关键数据（不影响页面布局的数据）
+    Promise.allSettled([
       // 加载开发模式状态
       devModeStore.loadDevModeState(),
-      // 加载挑战数据
-      challengeStore.loadChallengeData(),
-      // 加载模式设置
-      wheelModeStore.loadModeSettings(),
       // 加载食物数据
       foodStore.loadFoodItems(),
       // 初始化用户状态（包括AI使用次数信息）
       userStore.initializeUserState().catch(error => {
         console.error('初始化用户状态失败:', error);
       }),
-    ]);
+    ]).then(() => {
+      console.log('✅ 所有数据加载完成');
+    });
   });
 </script>
 

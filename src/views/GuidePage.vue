@@ -42,6 +42,7 @@
   const currentStep = ref(1);
   const isFlying = ref(false);
   const showHomePreview = ref(false);
+  const isTransitioning = ref(false);
 
   // 添加DOM引用
   const step1Ref = useTemplateRef('step1');
@@ -50,7 +51,9 @@
 
   // 切换到下一步
   const nextStep = step => {
-    if (currentStep.value === step) return;
+    if (currentStep.value === step || isTransitioning.value) return;
+
+    isTransitioning.value = true;
 
     // 使用ref获取当前步骤元素和目标步骤元素
     const stepsRefs = [null, '#step1', '#step2', '#step3'];
@@ -63,10 +66,12 @@
       wheelAnimation(currentEl, nextEl, () => {
         // 动画完全结束后才更新当前步骤
         currentStep.value = step;
+        isTransitioning.value = false;
       });
     } else {
       // 如果元素不存在，则直接更新步骤
       currentStep.value = step;
+      isTransitioning.value = false;
     }
   };
 

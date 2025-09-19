@@ -62,12 +62,7 @@
               <!-- 菜品列表示例 -->
               <div class="space-y-2 flex-1">
                 <div
-                  class="flex items-center bg-white bg-opacity-70 rounded-lg p-1.5 transform transition-all hover:scale-105"
-                  style="
-                    animation: fadeIn 0.5s ease-out forwards;
-                    opacity: 0;
-                    animation-delay: 0.2s;
-                  "
+                  class="flex items-center bg-white bg-opacity-70 rounded-lg p-1.5 transform transition-all hover:scale-105 fade-in-delay-1"
                 >
                   <div
                     class="w-8 h-8 rounded-lg overflow-hidden mr-2 pulse-animation"
@@ -82,12 +77,7 @@
                   <span class="text-xs font-medium text-gray-700">红烧肉</span>
                 </div>
                 <div
-                  class="flex items-center bg-white bg-opacity-70 rounded-lg p-1.5 transform transition-all hover:scale-105"
-                  style="
-                    animation: fadeIn 0.5s ease-out forwards;
-                    opacity: 0;
-                    animation-delay: 0.4s;
-                  "
+                  class="flex items-center bg-white bg-opacity-70 rounded-lg p-1.5 transform transition-all hover:scale-105 fade-in-delay-2"
                 >
                   <div
                     class="w-8 h-8 rounded-lg overflow-hidden mr-2 pulse-animation"
@@ -102,12 +92,7 @@
                   <span class="text-xs font-medium text-gray-700">麻婆豆腐</span>
                 </div>
                 <div
-                  class="flex items-center bg-white bg-opacity-70 rounded-lg p-1.5 transform transition-all hover:scale-105"
-                  style="
-                    animation: fadeIn 0.5s ease-out forwards;
-                    opacity: 0;
-                    animation-delay: 0.6s;
-                  "
+                  class="flex items-center bg-white bg-opacity-70 rounded-lg p-1.5 transform transition-all hover:scale-105 fade-in-delay-3"
                 >
                   <div
                     class="w-8 h-8 rounded-lg overflow-hidden mr-2 pulse-animation"
@@ -205,22 +190,13 @@
 
         <!-- 引导内容：文字说明 -->
         <div class="text-center z-10">
-          <h2
-            class="text-2xl font-bold text-gray-800 mb-2"
-            style="animation: popUp 0.5s ease-out forwards"
-          >
+          <h2 class="text-2xl font-bold text-gray-800 mb-2 pop-up-animation">
             {{ $t('guide.step2.title') }}
           </h2>
-          <p
-            class="text-gray-600 mb-1 text-sm"
-            style="animation: slideUp 0.5s ease-out forwards; animation-delay: 0.2s; opacity: 0"
-          >
+          <p class="text-gray-600 mb-1 text-sm slide-up-delay-1">
             {{ $t('guide.step2.subtitle1') }}
           </p>
-          <p
-            class="text-gray-600 text-sm"
-            style="animation: slideUp 0.5s ease-out forwards; animation-delay: 0.4s; opacity: 0"
-          >
+          <p class="text-gray-600 text-sm slide-up-delay-2">
             {{ $t('guide.step2.subtitle2') }}
           </p>
         </div>
@@ -248,7 +224,7 @@
 </template>
 
 <script setup>
-  import { watch, ref } from 'vue';
+  import { watch, ref, onMounted } from 'vue';
 
   const props = defineProps({
     isActive: {
@@ -266,20 +242,37 @@
   // 控制动画开始的变量
   const animationsEnabled = ref(false);
 
-  // 监听isActive变化，延迟启动动画
+  // 预加载外部图片资源
+  const preloadImages = () => {
+    const imageUrls = [
+      'https://images.unsplash.com/photo-1555126634-323283e090fa',
+      'https://images.unsplash.com/photo-1585032226651-759b368d7246',
+      'https://images.unsplash.com/photo-1512058556646-c4da40fba323',
+    ];
+
+    imageUrls.forEach(url => {
+      const img = new Image();
+      img.src = url;
+    });
+  };
+
+  onMounted(() => {
+    // 组件挂载时预加载图片
+    preloadImages();
+  });
+
+  // 监听isActive变化，优化动画启动时机
   watch(
     () => props.isActive,
     newVal => {
       if (newVal) {
-        // 当组件变为激活状态时，延迟300ms后启用动画
-        animationsEnabled.value = false;
-        setTimeout(() => {
-          animationsEnabled.value = true;
-        }, 300);
+        // 当组件变为激活状态时，立即启用动画（移除延迟）
+        animationsEnabled.value = true;
       } else {
         animationsEnabled.value = false;
       }
-    }
+    },
+    { immediate: true }
   );
 </script>
 
@@ -293,16 +286,40 @@
     animation: pulse 2s ease-in-out infinite;
   }
 
-  .animation-ready [style*='animation: fadeIn'] {
-    animation: fadeIn 0.5s ease-out forwards;
+  /* 优化后的动画类 */
+  .animation-ready .fade-in-delay-1 {
+    animation: fadeIn 0.4s ease-out forwards;
+    animation-delay: 0.1s;
+    opacity: 0;
   }
 
-  .animation-ready [style*='animation: slideUp'] {
-    animation: slideUp 0.5s ease-out forwards;
+  .animation-ready .fade-in-delay-2 {
+    animation: fadeIn 0.4s ease-out forwards;
+    animation-delay: 0.2s;
+    opacity: 0;
   }
 
-  .animation-ready [style*='animation: popUp'] {
-    animation: popUp 0.5s ease-out forwards;
+  .animation-ready .fade-in-delay-3 {
+    animation: fadeIn 0.4s ease-out forwards;
+    animation-delay: 0.3s;
+    opacity: 0;
+  }
+
+  .animation-ready .pop-up-animation {
+    animation: popUp 0.4s ease-out forwards;
+    opacity: 0;
+  }
+
+  .animation-ready .slide-up-delay-1 {
+    animation: slideUp 0.4s ease-out forwards;
+    animation-delay: 0.1s;
+    opacity: 0;
+  }
+
+  .animation-ready .slide-up-delay-2 {
+    animation: slideUp 0.4s ease-out forwards;
+    animation-delay: 0.2s;
+    opacity: 0;
   }
 
   /* 动画定义 */

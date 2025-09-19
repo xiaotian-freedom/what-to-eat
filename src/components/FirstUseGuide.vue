@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, nextTick, watch } from 'vue';
+  import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
 
   useI18n();
@@ -335,12 +335,19 @@
   // 更新气泡位置
   const updateBubblePosition = async () => {
     await nextTick();
+
+    // 添加延迟确保DOM完全渲染
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     const position = calculateBubblePosition();
     bubbleStyle.value = position;
 
     // 等待下一个tick确保bubbleStyle已更新
     await nextTick();
     tailStyle.value = calculateTailPosition();
+
+    // 验证位置是否正确，如果不正确则重试
+    await validateAndRetryPosition();
 
     // 详细调试信息
     const step = steps[currentStep.value];
@@ -445,8 +452,35 @@
 
   // 组件挂载时初始化位置
   onMounted(() => {
-    updateBubblePosition();
+    // 延迟初始化，确保父组件完全渲染
+    setTimeout(() => {
+      updateBubblePosition();
+    }, 200);
+
+    // 监听窗口大小变化，重新计算位置
+    window.addEventListener('resize', handleWindowResize);
+    window.addEventListener('orientationchange', handleWindowResize);
   });
+
+  // 组件卸载时清理事件监听器
+  onUnmounted(() => {
+    window.removeEventListener('resize', handleWindowResize);
+    window.removeEventListener('orientationchange', handleWindowResize);
+  });
+
+  // 防抖定时器
+  let resizeTimeout: number | null = null;
+
+  // 处理窗口大小变化
+  const handleWindowResize = () => {
+    // 防抖处理，避免频繁重新计算
+    if (resizeTimeout) {
+      clearTimeout(resizeTimeout);
+    }
+    resizeTimeout = setTimeout(() => {
+      updateBubblePosition();
+    }, 300);
+  };
 
   // 手动调整气泡位置（用于调试）
   const adjustBubblePosition = (adjustments: { left?: number; top?: number }) => {
@@ -459,6 +493,59 @@
       left: `${currentLeft + (adjustments.left || 0)}px`,
       top: `${currentTop + (adjustments.top || 0)}px`,
     };
+  };
+
+  // 验证位置是否正确，如果不正确则重试
+  const validateAndRetryPosition = async (retryCount = 0) => {
+    const maxRetries = 3;
+    const step = steps[currentStep.value];
+    const targetElement = props.targetElements?.[step.target as keyof typeof props.targetElements];
+
+    if (!targetElement) {
+      console.warn('⚠️ 目标元素不存在，跳过位置验证');
+      return;
+    }
+
+    const currentStyle = bubbleStyle.value as { left?: string; top?: string };
+    const bubbleLeft = parseInt(currentStyle.left || '0') || 0;
+    const bubbleTop = parseInt(currentStyle.top || '0') || 0;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // 检查位置是否合理
+    const isPositionValid =
+      bubbleLeft >= 0 &&
+      bubbleTop >= 0 &&
+      bubbleLeft + 240 <= viewportWidth &&
+      bubbleTop + 150 <= viewportHeight &&
+      bubbleLeft < viewportWidth &&
+      bubbleTop < viewportHeight;
+
+    if (!isPositionValid && retryCount < maxRetries) {
+      console.warn(`⚠️ 气泡位置异常，第${retryCount + 1}次重试:`, {
+        position: { left: bubbleLeft, top: bubbleTop },
+        viewport: { width: viewportWidth, height: viewportHeight },
+        isValid: isPositionValid,
+      });
+
+      // 等待一段时间后重试
+      await new Promise(resolve => setTimeout(resolve, 200 * (retryCount + 1)));
+
+      // 重新计算位置
+      const newPosition = calculateBubblePosition();
+      bubbleStyle.value = newPosition;
+
+      await nextTick();
+      tailStyle.value = calculateTailPosition();
+
+      // 递归重试
+      await validateAndRetryPosition(retryCount + 1);
+    } else if (!isPositionValid) {
+      console.error('🚨 多次重试后位置仍然异常，使用紧急修复');
+      emergencyFixPosition();
+    } else {
+      console.log('✅ 气泡位置验证通过');
+    }
   };
 
   // 紧急修复位置（如果气泡跑到屏幕外）

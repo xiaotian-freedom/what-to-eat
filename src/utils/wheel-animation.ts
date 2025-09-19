@@ -36,8 +36,8 @@ export function wheelAnimation(
   tl.to(currentElement, {
     rotationY: -90,
     opacity: 0,
-    duration: 0.3,
-    ease: 'power1.inOut',
+    duration: 0.25,
+    ease: 'power2.inOut',
     onComplete: () => {
       // 执行回调函数(如果有)
       if (typeof callback === 'function') {
@@ -46,11 +46,15 @@ export function wheelAnimation(
     },
   });
 
-  // 第二阶段动画：显示下一个元素，但在第一个元素旋转到一半时开始
-  tl.to(nextElement, {
-    rotationY: 0,
-    opacity: 1,
-    duration: 0.3,
-    ease: 'power1.inOut',
-  }); // 关键点：这个参数使第二个动画在第一个动画完成前0.25秒就开始
+  // 第二阶段动画：显示下一个元素，在第一个元素旋转到一半时开始
+  tl.to(
+    nextElement,
+    {
+      rotationY: 0,
+      opacity: 1,
+      duration: 0.25,
+      ease: 'power2.out',
+    },
+    '-=0.15'
+  ); // 在第一个动画完成前0.15秒开始，减少重叠时间
 }

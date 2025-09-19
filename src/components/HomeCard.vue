@@ -243,19 +243,72 @@
   const canUseToday = computed(() => challengeStore.canUseToday);
 
   // 页面加载时确保数据已经加载
-  onMounted(() => {
+  onMounted(async () => {
+    // 先加载基础数据
     challengeStore.loadChallengeData();
     wheelModeStore.loadModeSettings();
     userPreferenceStore.loadUserPreference();
 
     // 检查是否需要显示首次使用引导
     if (userPreferenceStore.isFirstTimeUser) {
-      // 延迟显示引导，确保页面完全加载
-      setTimeout(() => {
+      // 等待DOM完全渲染和所有数据加载完成
+      await waitForDOMReady();
+
+      // 再次检查目标元素是否可用
+      if (isTargetElementsReady()) {
         showFirstUseGuide.value = true;
-      }, 1000);
+      } else {
+        // 如果目标元素还没准备好，继续等待
+        setTimeout(async () => {
+          await waitForTargetElements();
+          showFirstUseGuide.value = true;
+        }, 500);
+      }
     }
   });
+
+  // 等待DOM完全准备好的辅助函数
+  const waitForDOMReady = (): Promise<void> => {
+    return new Promise(resolve => {
+      if (document.readyState === 'complete') {
+        resolve();
+      } else {
+        const checkReady = () => {
+          if (document.readyState === 'complete') {
+            resolve();
+          } else {
+            setTimeout(checkReady, 100);
+          }
+        };
+        checkReady();
+      }
+    });
+  };
+
+  // 检查目标元素是否准备好
+  const isTargetElementsReady = (): boolean => {
+    const elements = targetElements.value;
+    return !!(
+      elements.addButton &&
+      elements.randomButton &&
+      elements.listButton &&
+      elements.menuButton
+    );
+  };
+
+  // 等待目标元素准备好
+  const waitForTargetElements = (): Promise<void> => {
+    return new Promise(resolve => {
+      const checkElements = () => {
+        if (isTargetElementsReady()) {
+          resolve();
+        } else {
+          setTimeout(checkElements, 100);
+        }
+      };
+      checkElements();
+    });
+  };
 
   // 处理随机选菜
   const handleRandomFood = async () => {
