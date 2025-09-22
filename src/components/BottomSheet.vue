@@ -13,8 +13,9 @@
     <Transition name="slide-up">
       <div
         v-if="visible"
+        ref="bottomSheetRef"
         class="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl theme-transition"
-        :class="[customClass]"
+        :class="[customClass, { 'keyboard-visible': isKeyboardVisible }]"
         :style="{
           maxHeight: maxHeight,
           background: backgroundStyle.background,
@@ -90,7 +91,8 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import { computed, ref, watch, nextTick } from 'vue';
+  import { useBottomSheetKeyboardAdaptation } from '@/composables/useKeyboardAdaptation';
 
   interface Props {
     visible: boolean;
@@ -104,6 +106,7 @@
     showCloseButton?: boolean;
     titleColor?: string;
     closeButtonColor?: string;
+    enableKeyboardAdaptation?: boolean;
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -117,7 +120,12 @@
     showCloseButton: true,
     titleColor: undefined,
     closeButtonColor: undefined,
+    enableKeyboardAdaptation: true,
   });
+
+  // 键盘适配
+  const { isKeyboardVisible, adjustBottomSheetHeight } = useBottomSheetKeyboardAdaptation();
+  const bottomSheetRef = ref<HTMLElement | null>(null);
 
   // 计算背景样式
   const backgroundStyle = computed((): Record<string, string> => {
@@ -132,6 +140,19 @@
       return { backgroundColor: props.backgroundColor };
     }
   });
+
+  // 监听键盘状态变化，调整 BottomSheet 高度
+  watch(
+    [() => props.visible, isKeyboardVisible],
+    ([visible, keyboardVisible]) => {
+      if (visible && props.enableKeyboardAdaptation && bottomSheetRef.value) {
+        nextTick(() => {
+          adjustBottomSheetHeight(bottomSheetRef.value!, props.maxHeight);
+        });
+      }
+    },
+    { immediate: true }
+  );
 
   const emit = defineEmits<{
     (e: 'close'): void;
@@ -177,5 +198,15 @@
 
   .close-button:active {
     transform: scale(0.95);
+  }
+
+  /* 键盘适配样式 */
+  .keyboard-visible {
+    transition: all 0.3s ease;
+  }
+
+  /* 当键盘弹起时，确保内容区域可以滚动 */
+  .keyboard-visible .overflow-y-auto {
+    max-height: calc(100% - 60px);
   }
 </style>

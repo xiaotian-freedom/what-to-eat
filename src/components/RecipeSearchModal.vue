@@ -4,6 +4,7 @@
     maxHeight="60vh"
     :title="$t('recipe.searchTitle')"
     backgroundStyle="linear-gradient(135deg, var(--color-background), var(--color-surface))"
+    :enableKeyboardAdaptation="true"
     @close="$emit('close')"
   >
     <div class="space-y-6">
@@ -22,6 +23,7 @@
             }"
             @keyup.enter="handleSearch"
             @input="handleInput"
+            @focus="handleInputFocus"
             ref="inputRef"
           />
           <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -100,6 +102,7 @@
 <script setup lang="ts">
   import { ref, watch, nextTick } from 'vue';
   import BottomSheet from './BottomSheet.vue';
+  import { useKeyboardAdaptation } from '@/composables/useKeyboardAdaptation';
 
   interface Props {
     visible: boolean;
@@ -116,6 +119,9 @@
   const dishName = ref('');
   const loading = ref(false);
   const inputRef = ref<HTMLInputElement | null>(null);
+
+  // 键盘适配
+  const { scrollToInput } = useKeyboardAdaptation();
 
   // 最近搜索历史
   const recentSearches = ref<string[]>([]);
@@ -184,6 +190,10 @@
         loadRecentSearches();
         nextTick(() => {
           inputRef.value?.focus();
+          // 如果输入框聚焦，确保它可见
+          if (inputRef.value) {
+            scrollToInput(inputRef.value);
+          }
         });
       } else {
         // 关闭时清空输入
@@ -196,6 +206,16 @@
   // 处理输入
   const handleInput = () => {
     // 可以在这里添加输入验证逻辑
+  };
+
+  // 处理输入框聚焦
+  const handleInputFocus = () => {
+    if (inputRef.value) {
+      // 延迟一下确保键盘弹起
+      setTimeout(() => {
+        scrollToInput(inputRef.value!);
+      }, 300);
+    }
   };
 
   // 选择热门菜品
