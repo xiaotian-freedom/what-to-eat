@@ -154,7 +154,7 @@ export function useKeyboardAdaptation() {
  * 专门用于 BottomSheet 的键盘适配
  */
 export function useBottomSheetKeyboardAdaptation() {
-  const { isKeyboardVisible, keyboardHeight, adjustContainerHeight } = useKeyboardAdaptation();
+  const { isKeyboardVisible, keyboardHeight } = useKeyboardAdaptation();
 
   const adjustBottomSheetHeight = (bottomSheetElement: HTMLElement, originalMaxHeight: string) => {
     if (!bottomSheetElement) return;

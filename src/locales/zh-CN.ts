@@ -142,6 +142,7 @@ export default {
   'recipe.detail.preparing': '准备中...',
   'recipe.detail.retry': '重新获取',
   'recipe.detail.shareRecipe': '分享做法',
+  'recipe.detail.shareAsImage': '生成图片分享',
   'recipe.detail.saveRecipe': '收藏做法',
   'recipe.detail.recipeSaved': '做法已收藏',
   'recipe.detail.alreadySaved': '已经收藏过了',
@@ -150,13 +151,13 @@ export default {
   'recipe.detail.shareText': '🍳 {dishName} 的做法\n\n{content}\n\n✨ 来自"今天吃什么"应用',
 
   // 菜谱内容部分
-  'recipe.content.introduction': '📖 菜品介绍',
-  'recipe.content.ingredients': '🥬 食材清单',
-  'recipe.content.steps': '👨‍🍳 制作步骤',
-  'recipe.content.tips': '💡 烹饪小贴士',
-  'recipe.content.nutrition': '🥗 营养价值',
-  'recipe.content.tip': '💡 小贴士：{tip}',
-  'recipe.content.estimatedTime': '⏱️ 预计时间：{time}',
+  'recipe.content.introduction': '菜品介绍',
+  'recipe.content.ingredients': '食材清单',
+  'recipe.content.steps': '制作步骤',
+  'recipe.content.tips': '烹饪小贴士',
+  'recipe.content.nutrition': '营养价值',
+  'recipe.content.tip': '小贴士：{tip}',
+  'recipe.content.estimatedTime': '预计时间：{time}',
 
   // 分享内容
   'recipe.share.introduction': '📖 介绍：{intro}',

@@ -144,7 +144,7 @@
   // 监听键盘状态变化，调整 BottomSheet 高度
   watch(
     [() => props.visible, isKeyboardVisible],
-    ([visible, keyboardVisible]) => {
+    ([visible]) => {
       if (visible && props.enableKeyboardAdaptation && bottomSheetRef.value) {
         nextTick(() => {
           adjustBottomSheetHeight(bottomSheetRef.value!, props.maxHeight);

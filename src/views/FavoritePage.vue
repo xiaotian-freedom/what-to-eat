@@ -4,7 +4,7 @@
     :class="`theme-gradient-${themeStore.currentTheme}`"
   >
     <!-- 卡片容器 -->
-    <div class="card-container w-full h-[70vh] max-w-md">
+    <div class="card-container w-full h-[80vh] max-w-md">
       <!-- 收藏卡片 -->
       <div
         class="card-face bg-white rounded-3xl shadow-xl overflow-hidden border-8 border-gray-100 relative flex flex-col w-full h-full"
@@ -15,7 +15,7 @@
         <!-- 内容区域 -->
         <div class="flex-1 flex flex-col p-6 overflow-y-auto">
           <!-- 收藏统计 -->
-          <div class="mb-4">
+          <!-- <div class="mb-4">
             <div class="text-center">
               <div class="text-3xl mb-2">❤️</div>
               <h2 class="text-xl font-semibold text-gray-800">{{ $t('favorite.title') }}</h2>
@@ -23,7 +23,7 @@
                 {{ $t('favorite.count', { count: favoriteStore.favoriteCount }) }}
               </p>
             </div>
-          </div>
+          </div> -->
 
           <!-- 收藏列表 -->
           <div v-if="favoriteStore.hasFavorites" class="space-y-3">

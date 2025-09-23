@@ -134,6 +134,7 @@ export default {
   'recipe.detail.preparing': 'Preparing...',
   'recipe.detail.retry': 'Retry',
   'recipe.detail.shareRecipe': 'Share Recipe',
+  'recipe.detail.shareAsImage': 'Share as Image',
   'recipe.detail.saveRecipe': 'Save Recipe',
   'recipe.detail.recipeSaved': 'Recipe saved',
   'recipe.detail.alreadySaved': 'Already saved',
@@ -142,12 +143,12 @@ export default {
   'recipe.detail.shareText': '🍳 {dishName} Recipe\n\n{content}\n\n✨ From "What to Eat Today" app',
 
   // Recipe content sections
-  'recipe.content.introduction': '📖 Introduction',
-  'recipe.content.ingredients': '🥬 Ingredients',
-  'recipe.content.steps': '👨‍🍳 Cooking Steps',
-  'recipe.content.tips': '💡 Cooking Tips',
-  'recipe.content.nutrition': '🥗 Nutrition',
-  'recipe.content.tip': '💡 Tip: {tip}',
+  'recipe.content.introduction': 'Introduction',
+  'recipe.content.ingredients': 'Ingredients',
+  'recipe.content.steps': 'Cooking Steps',
+  'recipe.content.tips': 'Cooking Tips',
+  'recipe.content.nutrition': 'Nutrition',
+  'recipe.content.tip': 'Tip: {tip}',
   'recipe.content.estimatedTime': '⏱️ Estimated time: {time}',
 
   // Share content

@@ -221,7 +221,7 @@
       </div>
 
       <!-- 做法内容 -->
-      <div v-else-if="recipe" class="space-y-6">
+      <div v-else-if="recipe" ref="recipeContentRef" class="space-y-6">
         <!-- 菜品介绍 -->
         <div v-if="recipe.introduction" class="rounded-xl p-4 shadow-sm recipe-content-card">
           <h3 class="text-lg font-semibold mb-2 flex items-center recipe-content-title">
@@ -317,8 +317,8 @@
           @click="shareRecipe"
           class="flex-1 py-3 text-white rounded-xl font-medium transition-all duration-200 flex items-center justify-center space-x-2 recipe-share-button"
         >
-          <span>📤</span>
-          <span>{{ t('recipe.detail.shareRecipe') }}</span>
+          <span>🖼️</span>
+          <span>{{ t('recipe.detail.shareAsImage') }}</span>
         </button>
         <button
           @click="saveRecipe"
@@ -333,11 +333,13 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import { computed, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import BottomSheet from './BottomSheet.vue';
   import { showSuccessToast } from 'vant';
   import { useFavoriteStore } from '@/stores/favorite';
+  import { ImageShareUtil } from '@/utils/imageShare';
+  import { VuePageToImage } from '@/utils/pageToImage';
 
   // 食材接口
   interface Ingredient {
@@ -382,6 +384,9 @@
   const { t } = useI18n();
   const favoriteStore = useFavoriteStore();
 
+  // 菜谱内容区域的引用
+  const recipeContentRef = ref<HTMLElement | null>(null);
+
   // 计算预计时间
   const estimatedTime = computed(() => {
     return props.recipe?.estimatedTime || '约30分钟';
@@ -392,56 +397,26 @@
     return props.recipe?.difficulty || '中等';
   });
 
-  // 分享做法
-  const shareRecipe = () => {
-    if (!props.recipe) return;
+  // 分享做法 - 生成图片分享
+  const shareRecipe = async () => {
+    if (!props.recipe || !recipeContentRef.value) return;
 
-    // 构建分享文本
-    let content = '';
-
-    if (props.recipe.introduction) {
-      content += `${t('recipe.share.introduction', { intro: props.recipe.introduction })}\n\n`;
-    }
-
-    if (props.recipe.ingredients && props.recipe.ingredients.length > 0) {
-      content += `${t('recipe.share.ingredients')}\n`;
-      props.recipe.ingredients.forEach(ingredient => {
-        content += `• ${ingredient.name} ${ingredient.amount}\n`;
-      });
-      content += '\n';
-    }
-
-    if (props.recipe.steps && props.recipe.steps.length > 0) {
-      content += `${t('recipe.share.steps')}\n`;
-      props.recipe.steps.forEach((step, index) => {
-        content += `${index + 1}. ${step.description}\n`;
-      });
-    }
-
-    const shareText = t('recipe.detail.shareText', {
-      dishName: props.dishName,
-      content,
+    const converter = new VuePageToImage({
+      // 可以在这里针对性地配置，比如设置背景色
+      backgroundColor: '#f5f5f5',
     });
 
-    // 使用 Web Share API 或复制到剪贴板
-    if (navigator.share) {
-      navigator
-        .share({
-          title: t('recipe.detail.title', { dishName: props.dishName }),
-          text: shareText,
-        })
-        .catch(console.error);
-    } else {
-      // 复制到剪贴板
-      navigator.clipboard
-        .writeText(shareText)
-        .then(() => {
-          showSuccessToast(t('recipe.detail.recipeCopied'));
-        })
-        .catch(() => {
-          console.log('分享内容：', shareText);
-          showSuccessToast(t('recipe.detail.recipeReady'));
-        });
+    const result = await converter.convert(recipeContentRef.value);
+
+    if (result.dataUrl) {
+      // 成功获取到图片数据
+      console.log('Generated image data URL:', result.dataUrl);
+
+      // 可以选择下载图片
+      // converter.downloadImage(result.dataUrl, 'my-page.png');
+      await ImageShareUtil.shareImageBlob(result.blob as Blob, `${props.dishName}-菜谱.png`);
+    } else if (result.error) {
+      console.error('Failed to convert to image:', result.error);
     }
   };
 

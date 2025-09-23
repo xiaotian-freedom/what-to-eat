@@ -175,7 +175,7 @@
             </div>
 
             <!-- 我的收藏 -->
-            <!-- <div
+            <div
               @click="handleFavoriteClick"
               class="bg-gradient-to-r from-pink-50 to-red-50 rounded-2xl p-4 border border-pink-100 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-95"
             >
@@ -191,7 +191,7 @@
                   <span class="text-red-400 text-xl">›</span>
                 </div>
               </div>
-            </div> -->
+            </div>
 
             <!-- 问题反馈 -->
             <div
@@ -347,7 +347,9 @@
   import { useFavoriteStore } from '@/stores/favorite';
   import { useLoading } from '@/composables/useLoading';
   import { useLoginPrompt } from '@/composables/useLoginPrompt';
+  import { useRouter } from 'vue-router';
 
+  const router = useRouter();
   const devModeStore = useDevModeStore();
   const themeStore = useThemeStore();
   const wheelModeStore = useWheelModeStore();
@@ -457,11 +459,11 @@
   };
 
   // 处理收藏点击
-  // const handleFavoriteClick = () => {
-  //   if (userStore.isAuthenticated) {
-  //     router.push('/favorite');
-  //   } else {
-  //     goToLogin();
-  //   }
-  // };
+  const handleFavoriteClick = () => {
+    if (userStore.isAuthenticated) {
+      router.push('/favorite');
+    } else {
+      showLoginPromptModal();
+    }
+  };
 </script>
