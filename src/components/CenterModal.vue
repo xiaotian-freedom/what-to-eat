@@ -143,7 +143,7 @@
     ([visible]) => {
       if (visible && props.enableKeyboardAdaptation && modalRef.value) {
         nextTick(() => {
-          //   adjustContainerHeight(modalRef.value!, props.maxHeight);
+          adjustContainerHeight(modalRef.value!, props.maxHeight);
         });
       }
     },
