@@ -1,10 +1,10 @@
 <template>
-  <BottomSheet
+  <CenterModal
     :visible="visible"
-    maxHeight="60vh"
+    maxHeight="70vh"
     :title="$t('recipe.searchTitle')"
     backgroundStyle="linear-gradient(135deg, var(--color-background), var(--color-surface))"
-    :enableKeyboardAdaptation="true"
+    :enableKeyboardAdaptation="false"
     @close="$emit('close')"
   >
     <div class="space-y-6">
@@ -77,7 +77,7 @@
       </div>
 
       <!-- 热门推荐 -->
-      <div v-if="!dishName.trim()" class="space-y-3">
+      <div class="space-y-3">
         <h3 class="text-sm font-medium recipe-popular-title">{{ $t('recipe.popularDishes') }}</h3>
         <div class="grid grid-cols-2 gap-2">
           <button
@@ -96,13 +96,13 @@
         </div>
       </div>
     </div>
-  </BottomSheet>
+  </CenterModal>
 </template>
 
 <script setup lang="ts">
-  import { ref, watch, nextTick } from 'vue';
-  import BottomSheet from './BottomSheet.vue';
-  import { useKeyboardAdaptation } from '@/composables/useKeyboardAdaptation';
+  import { ref, watch } from 'vue';
+  import CenterModal from './CenterModal.vue';
+  // import { useKeyboardAdaptation } from '@/composables/useKeyboardAdaptation';
 
   interface Props {
     visible: boolean;
@@ -121,7 +121,7 @@
   const inputRef = ref<HTMLInputElement | null>(null);
 
   // 键盘适配
-  const { scrollToInput } = useKeyboardAdaptation();
+  // const { scrollToInput } = useKeyboardAdaptation();
 
   // 最近搜索历史
   const recentSearches = ref<string[]>([]);
@@ -188,13 +188,13 @@
       if (newVisible) {
         // 加载最近搜索历史
         loadRecentSearches();
-        nextTick(() => {
-          inputRef.value?.focus();
-          // 如果输入框聚焦，确保它可见
-          if (inputRef.value) {
-            scrollToInput(inputRef.value);
-          }
-        });
+        // nextTick(() => {
+        //   inputRef.value?.focus();
+        //   // 如果输入框聚焦，确保它可见
+        //   if (inputRef.value) {
+        //     scrollToInput(inputRef.value);
+        //   }
+        // });
       } else {
         // 关闭时清空输入
         dishName.value = '';
@@ -210,12 +210,12 @@
 
   // 处理输入框聚焦
   const handleInputFocus = () => {
-    if (inputRef.value) {
-      // 延迟一下确保键盘弹起
-      setTimeout(() => {
-        scrollToInput(inputRef.value!);
-      }, 300);
-    }
+    // if (inputRef.value) {
+    //   // 延迟一下确保键盘弹起
+    //   setTimeout(() => {
+    //     scrollToInput(inputRef.value!);
+    //   }, 300);
+    // }
   };
 
   // 选择热门菜品
