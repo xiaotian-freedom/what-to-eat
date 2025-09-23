@@ -782,11 +782,30 @@ ${foodListStr}${recentChoicesStr}
 
               if (data === '[DONE]') {
                 // 流式传输完成
+                // 清理内容，移除可能的 markdown 代码块标记
+                let cleanedContent = fullContent.trim();
+
+                // 移除 markdown 代码块标记
+                if (cleanedContent.startsWith('```json')) {
+                  cleanedContent = cleanedContent.replace(/^```json\s*/, '');
+                }
+                if (cleanedContent.startsWith('```')) {
+                  cleanedContent = cleanedContent.replace(/^```\s*/, '');
+                }
+                if (cleanedContent.endsWith('```')) {
+                  cleanedContent = cleanedContent.replace(/\s*```$/, '');
+                }
+
+                // 再次清理首尾空白
+                cleanedContent = cleanedContent.trim();
+
                 try {
-                  const recipe = JSON.parse(fullContent);
+                  const recipe = JSON.parse(cleanedContent);
                   onComplete(recipe);
                 } catch (parseError) {
                   console.error('解析完整菜谱失败:', parseError);
+                  console.error('原始内容:', fullContent);
+                  console.error('清理后内容:', cleanedContent);
                   onError('解析菜谱数据失败');
                 }
                 return;
@@ -1180,11 +1199,30 @@ ${foodListStr}${recentChoicesStr}
 
               if (data === '[DONE]') {
                 // 流式传输完成
+                // 清理内容，移除可能的 markdown 代码块标记
+                let cleanedContent = fullContent.trim();
+
+                // 移除 markdown 代码块标记
+                if (cleanedContent.startsWith('```json')) {
+                  cleanedContent = cleanedContent.replace(/^```json\s*/, '');
+                }
+                if (cleanedContent.startsWith('```')) {
+                  cleanedContent = cleanedContent.replace(/^```\s*/, '');
+                }
+                if (cleanedContent.endsWith('```')) {
+                  cleanedContent = cleanedContent.replace(/\s*```$/, '');
+                }
+
+                // 再次清理首尾空白
+                cleanedContent = cleanedContent.trim();
+
                 try {
-                  const recipe = JSON.parse(fullContent);
+                  const recipe = JSON.parse(cleanedContent);
                   onComplete(recipe);
                 } catch (parseError) {
                   console.error('解析完整菜谱失败:', parseError);
+                  console.error('原始内容:', fullContent);
+                  console.error('清理后内容:', cleanedContent);
                   onError('解析菜谱数据失败');
                 }
                 return;
